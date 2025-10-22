@@ -1,0 +1,771 @@
+# DDD System Architecture Schema Definition
+# Version 1.0.0
+# Purpose: Formal YAML schema for modeling software systems using Domain-Driven Design patterns
+
+# schema_version: "1.0.0"
+schema_name: "DDD System Architecture Schema"
+description: "YAML schema for describing system architecture using Domain-Driven Design strategic and tactical patterns"
+
+metadata:
+  author: "Marina Music"
+  created: "2025-10-04"
+  license: "MIT"
+  references:
+    - "Eric Evans - Domain-Driven Design (2003)"
+    - "Vaughn Vernon - Implementing Domain-Driven Design (2013)"
+    - "Martin Fowler - Patterns of Enterprise Application Architecture (2002)"
+
+# ============================================================================
+# NAMING CONVENTIONS
+# ============================================================================
+naming_conventions:
+  domain_id: "dom_<name>"
+  bounded_context_id: "bc_<name>"
+  aggregate_id: "agg_<name>"
+  entity_id: "ent_<name>"
+  value_object_id: "vo_<name>"
+  repository_id: "repo_<name>"
+  domain_service_id: "svc_dom_<name>"
+  application_service_id: "svc_app_<name>"
+  factory_id: "factory_<name>"
+  domain_event_id: "evt_<name>"
+  specification_id: "spec_<name>"
+  context_mapping_id: "cm_<source>_to_<target>"
+
+# ============================================================================
+# TYPE DEFINITIONS
+# ============================================================================
+$defs:
+
+  # --------------------------------------------------------------------------
+  # STRATEGIC PATTERNS
+  # --------------------------------------------------------------------------
+
+  system:
+    type: object
+    description: "The entire software system being modeled"
+    required: [id, name, domains]
+    properties:
+      id:
+        type: string
+        description: "Unique system identifier"
+      name:
+        type: string
+        description: "System name"
+      description:
+        type: string
+        description: "What this system does"
+      version:
+        type: string
+        description: "System version"
+      domains:
+        type: array
+        description: "All domains in the system"
+        items:
+          type: reference
+          ref_type: domain
+      bounded_contexts:
+        type: array
+        description: "All bounded contexts in system"
+        items:
+          type: reference
+          ref_type: bounded_context
+      context_mappings:
+        type: array
+        description: "Relationships between bounded contexts"
+        items:
+          type: reference
+          ref_type: context_mapping
+
+  domain:
+    type: object
+    description: "A sphere of knowledge and activity around which the system is organized"
+    required: [id, name, type]
+    properties:
+      id:
+        type: string
+        pattern: "^dom_[a-z0-9_]+$"
+        description: "Unique domain identifier"
+      name:
+        type: string
+        description: "Domain name from ubiquitous language"
+      type:
+        type: enum
+        values: [core, supporting, generic]
+        description: "Domain classification"
+      description:
+        type: string
+        description: "What this domain encompasses"
+      strategic_importance:
+        type: enum
+        values: [critical, important, standard, low]
+        description: "Business importance level"
+      bounded_contexts:
+        type: array
+        description: "Bounded contexts within this domain"
+        items:
+          type: reference
+          ref_type: bounded_context
+      investment_strategy:
+        type: string
+        description: "How much to invest (best team, adequate, minimal, outsource)"
+      notes:
+        type: string
+        description: "Additional context about this domain"
+
+  bounded_context:
+    type: object
+    description: "Explicit boundary within which a domain model is defined and applicable"
+    required: [id, name, domain_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: "Unique bounded context identifier"
+      name:
+        type: string
+        description: "Context name from ubiquitous language"
+      domain_ref:
+        type: reference
+        ref_type: domain
+        description: "Parent domain"
+      description:
+        type: string
+        description: "Purpose and scope of this context"
+      ubiquitous_language:
+        type: object
+        description: "Key terms and definitions specific to this context"
+        properties:
+          glossary:
+            type: array
+            items:
+              type: object
+              properties:
+                term: {type: string}
+                definition: {type: string}
+                examples: {type: array, items: {type: string}}
+      team_ownership:
+        type: string
+        description: "Team responsible for this context"
+      aggregates:
+        type: array
+        description: "Aggregates in this context"
+        items:
+          type: reference
+          ref_type: aggregate
+      repositories:
+        type: array
+        description: "Repositories in this context"
+        items:
+          type: reference
+          ref_type: repository
+      domain_services:
+        type: array
+        description: "Domain services in this context"
+        items:
+          type: reference
+          ref_type: domain_service
+      application_services:
+        type: array
+        description: "Application services in this context"
+        items:
+          type: reference
+          ref_type: application_service
+      domain_events:
+        type: array
+        description: "Domain events published by this context"
+        items:
+          type: reference
+          ref_type: domain_event
+      factories:
+        type: array
+        description: "Factories in this context"
+        items:
+          type: reference
+          ref_type: factory
+
+  context_mapping:
+    type: object
+    description: "Relationship between two bounded contexts"
+    required: [id, upstream_context, downstream_context, relationship_type]
+    properties:
+      id:
+        type: string
+        pattern: "^cm_[a-z0-9_]+_to_[a-z0-9_]+$"
+        description: "Unique mapping identifier"
+      upstream_context:
+        type: reference
+        ref_type: bounded_context
+        description: "Context that influences"
+      downstream_context:
+        type: reference
+        ref_type: bounded_context
+        description: "Context that is influenced"
+      relationship_type:
+        type: enum
+        values:
+          - partnership
+          - shared_kernel
+          - customer_supplier
+          - conformist
+          - anti_corruption_layer
+          - open_host_service
+          - published_language
+          - separate_ways
+          - big_ball_of_mud
+        description: "Type of relationship between contexts"
+      integration_pattern:
+        type: string
+        description: "How integration is implemented (REST API, messaging, shared DB, etc.)"
+      translation_map:
+        type: object
+        description: "How concepts translate between contexts"
+      shared_elements:
+        type: array
+        description: "For shared kernel - what is shared"
+        items: {type: string}
+      acl_details:
+        type: object
+        description: "For anti-corruption layer - implementation details"
+        properties:
+          facades: {type: array, items: {type: string}}
+          adapters: {type: array, items: {type: string}}
+          translators: {type: array, items: {type: string}}
+      notes:
+        type: string
+        description: "Additional context about this mapping"
+
+  # --------------------------------------------------------------------------
+  # TACTICAL PATTERNS - Aggregates
+  # --------------------------------------------------------------------------
+
+  aggregate:
+    type: object
+    description: "Cluster of entities and value objects with defined consistency boundary"
+    required: [id, name, bounded_context_ref, root_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^agg_[a-z0-9_]+$"
+        description: "Unique aggregate identifier"
+      name:
+        type: string
+        description: "Aggregate name from ubiquitous language"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Bounded context this aggregate belongs to"
+      root_ref:
+        type: reference
+        ref_type: entity
+        description: "The aggregate root entity"
+      entities:
+        type: array
+        description: "Entities within this aggregate (including root)"
+        items:
+          type: reference
+          ref_type: entity
+      value_objects:
+        type: array
+        description: "Value objects within this aggregate"
+        items:
+          type: reference
+          ref_type: value_object
+      consistency_rules:
+        type: array
+        description: "Business rules that must be consistent"
+        items: {type: string}
+      invariants:
+        type: array
+        description: "Conditions that must always be true"
+        items: {type: string}
+      lifecycle_hooks:
+        type: object
+        description: "Lifecycle events and handlers"
+        properties:
+          on_create: {type: array, items: {type: string}}
+          on_update: {type: array, items: {type: string}}
+          on_delete: {type: array, items: {type: string}}
+      size_estimate:
+        type: enum
+        values: [small, medium, large]
+        description: "Aggregate size (prefer small)"
+
+  entity:
+    type: object
+    description: "Object with unique identity and lifecycle"
+    required: [id, name, bounded_context_ref, identity_field]
+    properties:
+      id:
+        type: string
+        pattern: "^ent_[a-z0-9_]+$"
+        description: "Unique entity definition identifier"
+      name:
+        type: string
+        description: "Entity name from ubiquitous language"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Context this entity belongs to"
+      aggregate_ref:
+        type: reference
+        ref_type: aggregate
+        description: "Aggregate this entity belongs to"
+      is_aggregate_root:
+        type: boolean
+        description: "True if this entity is an aggregate root"
+      identity_field:
+        type: string
+        description: "Field name that serves as identity"
+      identity_generation:
+        type: enum
+        values: [user_provided, auto_generated, derived, external]
+        description: "How identity is generated"
+      attributes:
+        type: array
+        description: "Entity attributes"
+        items:
+          type: object
+          properties:
+            name: {type: string}
+            type: {type: string}
+            value_object_ref: {type: reference, ref_type: value_object}
+            required: {type: boolean}
+            description: {type: string}
+      business_methods:
+        type: array
+        description: "Key business operations"
+        items:
+          type: object
+          properties:
+            name: {type: string}
+            description: {type: string}
+            parameters: {type: array}
+            returns: {type: string}
+            publishes_events: {type: array}
+      invariants:
+        type: array
+        description: "Rules that must always hold"
+        items: {type: string}
+      lifecycle_states:
+        type: array
+        description: "Possible states in entity lifecycle"
+        items: {type: string}
+
+  value_object:
+    type: object
+    description: "Immutable object defined by its attributes"
+    required: [id, name, bounded_context_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^vo_[a-z0-9_]+$"
+        description: "Unique value object definition identifier"
+      name:
+        type: string
+        description: "Value object name from ubiquitous language"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Context this value object belongs to"
+      description:
+        type: string
+        description: "What this value object represents"
+      attributes:
+        type: array
+        description: "Value object attributes"
+        items:
+          type: object
+          properties:
+            name: {type: string}
+            type: {type: string}
+            required: {type: boolean}
+            validation: {type: string}
+      validation_rules:
+        type: array
+        description: "Rules enforced in constructor"
+        items: {type: string}
+      equality_criteria:
+        type: array
+        description: "Which attributes determine equality"
+        items: {type: string}
+      immutability:
+        type: boolean
+        default: true
+        description: "Value objects must be immutable"
+      side_effect_free_methods:
+        type: array
+        description: "Methods that return new instances"
+        items:
+          type: object
+          properties:
+            name: {type: string}
+            description: {type: string}
+            returns: {type: string}
+      common_values:
+        type: array
+        description: "Common instances (e.g., Money.ZERO)"
+        items: {type: string}
+
+  # --------------------------------------------------------------------------
+  # TACTICAL PATTERNS - Repositories and Services
+  # --------------------------------------------------------------------------
+
+  repository:
+    type: object
+    description: "Persistence abstraction for aggregates"
+    required: [id, name, aggregate_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^repo_[a-z0-9_]+$"
+        description: "Unique repository identifier"
+      name:
+        type: string
+        description: "Repository name (e.g., CustomerRepository)"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Context this repository belongs to"
+      aggregate_ref:
+        type: reference
+        ref_type: aggregate
+        description: "Aggregate this repository manages"
+      interface_methods:
+        type: array
+        description: "Repository interface methods"
+        items:
+          type: object
+          properties:
+            name: {type: string}
+            description: {type: string}
+            parameters: {type: array}
+            returns: {type: string}
+            query_type: {type: enum, values: [by_id, by_criteria, all, custom]}
+      persistence_strategy:
+        type: string
+        description: "How persistence is implemented (JPA, MongoDB, EventStore, etc.)"
+      implementation_notes:
+        type: string
+        description: "Implementation details or patterns used"
+
+  domain_service:
+    type: object
+    description: "Stateless operation that doesn't belong to an entity"
+    required: [id, name, bounded_context_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^svc_dom_[a-z0-9_]+$"
+        description: "Unique domain service identifier"
+      name:
+        type: string
+        description: "Service name from ubiquitous language"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Context this service belongs to"
+      description:
+        type: string
+        description: "What this service does and why it exists"
+      operations:
+        type: array
+        description: "Service operations"
+        items:
+          type: object
+          properties:
+            name: {type: string}
+            description: {type: string}
+            parameters: {type: array}
+            returns: {type: string}
+            involves_aggregates: {type: array}
+            business_logic: {type: string}
+      dependencies:
+        type: array
+        description: "What this service depends on"
+        items:
+          type: object
+          properties:
+            type: {type: enum, values: [repository, domain_service, specification]}
+            ref: {type: string}
+      stateless:
+        type: boolean
+        default: true
+        description: "Domain services must be stateless"
+
+  application_service:
+    type: object
+    description: "Orchestrates use cases, transaction boundaries"
+    required: [id, name, bounded_context_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^svc_app_[a-z0-9_]+$"
+        description: "Unique application service identifier"
+      name:
+        type: string
+        description: "Service name representing use case"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Context this service belongs to"
+      use_case:
+        type: string
+        description: "Business use case this service implements"
+      orchestrates:
+        type: array
+        description: "What this service orchestrates"
+        items:
+          type: object
+          properties:
+            type: {type: enum, values: [aggregate, domain_service, repository]}
+            ref: {type: string}
+            operation: {type: string}
+      transaction_boundary:
+        type: boolean
+        default: true
+        description: "Defines transaction scope"
+      publishes_events:
+        type: array
+        description: "Events published after successful execution"
+        items:
+          type: reference
+          ref_type: domain_event
+      authorization:
+        type: string
+        description: "Authorization rules for this service"
+
+  # --------------------------------------------------------------------------
+  # TACTICAL PATTERNS - Events and Factories
+  # --------------------------------------------------------------------------
+
+  domain_event:
+    type: object
+    description: "Something that happened in the domain"
+    required: [id, name, aggregate_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^evt_[a-z0-9_]+$"
+        description: "Unique event identifier"
+      name:
+        type: string
+        description: "Event name in past tense (e.g., OrderPlaced)"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Context this event belongs to"
+      aggregate_ref:
+        type: reference
+        ref_type: aggregate
+        description: "Aggregate that publishes this event"
+      description:
+        type: string
+        description: "What happened and why it matters"
+      data_carried:
+        type: array
+        description: "Data included in the event"
+        items:
+          type: object
+          properties:
+            name: {type: string}
+            type: {type: string}
+            description: {type: string}
+      handlers:
+        type: array
+        description: "Who handles this event"
+        items:
+          type: object
+          properties:
+            bounded_context: {type: string}
+            handler: {type: string}
+            action: {type: string}
+      immutable:
+        type: boolean
+        default: true
+        description: "Events are immutable facts"
+      timestamp_included:
+        type: boolean
+        default: true
+        description: "Events include occurrence timestamp"
+
+  factory:
+    type: object
+    description: "Encapsulates complex object creation"
+    required: [id, name, creates_type]
+    properties:
+      id:
+        type: string
+        pattern: "^factory_[a-z0-9_]+$"
+        description: "Unique factory identifier"
+      name:
+        type: string
+        description: "Factory name"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Context this factory belongs to"
+      creates_type:
+        type: enum
+        values: [entity, aggregate, value_object]
+        description: "What kind of object this creates"
+      creates_ref:
+        type: reference
+        description: "Reference to what it creates"
+      creation_methods:
+        type: array
+        description: "Factory methods"
+        items:
+          type: object
+          properties:
+            name: {type: string}
+            parameters: {type: array}
+            returns: {type: string}
+            description: {type: string}
+      location:
+        type: enum
+        values: [domain_layer, infrastructure_layer, on_aggregate]
+        description: "Where factory lives"
+      reconstitution:
+        type: boolean
+        description: "Also handles reconstitution from storage"
+
+  specification:
+    type: object
+    description: "Encapsulates business rule or query criteria"
+    required: [id, name, bounded_context_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^spec_[a-z0-9_]+$"
+        description: "Unique specification identifier"
+      name:
+        type: string
+        description: "Specification name"
+      bounded_context_ref:
+        type: reference
+        ref_type: bounded_context
+        description: "Context this specification belongs to"
+      applies_to:
+        type: reference
+        description: "Entity or VO this specification applies to"
+      rule:
+        type: string
+        description: "Business rule being checked"
+      composable:
+        type: boolean
+        description: "Can be combined with other specifications (AND, OR, NOT)"
+      use_cases:
+        type: array
+        description: "Where this specification is used"
+        items: {type: string}
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+validation_rules:
+  - rule: "aggregate_root_is_entity"
+    description: "Every aggregate must have exactly one root, which must be an entity"
+    validation: "aggregate.root_ref must reference an entity with is_aggregate_root=true"
+
+  - rule: "repository_per_aggregate_root"
+    description: "Repository must reference an aggregate, not individual entities"
+    validation: "repository.aggregate_ref must be set, entities accessed only through aggregate"
+
+  - rule: "bounded_context_has_domain"
+    description: "Every bounded context must belong to exactly one domain"
+    validation: "bounded_context.domain_ref must be set and valid"
+
+  - rule: "context_mapping_different_contexts"
+    description: "Context mapping must connect two different bounded contexts"
+    validation: "context_mapping.upstream_context != context_mapping.downstream_context"
+
+  - rule: "entity_identity_immutable"
+    description: "Entity identity field should be immutable"
+    validation: "entity.identity_field should not have setter method"
+
+  - rule: "value_objects_immutable"
+    description: "Value objects must be immutable"
+    validation: "value_object.immutability must be true"
+
+  - rule: "domain_service_stateless"
+    description: "Domain services must be stateless"
+    validation: "domain_service.stateless must be true"
+
+  - rule: "events_immutable"
+    description: "Domain events must be immutable"
+    validation: "domain_event.immutable must be true"
+
+  - rule: "aggregate_size"
+    description: "Prefer small aggregates (Vaughn Vernon's rule 2)"
+    validation: "aggregate.size_estimate should preferably be 'small'"
+
+  - rule: "reference_by_identity"
+    description: "Aggregates reference other aggregates by ID only"
+    validation: "entity.attributes should use ID references for external aggregates"
+
+# ============================================================================
+# BEST PRACTICES
+# ============================================================================
+best_practices:
+  strategic:
+    - "Start by identifying domains and subdomains"
+    - "Define bounded contexts based on linguistic boundaries"
+    - "Use context mapping to make integration explicit"
+    - "Invest most in core domain"
+    - "Buy or outsource generic subdomains"
+
+  tactical:
+    - "Design small aggregates (Vaughn Vernon's rule)"
+    - "Protect true invariants in consistency boundaries"
+    - "Reference other aggregates by identity only"
+    - "Use eventual consistency outside aggregate boundaries"
+    - "Make value objects for domain concepts, not primitives"
+    - "Publish domain events for cross-aggregate communication"
+
+  process:
+    - "Develop ubiquitous language with domain experts"
+    - "Model collaboratively, not in isolation"
+    - "Refactor toward deeper insight continuously"
+    - "Test with domain scenarios"
+    - "Keep language and code synchronized"
+
+# ============================================================================
+# EXAMPLES
+# ============================================================================
+examples:
+  - name: "Simple Aggregate"
+    description: "Customer aggregate with value objects"
+    code: |
+      aggregate_id: agg_customer
+      root: ent_customer
+      entities: [ent_customer]
+      value_objects: [vo_email, vo_person_name, vo_address]
+      invariants:
+        - "Email must be unique"
+        - "Customer must have valid email"
+
+  - name: "Context Mapping"
+    description: "Sales context using Inventory context via Customer/Supplier"
+    code: |
+      context_mapping_id: cm_inventory_to_sales
+      upstream: bc_inventory
+      downstream: bc_sales
+      relationship: customer_supplier
+      integration: "REST API - Inventory exposes product availability"
+
+  - name: "Domain Event"
+    description: "Order submitted event"
+    code: |
+      event_id: evt_order_submitted
+      name: "OrderSubmitted"
+      aggregate: agg_order
+      data: [order_id, customer_id, total_amount, timestamp]
+      handlers:
+        - context: bc_inventory
+          action: "Reserve inventory"
+        - context: bc_notifications
+          action: "Send confirmation email"
+
+---
+# End of Schema Definition

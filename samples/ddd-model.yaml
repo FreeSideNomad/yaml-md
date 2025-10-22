@@ -1,0 +1,751 @@
+# Job Seeker Application - DDD Architecture Model
+# Complete system architecture using DDD patterns
+# Based on: research/ddd/deliverables/ddd-schema-definition.yaml
+
+system:
+  id: "sys_job_seeker"
+  name: "Job Seeker Application"
+  description: "AI-powered job application assistant for data scientists"
+  version: "1.0.0"
+
+# ============================================================================
+# DOMAINS
+# ============================================================================
+domains:
+  - id: "dom_job_matching"
+    name: "Job Matching"
+    type: "core"
+    description: "Core domain for intelligently matching jobs to candidate profiles"
+    strategic_importance: "critical"
+    bounded_contexts: ["bc_profile", "bc_matching", "bc_requirements"]
+    investment_strategy: "Best team, rigorous DDD, continuous refinement"
+    notes: "This is where we provide competitive advantage"
+
+  - id: "dom_job_aggregation"
+    name: "Job Aggregation"
+    type: "supporting"
+    description: "Aggregate jobs from various sources and normalize data"
+    strategic_importance: "important"
+    bounded_contexts: ["bc_scrapers", "bc_job_catalog"]
+    investment_strategy: "Adequate quality, consider third-party scraping services"
+    notes: "Necessary but not differentiating"
+
+  - id: "dom_career_development"
+    name: "Career Development"
+    type: "supporting"
+    description: "Help candidates improve skills and close gaps"
+    strategic_importance: "important"
+    bounded_contexts: ["bc_skills_analysis", "bc_project_recommendations"]
+    investment_strategy: "Adequate quality, focus on actionable insights"
+
+  - id: "dom_application_tracking"
+    name: "Application Tracking"
+    type: "supporting"
+    description: "Track job applications and their status"
+    strategic_importance: "standard"
+    bounded_contexts: ["bc_applications"]
+    investment_strategy: "Simple implementation, standard patterns"
+
+  - id: "dom_notifications"
+    name: "Notifications"
+    type: "generic"
+    description: "Send notifications to users"
+    strategic_importance: "low"
+    bounded_contexts: ["bc_notifications"]
+    investment_strategy: "Use third-party service (SendGrid, Twilio)"
+
+# ============================================================================
+# BOUNDED CONTEXTS
+# ============================================================================
+bounded_contexts:
+  - id: "bc_profile"
+    name: "Profile Management"
+    domain_ref: "dom_job_matching"
+    description: "Manages candidate profile including skills, experience, preferences"
+    team_ownership: "Core Matching Team"
+    ubiquitous_language:
+      glossary:
+        - term: "Candidate"
+          definition: "A job seeker using the system"
+          examples: ["Marina - junior data scientist looking for roles in Canada"]
+        - term: "Skills"
+          definition: "Technical and soft skills possessed by candidate"
+          examples: ["Python, Machine Learning, CNNs"]
+        - term: "Profile Completeness"
+          definition: "Percentage of profile fields filled with quality information"
+          examples: ["80% complete - missing portfolio projects"]
+    aggregates: ["agg_candidate_profile"]
+    repositories: ["repo_profile"]
+    domain_services: ["svc_dom_profile_scorer"]
+    application_services: ["svc_app_update_profile", "svc_app_import_resume"]
+    domain_events: ["evt_profile_created", "evt_profile_updated", "evt_skills_changed"]
+
+  - id: "bc_job_catalog"
+    name: "Job Catalog"
+    domain_ref: "dom_job_aggregation"
+    description: "Centralized catalog of all jobs from various sources"
+    team_ownership: "Aggregation Team"
+    ubiquitous_language:
+      glossary:
+        - term: "Job Posting"
+          definition: "A job opportunity aggregated from external source"
+          examples: ["Senior Data Scientist at Netflix via LinkedIn"]
+        - term: "Source"
+          definition: "Where job posting came from"
+          examples: ["Indeed", "LinkedIn", "Company Career Page"]
+        - term: "Freshness"
+          definition: "How recently job was posted or updated"
+          examples: ["Posted 2 hours ago", "Updated yesterday"]
+    aggregates: ["agg_job_posting"]
+    repositories: ["repo_job_posting"]
+    domain_services: ["svc_dom_deduplication"]
+    application_services: ["svc_app_ingest_jobs"]
+    domain_events: ["evt_job_posted", "evt_job_expired"]
+
+  - id: "bc_matching"
+    name: "Job Matching Engine"
+    domain_ref: "dom_job_matching"
+    description: "Intelligent matching of jobs to candidate profiles"
+    team_ownership: "Core Matching Team"
+    ubiquitous_language:
+      glossary:
+        - term: "Match Score"
+          definition: "Calculated fit between candidate and job (0-100)"
+          examples: ["95 - excellent match", "45 - poor match"]
+        - term: "Match Tier"
+          definition: "Classification of match quality"
+          examples: ["High (80+)", "Medium (50-79)", "Low (<50)"]
+        - term: "Match Criteria"
+          definition: "Factors considered in matching"
+          examples: ["Skills overlap", "Experience level", "Location", "Domain fit"]
+    aggregates: ["agg_job_match"]
+    repositories: ["repo_job_match"]
+    domain_services: ["svc_dom_matching_engine", "svc_dom_scoring_algorithm"]
+    application_services: ["svc_app_calculate_matches", "svc_app_get_recommendations"]
+    domain_events: ["evt_match_calculated", "evt_high_match_found"]
+
+  - id: "bc_requirements"
+    name: "Requirements Analysis"
+    domain_ref: "dom_job_matching"
+    description: "Analyze and aggregate job requirements across postings"
+    team_ownership: "Core Matching Team"
+    ubiquitous_language:
+      glossary:
+        - term: "Requirement"
+          definition: "A skill, qualification, or experience needed for a job"
+          examples: ["Python 3+ years", "Masters in CS", "ML experience"]
+        - term: "Common Requirement"
+          definition: "Requirement that appears frequently in high-match jobs"
+          examples: ["Python appears in 85% of matched jobs"]
+        - term: "Requirements Gap"
+          definition: "Requirements candidate doesn't meet"
+          examples: ["Candidate lacks Kubernetes experience"]
+    aggregates: ["agg_requirements_analysis"]
+    repositories: ["repo_requirements_analysis"]
+    domain_services: ["svc_dom_requirement_extractor", "svc_dom_aggregator"]
+    application_services: ["svc_app_analyze_requirements"]
+    domain_events: ["evt_analysis_completed"]
+
+  - id: "bc_skills_analysis"
+    name: "Skills Gap Analysis"
+    domain_ref: "dom_career_development"
+    description: "Identify skill gaps and prioritize learning"
+    team_ownership: "Career Development Team"
+    aggregates: ["agg_skills_gap_report"]
+    repositories: ["repo_skills_gap"]
+    domain_services: ["svc_dom_gap_identifier", "svc_dom_priority_ranker"]
+    application_services: ["svc_app_generate_gap_report"]
+    domain_events: ["evt_gap_identified", "evt_skill_acquired"]
+
+  - id: "bc_project_recommendations"
+    name: "Project Recommendations"
+    domain_ref: "dom_career_development"
+    description: "Recommend portfolio projects to close skill gaps"
+    team_ownership: "Career Development Team"
+    aggregates: ["agg_project_recommendation"]
+    repositories: ["repo_project_recommendation"]
+    domain_services: ["svc_dom_project_recommender"]
+    application_services: ["svc_app_get_project_ideas"]
+    domain_events: ["evt_projects_recommended"]
+
+  - id: "bc_applications"
+    name: "Application Tracking"
+    domain_ref: "dom_application_tracking"
+    description: "Track job applications and their progress"
+    team_ownership: "Application Tracking Team"
+    aggregates: ["agg_job_application"]
+    repositories: ["repo_application"]
+    domain_services: []
+    application_services: ["svc_app_submit_application", "svc_app_update_status"]
+    domain_events: ["evt_application_submitted", "evt_application_status_changed"]
+
+  - id: "bc_scrapers"
+    name: "Job Scrapers"
+    domain_ref: "dom_job_aggregation"
+    description: "Scrape jobs from external sources"
+    team_ownership: "Aggregation Team"
+    aggregates: ["agg_scraping_job"]
+    repositories: ["repo_scraping_job"]
+    domain_services: []
+    application_services: ["svc_app_schedule_scraping", "svc_app_run_scraper"]
+    domain_events: ["evt_scraping_completed"]
+
+  - id: "bc_notifications"
+    name: "Notifications"
+    domain_ref: "dom_notifications"
+    description: "Send email, SMS, push notifications"
+    team_ownership: "Infrastructure Team"
+    aggregates: ["agg_notification"]
+    repositories: ["repo_notification"]
+    domain_services: []
+    application_services: ["svc_app_send_notification"]
+    domain_events: ["evt_notification_sent"]
+
+# ============================================================================
+# CONTEXT MAPPINGS
+# ============================================================================
+context_mappings:
+  - id: "cm_profile_to_matching"
+    upstream_context: "bc_profile"
+    downstream_context: "bc_matching"
+    relationship_type: "customer_supplier"
+    integration_pattern: "Domain events + Direct repository access"
+    notes: "Matching needs profile data. Profile team supports matching requirements."
+
+  - id: "cm_job_catalog_to_matching"
+    upstream_context: "bc_job_catalog"
+    downstream_context: "bc_matching"
+    relationship_type: "customer_supplier"
+    integration_pattern: "Read-only repository access"
+    notes: "Matching reads jobs from catalog. Catalog team ensures data quality."
+
+  - id: "cm_matching_to_requirements"
+    upstream_context: "bc_matching"
+    downstream_context: "bc_requirements"
+    relationship_type: "partnership"
+    integration_pattern: "Shared analysis, coordinated development"
+    notes: "Close collaboration needed. Both improve together."
+
+  - id: "cm_requirements_to_skills"
+    upstream_context: "bc_requirements"
+    downstream_context: "bc_skills_analysis"
+    relationship_type: "customer_supplier"
+    integration_pattern: "Domain events"
+    notes: "Skills analysis reacts to requirement analysis completion."
+
+  - id: "cm_skills_to_projects"
+    upstream_context: "bc_skills_analysis"
+    downstream_context: "bc_project_recommendations"
+    relationship_type: "customer_supplier"
+    integration_pattern: "API calls"
+    notes: "Project recommendations based on identified gaps."
+
+  - id: "cm_scrapers_to_catalog"
+    upstream_context: "bc_scrapers"
+    downstream_context: "bc_job_catalog"
+    relationship_type: "customer_supplier"
+    integration_pattern: "Message queue (async)"
+    notes: "Scrapers publish jobs, catalog ingests and normalizes."
+
+  - id: "cm_matching_to_notifications"
+    upstream_context: "bc_matching"
+    downstream_context: "bc_notifications"
+    relationship_type: "conformist"
+    integration_pattern: "Third-party service API"
+    notes: "Notifications uses SendGrid. Matching conforms to their API."
+
+  - id: "cm_applications_to_notifications"
+    upstream_context: "bc_applications"
+    downstream_context: "bc_notifications"
+    relationship_type: "conformist"
+    integration_pattern: "Third-party service API"
+    notes: "Application updates trigger notifications."
+
+# ============================================================================
+# AGGREGATES
+# ============================================================================
+aggregates:
+  - id: "agg_candidate_profile"
+    name: "Candidate Profile"
+    bounded_context_ref: "bc_profile"
+    root_ref: "ent_candidate"
+    entities: ["ent_candidate"]
+    value_objects: ["vo_candidate_id", "vo_email", "vo_person_name", "vo_skills", "vo_education", "vo_experience", "vo_location", "vo_preferences"]
+    consistency_rules:
+      - "Candidate must have valid email"
+      - "Skills list must not be empty for matching to work"
+      - "Location must be valid Canadian location"
+    invariants:
+      - "Email uniqueness across all candidates"
+      - "Profile completeness score >= 60% for matching"
+    size_estimate: "medium"
+
+  - id: "agg_job_posting"
+    name: "Job Posting"
+    bounded_context_ref: "bc_job_catalog"
+    root_ref: "ent_job_posting"
+    entities: ["ent_job_posting"]
+    value_objects: ["vo_job_id", "vo_job_title", "vo_company", "vo_location", "vo_salary_range", "vo_requirements", "vo_description", "vo_source"]
+    consistency_rules:
+      - "Job must have title, company, and source"
+      - "Job must not be duplicate (same title, company, location)"
+    invariants:
+      - "Posted date <= Current date"
+      - "Expiry date > Posted date"
+    size_estimate: "small"
+
+  - id: "agg_job_match"
+    name: "Job Match"
+    bounded_context_ref: "bc_matching"
+    root_ref: "ent_job_match"
+    entities: ["ent_job_match"]
+    value_objects: ["vo_match_score", "vo_match_tier", "vo_match_criteria_scores"]
+    consistency_rules:
+      - "Match score must be 0-100"
+      - "Match tier must correspond to score (High: 80+, Medium: 50-79, Low: <50)"
+    invariants:
+      - "Match score calculated from weighted criteria"
+      - "Match references valid candidate and job"
+    size_estimate: "small"
+
+  - id: "agg_requirements_analysis"
+    name: "Requirements Analysis"
+    bounded_context_ref: "bc_requirements"
+    root_ref: "ent_requirements_analysis"
+    entities: ["ent_requirements_analysis", "ent_requirement_frequency"]
+    value_objects: ["vo_requirement", "vo_frequency", "vo_importance_score"]
+    consistency_rules:
+      - "Analysis must be for specific candidate and time period"
+      - "Requirements sorted by frequency"
+    invariants:
+      - "Analysis date <= Current date"
+    size_estimate: "medium"
+
+  - id: "agg_skills_gap_report"
+    name: "Skills Gap Report"
+    bounded_context_ref: "bc_skills_analysis"
+    root_ref: "ent_skills_gap_report"
+    entities: ["ent_skills_gap_report", "ent_skill_gap"]
+    value_objects: ["vo_skill", "vo_gap_severity", "vo_learning_priority"]
+    consistency_rules:
+      - "Gaps identified from requirements analysis"
+      - "Priority based on frequency and importance"
+    invariants:
+      - "Report is for specific candidate"
+    size_estimate: "small"
+
+  - id: "agg_job_application"
+    name: "Job Application"
+    bounded_context_ref: "bc_applications"
+    root_ref: "ent_job_application"
+    entities: ["ent_job_application"]
+    value_objects: ["vo_application_status", "vo_application_date", "vo_resume_version", "vo_cover_letter"]
+    consistency_rules:
+      - "Cannot apply to same job twice"
+      - "Status transitions must be valid (applied → interviewing → offer/rejected)"
+    invariants:
+      - "Application references valid candidate and job"
+    size_estimate: "small"
+
+# ============================================================================
+# ENTITIES
+# ============================================================================
+entities:
+  - id: "ent_candidate"
+    name: "Candidate"
+    bounded_context_ref: "bc_profile"
+    aggregate_ref: "agg_candidate_profile"
+    is_aggregate_root: true
+    identity_field: "candidate_id"
+    identity_generation: "auto_generated"
+    attributes:
+      - {name: "candidate_id", type: "CandidateId", value_object_ref: "vo_candidate_id", required: true}
+      - {name: "email", type: "Email", value_object_ref: "vo_email", required: true}
+      - {name: "name", type: "PersonName", value_object_ref: "vo_person_name", required: true}
+      - {name: "skills", type: "Skills", value_object_ref: "vo_skills", required: true}
+      - {name: "education", type: "Education", value_object_ref: "vo_education", required: true}
+      - {name: "experience", type: "Experience", value_object_ref: "vo_experience", required: false}
+      - {name: "location", type: "Location", value_object_ref: "vo_location", required: true}
+      - {name: "preferences", type: "JobPreferences", value_object_ref: "vo_preferences", required: false}
+      - {name: "profile_completeness", type: "Percentage", required: false, description: "Calculated score"}
+    business_methods:
+      - name: "updateSkills"
+        description: "Update candidate's skills"
+        parameters: ["Skills newSkills"]
+        returns: "void"
+        publishes_events: ["evt_skills_changed"]
+      - name: "calculateCompleteness"
+        description: "Calculate profile completeness percentage"
+        parameters: []
+        returns: "Percentage"
+        publishes_events: []
+      - name: "isEligibleForMatching"
+        description: "Check if profile is complete enough for matching"
+        parameters: []
+        returns: "boolean"
+        publishes_events: []
+    invariants:
+      - "Email must be unique"
+      - "Skills list must not be empty"
+      - "Completeness score must be accurate"
+    lifecycle_states: ["draft", "active", "suspended"]
+
+  - id: "ent_job_posting"
+    name: "Job Posting"
+    bounded_context_ref: "bc_job_catalog"
+    aggregate_ref: "agg_job_posting"
+    is_aggregate_root: true
+    identity_field: "job_id"
+    identity_generation: "auto_generated"
+    attributes:
+      - {name: "job_id", type: "JobId", value_object_ref: "vo_job_id", required: true}
+      - {name: "title", type: "JobTitle", value_object_ref: "vo_job_title", required: true}
+      - {name: "company", type: "Company", value_object_ref: "vo_company", required: true}
+      - {name: "location", type: "Location", value_object_ref: "vo_location", required: true}
+      - {name: "salary_range", type: "SalaryRange", value_object_ref: "vo_salary_range", required: false}
+      - {name: "requirements", type: "Requirements", value_object_ref: "vo_requirements", required: true}
+      - {name: "description", type: "Description", value_object_ref: "vo_description", required: true}
+      - {name: "source", type: "Source", value_object_ref: "vo_source", required: true}
+      - {name: "posted_date", type: "Date", required: true}
+      - {name: "expiry_date", type: "Date", required: false}
+    business_methods:
+      - name: "isExpired"
+        description: "Check if job posting has expired"
+        parameters: []
+        returns: "boolean"
+        publishes_events: []
+      - name: "markExpired"
+        description: "Mark job as expired"
+        parameters: []
+        returns: "void"
+        publishes_events: ["evt_job_expired"]
+    lifecycle_states: ["active", "expired", "filled"]
+
+  - id: "ent_job_match"
+    name: "Job Match"
+    bounded_context_ref: "bc_matching"
+    aggregate_ref: "agg_job_match"
+    is_aggregate_root: true
+    identity_field: "match_id"
+    identity_generation: "auto_generated"
+    attributes:
+      - {name: "match_id", type: "MatchId", required: true}
+      - {name: "candidate_id", type: "CandidateId", required: true, description: "Reference by ID only"}
+      - {name: "job_id", type: "JobId", required: true, description: "Reference by ID only"}
+      - {name: "match_score", type: "MatchScore", value_object_ref: "vo_match_score", required: true}
+      - {name: "match_tier", type: "MatchTier", value_object_ref: "vo_match_tier", required: true}
+      - {name: "criteria_scores", type: "CriteriaScores", value_object_ref: "vo_match_criteria_scores", required: true}
+      - {name: "calculated_at", type: "DateTime", required: true}
+    business_methods:
+      - name: "recalculate"
+        description: "Recalculate match score (if profile or job changed)"
+        parameters: ["Candidate candidate", "JobPosting job"]
+        returns: "void"
+        publishes_events: ["evt_match_calculated"]
+    invariants:
+      - "Score matches tier (80+ = High, 50-79 = Medium, <50 = Low)"
+      - "Criteria scores sum to total score"
+
+# ============================================================================
+# VALUE OBJECTS (Selected Examples)
+# ============================================================================
+value_objects:
+  - id: "vo_email"
+    name: "Email"
+    bounded_context_ref: "bc_profile"
+    description: "Email address value object with validation"
+    attributes:
+      - {name: "address", type: "string", required: true, validation: "RFC 5322 email format"}
+    validation_rules:
+      - "Must match email regex pattern"
+      - "Must have @ symbol and domain"
+      - "Normalized to lowercase"
+    equality_criteria: ["address"]
+    immutability: true
+    side_effect_free_methods:
+      - {name: "domain", description: "Extract domain part", returns: "string"}
+      - {name: "localPart", description: "Extract local part", returns: "string"}
+
+  - id: "vo_skills"
+    name: "Skills"
+    bounded_context_ref: "bc_profile"
+    description: "Collection of candidate skills with proficiency levels"
+    attributes:
+      - {name: "technical_skills", type: "Map<SkillName, ProficiencyLevel>", required: true}
+      - {name: "soft_skills", type: "Set<SkillName>", required: false}
+    validation_rules:
+      - "Technical skills map must not be empty"
+      - "Proficiency levels must be: beginner, intermediate, advanced, expert"
+    equality_criteria: ["technical_skills", "soft_skills"]
+    immutability: true
+    side_effect_free_methods:
+      - {name: "hasSkill", description: "Check if skill exists", returns: "boolean"}
+      - {name: "proficiencyFor", description: "Get proficiency for skill", returns: "ProficiencyLevel"}
+      - {name: "addSkill", description: "Return new Skills with added skill", returns: "Skills"}
+      - {name: "overlapWith", description: "Calculate overlap with other Skills", returns: "Percentage"}
+
+  - id: "vo_match_score"
+    name: "MatchScore"
+    bounded_context_ref: "bc_matching"
+    description: "Calculated match score between 0 and 100"
+    attributes:
+      - {name: "value", type: "int", required: true, validation: "0 <= value <= 100"}
+    validation_rules:
+      - "Score must be between 0 and 100 inclusive"
+    equality_criteria: ["value"]
+    immutability: true
+    side_effect_free_methods:
+      - {name: "isHighMatch", description: "Score >= 80", returns: "boolean"}
+      - {name: "isMediumMatch", description: "50 <= Score < 80", returns: "boolean"}
+      - {name: "isLowMatch", description: "Score < 50", returns: "boolean"}
+    common_values: ["ZERO", "PERFECT (100)", "MINIMUM_ACCEPTABLE (50)"]
+
+  - id: "vo_location"
+    name: "Location"
+    bounded_context_ref: "bc_profile"
+    description: "Canadian location (city, province)"
+    attributes:
+      - {name: "city", type: "string", required: true}
+      - {name: "province", type: "CanadianProvince", required: true}
+      - {name: "country", type: "string", required: true, validation: "Must be 'Canada'"}
+    validation_rules:
+      - "Province must be valid Canadian province code (ON, BC, QC, etc.)"
+      - "Country must be 'Canada'"
+    equality_criteria: ["city", "province", "country"]
+    immutability: true
+
+# ============================================================================
+# REPOSITORIES
+# ============================================================================
+repositories:
+  - id: "repo_profile"
+    name: "ProfileRepository"
+    bounded_context_ref: "bc_profile"
+    aggregate_ref: "agg_candidate_profile"
+    interface_methods:
+      - {name: "save", parameters: ["CandidateProfile profile"], returns: "void", query_type: "custom"}
+      - {name: "findById", parameters: ["CandidateId id"], returns: "Optional<CandidateProfile>", query_type: "by_id"}
+      - {name: "findByEmail", parameters: ["Email email"], returns: "Optional<CandidateProfile>", query_type: "by_criteria"}
+      - {name: "findIncompleteProfiles", parameters: [], returns: "List<CandidateProfile>", query_type: "custom"}
+    persistence_strategy: "PostgreSQL with JPA"
+    implementation_notes: "Uses Data Mapper pattern to separate domain model from persistence"
+
+  - id: "repo_job_posting"
+    name: "JobPostingRepository"
+    bounded_context_ref: "bc_job_catalog"
+    aggregate_ref: "agg_job_posting"
+    interface_methods:
+      - {name: "save", parameters: ["JobPosting job"], returns: "void", query_type: "custom"}
+      - {name: "findById", parameters: ["JobId id"], returns: "Optional<JobPosting>", query_type: "by_id"}
+      - {name: "findActive", parameters: [], returns: "List<JobPosting>", query_type: "custom"}
+      - {name: "findByLocation", parameters: ["Location location"], returns: "List<JobPosting>", query_type: "by_criteria"}
+      - {name: "findPostedAfter", parameters: ["Date date"], returns: "List<JobPosting>", query_type: "by_criteria"}
+    persistence_strategy: "PostgreSQL with pgvector for semantic search"
+    implementation_notes: "Job embeddings stored for similarity matching"
+
+  - id: "repo_job_match"
+    name: "JobMatchRepository"
+    bounded_context_ref: "bc_matching"
+    aggregate_ref: "agg_job_match"
+    interface_methods:
+      - {name: "save", parameters: ["JobMatch match"], returns: "void", query_type: "custom"}
+      - {name: "findByCandidate", parameters: ["CandidateId candidateId"], returns: "List<JobMatch>", query_type: "by_criteria"}
+      - {name: "findHighMatches", parameters: ["CandidateId candidateId"], returns: "List<JobMatch>", query_type: "custom"}
+      - {name: "findByJob", parameters: ["JobId jobId"], returns: "List<JobMatch>", query_type: "by_criteria"}
+    persistence_strategy: "PostgreSQL"
+
+# ============================================================================
+# DOMAIN SERVICES
+# ============================================================================
+domain_services:
+  - id: "svc_dom_matching_engine"
+    name: "MatchingEngine"
+    bounded_context_ref: "bc_matching"
+    description: "Core algorithm for calculating job-candidate match scores"
+    operations:
+      - name: "calculateMatch"
+        description: "Calculate match between candidate and job"
+        parameters: ["Candidate candidate", "JobPosting job"]
+        returns: "JobMatch"
+        involves_aggregates: ["agg_candidate_profile", "agg_job_posting"]
+        business_logic: "Multi-criteria weighted scoring: skills (40%), experience (25%), education (20%), location (10%), domain (5%)"
+      - name: "findBestMatches"
+        description: "Find top N matches for candidate"
+        parameters: ["CandidateId candidateId", "int limit"]
+        returns: "List<JobMatch>"
+        involves_aggregates: ["agg_job_match"]
+        business_logic: "Returns matches sorted by score, filtered by minimum threshold"
+    dependencies:
+      - {type: "repository", ref: "repo_profile"}
+      - {type: "repository", ref: "repo_job_posting"}
+    stateless: true
+
+  - id: "svc_dom_deduplication"
+    name: "JobDeduplicationService"
+    bounded_context_ref: "bc_job_catalog"
+    description: "Identifies and merges duplicate job postings from different sources"
+    operations:
+      - name: "isDuplicate"
+        description: "Check if two jobs are the same"
+        parameters: ["JobPosting job1", "JobPosting job2"]
+        returns: "boolean"
+        business_logic: "Fuzzy matching on title + company + location; similarity threshold 85%"
+      - name: "mergeDuplicates"
+        description: "Merge multiple postings of same job"
+        parameters: ["List<JobPosting> duplicates"]
+        returns: "JobPosting"
+        business_logic: "Keep most recent, aggregate sources, prefer higher quality data"
+    stateless: true
+
+  - id: "svc_dom_requirement_extractor"
+    name: "RequirementExtractor"
+    bounded_context_ref: "bc_requirements"
+    description: "Extracts structured requirements from job descriptions using NLP"
+    operations:
+      - name: "extract"
+        description: "Extract requirements from job description"
+        parameters: ["JobDescription description"]
+        returns: "Requirements"
+        business_logic: "NLP-based extraction of skills, years of experience, education level, certifications"
+    stateless: true
+
+# ============================================================================
+# APPLICATION SERVICES
+# ============================================================================
+application_services:
+  - id: "svc_app_update_profile"
+    name: "UpdateProfileService"
+    bounded_context_ref: "bc_profile"
+    use_case: "Candidate updates their profile"
+    orchestrates:
+      - {type: "repository", ref: "repo_profile", operation: "findById, save"}
+      - {type: "aggregate", ref: "agg_candidate_profile", operation: "updateSkills, calculateCompleteness"}
+    transaction_boundary: true
+    publishes_events: ["evt_profile_updated"]
+    authorization: "Only the candidate can update their own profile"
+
+  - id: "svc_app_calculate_matches"
+    name: "CalculateMatchesService"
+    bounded_context_ref: "bc_matching"
+    use_case: "Calculate matches for all new jobs or updated profile"
+    orchestrates:
+      - {type: "repository", ref: "repo_profile", operation: "findById"}
+      - {type: "repository", ref: "repo_job_posting", operation: "findActive"}
+      - {type: "domain_service", ref: "svc_dom_matching_engine", operation: "calculateMatch"}
+      - {type: "repository", ref: "repo_job_match", operation: "save"}
+    transaction_boundary: true
+    publishes_events: ["evt_match_calculated", "evt_high_match_found"]
+
+  - id: "svc_app_submit_application"
+    name: "SubmitApplicationService"
+    bounded_context_ref: "bc_applications"
+    use_case: "Candidate submits application for a job"
+    orchestrates:
+      - {type: "aggregate", ref: "agg_job_application", operation: "create"}
+      - {type: "repository", ref: "repo_application", operation: "save"}
+    transaction_boundary: true
+    publishes_events: ["evt_application_submitted"]
+    authorization: "Candidate must own the profile"
+
+# ============================================================================
+# DOMAIN EVENTS
+# ============================================================================
+domain_events:
+  - id: "evt_profile_updated"
+    name: "ProfileUpdated"
+    bounded_context_ref: "bc_profile"
+    aggregate_ref: "agg_candidate_profile"
+    description: "Candidate profile was updated"
+    data_carried:
+      - {name: "candidate_id", type: "CandidateId"}
+      - {name: "updated_fields", type: "Set<String>"}
+      - {name: "occurred_at", type: "DateTime"}
+    handlers:
+      - {bounded_context: "bc_matching", handler: "RecalculateMatchesHandler", action: "Recalculate all matches for this candidate"}
+      - {bounded_context: "bc_requirements", handler: "UpdateRequirementsHandler", action: "Update requirements analysis"}
+    immutable: true
+    timestamp_included: true
+
+  - id: "evt_job_posted"
+    name: "JobPosted"
+    bounded_context_ref: "bc_job_catalog"
+    aggregate_ref: "agg_job_posting"
+    description: "New job was posted to catalog"
+    data_carried:
+      - {name: "job_id", type: "JobId"}
+      - {name: "title", type: "JobTitle"}
+      - {name: "location", type: "Location"}
+      - {name: "occurred_at", type: "DateTime"}
+    handlers:
+      - {bounded_context: "bc_matching", handler: "CalculateMatchesForNewJob", action: "Calculate matches for all eligible candidates"}
+    immutable: true
+    timestamp_included: true
+
+  - id: "evt_high_match_found"
+    name: "HighMatchFound"
+    bounded_context_ref: "bc_matching"
+    aggregate_ref: "agg_job_match"
+    description: "A high-quality match (score >= 80) was found"
+    data_carried:
+      - {name: "match_id", type: "MatchId"}
+      - {name: "candidate_id", type: "CandidateId"}
+      - {name: "job_id", type: "JobId"}
+      - {name: "match_score", type: "MatchScore"}
+      - {name: "occurred_at", type: "DateTime"}
+    handlers:
+      - {bounded_context: "bc_notifications", handler: "NotifyHighMatch", action: "Send notification to candidate"}
+    immutable: true
+    timestamp_included: true
+
+  - id: "evt_application_submitted"
+    name: "ApplicationSubmitted"
+    bounded_context_ref: "bc_applications"
+    aggregate_ref: "agg_job_application"
+    description: "Candidate submitted job application"
+    data_carried:
+      - {name: "application_id", type: "ApplicationId"}
+      - {name: "candidate_id", type: "CandidateId"}
+      - {name: "job_id", type: "JobId"}
+      - {name: "submitted_at", type: "DateTime"}
+    handlers:
+      - {bounded_context: "bc_notifications", handler: "SendConfirmation", action: "Send confirmation email"}
+      - {bounded_context: "bc_matching", handler: "UpdateMatchStatus", action: "Mark job as applied"}
+    immutable: true
+    timestamp_included: true
+
+# ============================================================================
+# FACTORIES
+# ============================================================================
+factories:
+  - id: "factory_candidate_profile"
+    name: "CandidateProfileFactory"
+    bounded_context_ref: "bc_profile"
+    creates_type: "aggregate"
+    creates_ref: "agg_candidate_profile"
+    creation_methods:
+      - name: "createFromResume"
+        parameters: ["ResumeFile resume"]
+        returns: "CandidateProfile"
+        description: "Parse resume and create initial profile"
+      - name: "createManual"
+        parameters: ["Email email", "PersonName name"]
+        returns: "CandidateProfile"
+        description: "Create empty profile for manual completion"
+    location: "domain_layer"
+    reconstitution: true
+
+  - id: "factory_job_match"
+    name: "JobMatchFactory"
+    bounded_context_ref: "bc_matching"
+    creates_type: "aggregate"
+    creates_ref: "agg_job_match"
+    creation_methods:
+      - name: "createMatch"
+        parameters: ["CandidateId candidateId", "JobId jobId", "MatchScore score", "CriteriaScores criteria"]
+        returns: "JobMatch"
+        description: "Create new match result"
+    location: "domain_layer"
+    reconstitution: false
+
+---
+# End of Job Seeker Application DDD Model
