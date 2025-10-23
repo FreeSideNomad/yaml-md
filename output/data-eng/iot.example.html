@@ -36,12 +36,89 @@
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="" href="#">Home</a>
           </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="sys-iot-sensor-platform" href="#sys-iot-sensor-platform">System: IoT Sensor Data Platform</a>
+          </li>
         </ul>
       </aside>
       <main class="Layout-main p-4" id="content">
         <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
           <h2>Top Level Types</h2>
-          <p>No top-level types discovered.</p>
+          <div class="home-index">
+            <a href="#sys-iot-sensor-platform">System: IoT Sensor Data Platform</a>
+          </div>
+        </section>
+        <section id="sys-iot-sensor-platform" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: IoT Sensor Data Platform", "href": "#sys-iot-sensor-platform"}]'>
+          <header><h2>System: IoT Sensor Data Platform</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>sys-iot-sensor-platform</dd>
+            <dt>Name</dt>
+            <dd>IoT Sensor Data Platform</dd>
+            <dt>Description</dt>
+            <dd>Scalable IoT data ingestion and processing for millions of connected devices</dd>
+            <dt>X-vendor</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="sys-iot-sensor-platform-owners-tab" data-tab-target="sys-iot-sensor-platform-owners-tab">Owners</button>
+            <button role="tab" aria-selected="false" aria-controls="sys-iot-sensor-platform-domains-tab" data-tab-target="sys-iot-sensor-platform-domains-tab">Domains</button>
+            <button role="tab" aria-selected="false" aria-controls="sys-iot-sensor-platform-tags-tab" data-tab-target="sys-iot-sensor-platform-tags-tab">Tags</button>
+            </nav>
+          <div role="tabpanel" id="sys-iot-sensor-platform-owners-tab" class="TabPanel" data-tab-label="Owners">
+            <ul class="ActionList">
+              <li class="ActionList-item">Team: iot-platform Contact: iot-platform@smartcity.com</li>
+            </ul>
+          </div>
+          <div role="tabpanel" id="sys-iot-sensor-platform-domains-tab" class="TabPanel hidden" data-tab-label="Domains">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Domains</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>dom-sensor-ingestion</td>
+                  </tr>
+                  <tr>
+                    <td>dom-time-series-analytics</td>
+                  </tr>
+                  <tr>
+                    <td>dom-anomaly-detection</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="sys-iot-sensor-platform-tags-tab" class="TabPanel hidden" data-tab-label="Tags">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>iot</td>
+                  </tr>
+                  <tr>
+                    <td>streaming</td>
+                  </tr>
+                  <tr>
+                    <td>time-series</td>
+                  </tr>
+                  <tr>
+                    <td>high-throughput</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
         </section>
       </main>
     </div>
@@ -172,7 +249,7 @@
           if (window.location.hash) {
             handleHashChange();
           } else {
-            showSection("home");
+            window.location.hash = "#sys-iot-sensor-platform";
           }
         })();
         

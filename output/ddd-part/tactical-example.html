@@ -36,12 +36,314 @@
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="" href="#">Home</a>
           </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="agg_profile" href="#agg_profile">Aggregate: CandidateProfile</a>
+          </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="agg_match" href="#agg_match">Aggregate: JobMatch</a>
+          </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="agg_job_posting" href="#agg_job_posting">Aggregate: JobPosting</a>
+          </li>
         </ul>
       </aside>
       <main class="Layout-main p-4" id="content">
         <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
           <h2>Top Level Types</h2>
-          <p>No top-level types discovered.</p>
+          <div class="home-index">
+            <a href="#agg_profile">Aggregate: CandidateProfile</a>
+            <a href="#agg_match">Aggregate: JobMatch</a>
+            <a href="#agg_job_posting">Aggregate: JobPosting</a>
+          </div>
+        </section>
+        <section id="agg_profile" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Aggregate: CandidateProfile", "href": "#agg_profile"}]'>
+          <header><h2>Aggregate: CandidateProfile</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>agg_profile</dd>
+            <dt>Name</dt>
+            <dd>CandidateProfile</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd>bc_profile</dd>
+            <dt>Root Ref</dt>
+            <dd>ent_candidate</dd>
+            <dt>Size Estimate</dt>
+            <dd>medium</dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="agg-profile-entities-tab" data-tab-target="agg-profile-entities-tab">Entities</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-profile-value-objects-tab" data-tab-target="agg-profile-value-objects-tab">Value Objects</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-profile-consistency-rules-tab" data-tab-target="agg-profile-consistency-rules-tab">Consistency Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-profile-invariants-tab" data-tab-target="agg-profile-invariants-tab">Invariants</button>
+            </nav>
+          <div role="tabpanel" id="agg-profile-entities-tab" class="TabPanel" data-tab-label="Entities">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Entities</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ent_candidate</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-profile-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Objects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>vo_email</td>
+                  </tr>
+                  <tr>
+                    <td>vo_phone</td>
+                  </tr>
+                  <tr>
+                    <td>vo_skill_level</td>
+                  </tr>
+                  <tr>
+                    <td>vo_location</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-profile-consistency-rules-tab" class="TabPanel hidden" data-tab-label="Consistency Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Consistency Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Email must be unique across system</td>
+                  </tr>
+                  <tr>
+                    <td>Profile must have at least one contact method</td>
+                  </tr>
+                  <tr>
+                    <td>Skills cannot have proficiency level &gt; 10</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-profile-invariants-tab" class="TabPanel hidden" data-tab-label="Invariants">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Invariants</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Candidate must have valid email</td>
+                  </tr>
+                  <tr>
+                    <td>At least one skill must be specified</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section id="agg_match" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Aggregate: JobMatch", "href": "#agg_match"}]'>
+          <header><h2>Aggregate: JobMatch</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>agg_match</dd>
+            <dt>Name</dt>
+            <dd>JobMatch</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd>bc_matching</dd>
+            <dt>Root Ref</dt>
+            <dd>ent_match</dd>
+            <dt>Size Estimate</dt>
+            <dd>small</dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="agg-match-entities-tab" data-tab-target="agg-match-entities-tab">Entities</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-match-value-objects-tab" data-tab-target="agg-match-value-objects-tab">Value Objects</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-match-consistency-rules-tab" data-tab-target="agg-match-consistency-rules-tab">Consistency Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-match-invariants-tab" data-tab-target="agg-match-invariants-tab">Invariants</button>
+            </nav>
+          <div role="tabpanel" id="agg-match-entities-tab" class="TabPanel" data-tab-label="Entities">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Entities</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ent_match</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-match-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Objects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>vo_match_score</td>
+                  </tr>
+                  <tr>
+                    <td>vo_match_criteria</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-match-consistency-rules-tab" class="TabPanel hidden" data-tab-label="Consistency Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Consistency Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Match score must be between 0 and 100</td>
+                  </tr>
+                  <tr>
+                    <td>Match must reference valid candidate and job</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-match-invariants-tab" class="TabPanel hidden" data-tab-label="Invariants">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Invariants</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Match score reflects weighted criteria</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section id="agg_job_posting" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Aggregate: JobPosting", "href": "#agg_job_posting"}]'>
+          <header><h2>Aggregate: JobPosting</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>agg_job_posting</dd>
+            <dt>Name</dt>
+            <dd>JobPosting</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd>bc_job_catalog</dd>
+            <dt>Root Ref</dt>
+            <dd>ent_job</dd>
+            <dt>Size Estimate</dt>
+            <dd>medium</dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="agg-job-posting-entities-tab" data-tab-target="agg-job-posting-entities-tab">Entities</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-job-posting-value-objects-tab" data-tab-target="agg-job-posting-value-objects-tab">Value Objects</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-job-posting-consistency-rules-tab" data-tab-target="agg-job-posting-consistency-rules-tab">Consistency Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="agg-job-posting-invariants-tab" data-tab-target="agg-job-posting-invariants-tab">Invariants</button>
+            </nav>
+          <div role="tabpanel" id="agg-job-posting-entities-tab" class="TabPanel" data-tab-label="Entities">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Entities</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ent_job</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-job-posting-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Objects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>vo_salary_range</td>
+                  </tr>
+                  <tr>
+                    <td>vo_job_requirements</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-job-posting-consistency-rules-tab" class="TabPanel hidden" data-tab-label="Consistency Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Consistency Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Job must have title and company</td>
+                  </tr>
+                  <tr>
+                    <td>Salary range min &lt;= max</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="agg-job-posting-invariants-tab" class="TabPanel hidden" data-tab-label="Invariants">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Invariants</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
         </section>
       </main>
     </div>

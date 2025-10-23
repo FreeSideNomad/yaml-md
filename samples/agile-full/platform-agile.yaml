@@ -1,0 +1,710 @@
+# Commercial Banking Platform - Agile Model
+# Version: 0.1.0 (Draft)
+# Status: Phase 1 - Vision & Technology Foundation
+# Schema: domains/agile/model-schema.yaml
+
+id: "cash-mgmt-platform"
+name: "Commercial Banking Cash Management Platform"
+description: "Unified platform for commercial banking cash management services, supporting client onboarding, service enrollment, user management, and approval workflows across North American markets"
+
+vision:
+  futureStateDescription: |
+    A modern, scalable cash management platform that empowers commercial banking clients across Canada and the US
+    to self-manage their banking services, users, and approval workflows through a unified digital experience.
+    The platform eliminates manual processes, reduces operational overhead, and provides clients with real-time
+    control over their banking relationships while maintaining robust security and compliance standards.
+
+  customerNeeds:
+    targetCustomers:
+      - "Existing Canadian commercial clients (Payedge initiative) requiring online Receivables service enrollment"
+      - "Indirect clients (payors) managed by direct commercial clients, requiring receivable-approval service access"
+      - "Mid-market and large commercial clients with complex organizational structures and approval hierarchies"
+      - "Small business clients needing basic receivables and payment management capabilities"
+      - "Future: US-based commercial clients requiring cross-border receivables capabilities"
+
+    problemsBeingSolved:
+      - "Payedge Receivables initiative cannot launch without platform support for client onboarding and user management"
+      - "No existing receivables service to digitize - this is a new service offering requiring greenfield platform"
+      - "Legacy Express platform (big ball of mud) cannot be modified or extended for new receivables service"
+      - "Express manages users for direct clients but has no concept of indirect clients (payors)"
+      - "No capability to onboard and manage indirect clients (payors) who need to approve invoices"
+      - "Bank employees lack portal to manage online profile enrollment and view indirect client relationships"
+      - "Indirect clients cannot self-manage their users, permissions, and approval rules for invoice processing"
+      - "No generic approval workflow engine - each service implements custom approval logic"
+      - "No configurable approval rules for receivables workflows (single, dual, threshold-based approvals)"
+      - "No unified view for bank employees to monitor three-tier relationship: Bank → Direct Client → Indirect Clients (payors)"
+
+    valueProposition: |
+      Enable Payedge to launch new Receivables service by delivering a dual-portal platform: (1) employee portal
+      for bank staff to manage client enrollment and monitor indirect client relationships; (2) self-service portal
+      for indirect clients (payors) to independently manage their users, permissions, and approval rules. Generic
+      approval workflow engine supports flexible invoice approval patterns (single/dual approver, thresholds).
+
+  solutionIntent:
+    approach: |
+      Build a domain-driven, API-first platform with clear bounded contexts for client management, service enrollment,
+      user management, and permission/approval orchestration. Leverage event-driven architecture for cross-context
+      communication and maintain loose coupling with external account systems through adapter patterns.
+
+    keyCapabilities:
+      - "Employee portal for bank staff to manage Canadian online profile enrollment (primary use case for MVP)"
+      - "Employee portal provides unified view into direct clients and their indirect client (payor) relationships"
+      - "Online profile with single primary client (MVP); secondary client support deferred to post-MVP"
+      - "Indirect client (payor) profile creation and management (~700 BUSINESS payors for MVP large client)"
+      - "Indirect client types: BUSINESS ONLY (business name + related persons with roles) - NO individuals in MVP"
+      - "~1050 indirect client users across 700 business payors (average 1.5 users per business)"
+      - "Dual identity provider strategy: Okta for indirect clients (MVP), A-and-P for direct clients (via Express)"
+      - "Full user lifecycle management for indirect clients in Okta: create, update, activate, deactivate, lock, unlock"
+      - "Platform creates and manages indirect client users in Okta (platform owns identity lifecycle)"
+      - "Anti-corruption layer: consume Express user events (add, update) - Express WILL BE MODIFIED to publish events"
+      - "Near real-time user synchronization from Express via event streaming - unidirectional (Express → Platform) for direct client users"
+      - "Daily batch synchronization from SRF for client-owned accounts (account list, status, updates)"
+      - "Data engineering capabilities for managing data replication from Express and SRF"
+      - "Online profile with site-id linking to Express profile for user replication (direct client users only)"
+      - "Direct client users managed in Express with A-and-P authentication - platform replicates for permission/approval enforcement"
+      - "Indirect client users fully managed in platform with Okta authentication - NEW capability"
+      - "Self-service portal for indirect clients to manage their own users (via platform → Okta integration), permissions, and approval rules"
+      - "Receivable-approval service for indirect clients with self-service invoice approval workflows"
+      - "Generic approval workflow engine: single approver OR multiple approvers (parallel only)"
+      - "Approval workflow lifecycle: submit → pending → approved/rejected/expired"
+      - "Approval rule configuration: approver count (1 or N), amount thresholds (parallel approval when multiple approvers required)"
+      - "Parallel approval: ALL required approvers must approve (no sequential approval in MVP)"
+      - "Three-tier relationship management: Bank → Direct Client (large client) → Indirect Clients (700 business payors)"
+      - "Bank-managed permission and approval rules for large client (MVP); platform stores and enforces rules"
+      - "Account enrollment supporting Canadian DDA accounts for payor invoice payments"
+
+    technicalDirection: |
+      Modern microservices architecture with domain-driven design principles, event-driven integration patterns,
+      and cloud-native deployment. API-first design with dual data integration strategies: near real-time event
+      streaming (Express user events) and daily batch synchronization (SRF account data). Data engineering
+      capabilities for managing data replication, transformation, and quality from external systems. Identity
+      federation with dual providers: A-and-P (direct clients via Express) and Okta (indirect clients). Data
+      residency and sovereignty considerations for multi-region deployment.
+
+    differentiators:
+      - "Dual-portal architecture: Employee portal for bank operations + self-service portal for indirect clients"
+      - "Dual identity provider strategy: A-and-P (direct clients via Express) + Okta (indirect clients via platform)"
+      - "Full user lifecycle management for indirect clients via Okta integration (platform-owned)"
+      - "Employee portal provides end-to-end visibility: direct client enrollment through indirect client monitoring"
+      - "Three-tier client hierarchy: Direct commercial clients can onboard and monitor their indirect clients (payors)"
+      - "Indirect clients have full self-service capabilities: manage users (via Okta), permissions, approval rules independently"
+      - "Generic approval workflow engine with flexible rules: single/dual approver, sequential/parallel, amount thresholds"
+      - "Approval workflow supports receivable-approval service for indirect clients (invoice approval)"
+      - "Flexible client identification: SRF for direct clients, IND for indirect clients (person or business)"
+      - "Platform enables new business model: clients can offer receivables services to their business partners"
+      - "Future: Corporate structure support via secondary client linking (post-MVP)"
+      - "Future: Migrate direct client users to Okta when Express is decommissioned"
+
+  boundaries:
+    inScope:
+      - "MVP: Employee portal for bank staff to manage Canadian online profile enrollment"
+      - "MVP: Employee portal view into direct client + indirect client (payor) relationships and profiles"
+      - "MVP: Onboard ONE large Canadian commercial client to online Receivables service via employee portal"
+      - "MVP: Onboard ~700 indirect clients (payors - BUSINESS ONLY, no individual persons) for the large Receivables client"
+      - "MVP: ~1050 indirect client users (average 1.5 users per indirect client business)"
+      - "MVP: Online profile with single primary client (no secondary client support in MVP)"
+      - "MVP: Receivable-approval service for indirect clients with self-service invoice approval workflows"
+      - "MVP: Generic approval workflow engine for invoice approval by indirect clients"
+      - "MVP: Configurable approval rules: single approver, multiple approvers (parallel approval only)"
+      - "MVP: Approval thresholds (amount-based) determine single vs multiple approver requirements"
+      - "MVP: Approval workflow states: pending, approved, rejected, expired"
+      - "MVP: Parallel approval only - all required approvers must approve (no sequential approval in MVP)"
+      - "MVP: Okta identity provider for indirect client user authentication (NOT A-and-P)"
+      - "MVP: Full user lifecycle management for indirect clients: create, update, activate, deactivate, lock, unlock"
+      - "MVP: Platform creates and manages indirect client users in Okta (platform owns lifecycle)"
+      - "MVP: Near real-time user replication from legacy Express platform (add/update user events) for DIRECT client users"
+      - "MVP: Express platform will be modified to publish user events (add, update)"
+      - "MVP: Daily batch synchronization from SRF for accounts owned by client (account list, status)"
+      - "MVP: Online profile with site-id link to Express profile for user synchronization (direct clients only)"
+      - "MVP: Bank-managed permission and approval rules for the large client (not client self-service)"
+      - "Client profile management (online profiles for direct clients, indirect profiles for payors)"
+      - "Indirect client profile creation (BUSINESS ONLY with related persons: signing-officer, administrator, director)"
+      - "User lifecycle management for both direct and indirect client users (~1050 indirect users)"
+      - "Future: Individual person indirect clients (deferred to post-MVP)"
+      - "Self-service capabilities for indirect clients: manage their own users, permissions, and approval rules"
+      - "Self-service portal for indirect clients (payors) separate from employee portal"
+      - "Account enrollment supporting Canadian DDA accounts (for payor invoice payments)"
+      - "Integration with Okta for indirect client user authentication and lifecycle management (MVP)"
+      - "Integration with A-and-P identity provider for direct client users (via Express - existing)"
+      - "Integration with legacy Express platform for near real-time user event synchronization (direct client users only)"
+      - "Integration with SRF for direct client data (primary client only in MVP), support for IND for indirect clients"
+      - "Geographic coverage: Canada (MVP), with architecture supporting future US and UK expansion"
+      - "Note: No existing receivables service to migrate - this is new service launch"
+      - "Future: Secondary client linking for complex corporate structures (head office/subsidiary, holding/child)"
+      - "Future: Account enrollment from multiple clients (primary + secondary)"
+      - "Future: Self-service enrollment for direct clients (post-MVP)"
+      - "Future: Migrate direct client users from A-and-P to Okta (post-MVP, when Express is decommissioned)"
+      - "Future: Additional cash management services (BTR, Interac Send, other online services)"
+
+    outOfScope:
+      - "Core banking functionality (account opening, transaction processing)"
+      - "Payment processing and execution (platform manages enrollment only)"
+      - "Credit decisioning and underwriting"
+      - "Fraud detection and anti-money laundering (AML) processing"
+      - "Customer Relationship Management (CRM) functionality"
+      - "Product catalog management (services are externally defined)"
+      - "Billing and invoicing for banking services"
+      - "Document management and archival"
+
+    constraints:
+      - "Express platform (legacy) will require modification to publish user events (add, update)"
+      - "Express already has self-serve user management - cannot change or replace this functionality (only add event publishing)"
+      - "Must replicate users from Express to platform via event streaming (add/update user events only)"
+      - "SRF integration limited to daily batch synchronization for account data (no real-time API available)"
+      - "Must integrate with existing Canadian banking platform (SRF) and Capital Markets platform (GID)"
+      - "Must support existing identity provider (A-and-P) before migrating to Okta"
+      - "Data sovereignty requirements for client data in Canada vs. US"
+      - "Regulatory compliance requirements differ by jurisdiction (Canada vs. US states)"
+      - "Must coexist with legacy cash management systems during transition period"
+      - "Limited control over account system APIs and data quality"
+      - "Account data updates via daily batch feeds (low velocity), not real-time"
+
+    assumptions:
+      - "MVP: Bank employee portal sufficient for onboarding one large client (no client self-service required)"
+      - "MVP: 700 business payors (NO individuals) with ~1050 users can be onboarded within MVP timeline (June 2026)"
+      - "MVP: All indirect clients are businesses - individual person indirect clients deferred to post-MVP"
+      - "MVP: Parallel approval sufficient - sequential approval not required"
+      - "Okta is available and approved for use in MVP (indirect client authentication)"
+      - "Platform can integrate with Okta APIs for full user lifecycle management"
+      - "Okta supports required MFA and security policies for commercial banking"
+      - "Express platform can be modified to publish user events (add, update) without disrupting existing functionality"
+      - "Express continues to handle user management for direct clients via existing self-serve capabilities"
+      - "Express uses A-and-P for direct client user authentication (existing integration)"
+      - "Platform replicates Express users via near real-time event streaming (add, update events) for direct clients"
+      - "Express site-id is stable and can be used as linking key for user synchronization (direct clients)"
+      - "Platform does NOT manage direct client users - this remains in Express with A-and-P (anti-corruption layer pattern)"
+      - "Platform DOES fully manage indirect client users in Okta - new functionality not in Express"
+      - "Dual identity provider approach is acceptable: A-and-P (direct clients via Express) + Okta (indirect clients via platform)"
+      - "Daily batch feeds from SRF for client-owned accounts are sufficient for account enrollment management"
+      - "SRF provides complete list of accounts owned by client (daily batch, no real-time API)"
+      - "Indirect clients (business payors) have technical capability for self-service portal with Okta authentication"
+      - "Permission and approval models are consistent enough across services to use generic engine"
+      - "Bank-managed permission/approval rules acceptable for MVP; client self-service in future releases"
+
+    dependencies:
+      - "Legacy Express platform - WILL BE MODIFIED to publish user events (add, update) via event streaming"
+      - "Express continues to own user management for direct clients via existing self-serve UI"
+      - "Platform consumes Express user events (add, update) via event streaming - unidirectional (Express → Platform)"
+      - "A-and-P identity provider for direct client user authentication (via Express integration)"
+      - "Okta identity provider for indirect client user authentication and lifecycle management (MVP)"
+      - "Platform must integrate with Okta APIs for user lifecycle operations (create, update, activate, deactivate, lock, unlock)"
+      - "SRF system for Canadian client demographics and daily batch account synchronization (client-owned accounts)"
+      - "SRF provides daily batch feed of accounts owned by client (account list, status, updates)"
+      - "DDA systems (Canadian) for deposit account information (payor payment accounts)"
+      - "ACH/GSAN systems for payment account information (receivables)"
+      - "GID system for Capital Markets client identification (future)"
+      - "Future: Additional account systems (OLB, MTG, RIBS, TSYS) for expanded services"
+
+  strategicAlignment:
+    businessObjectives:
+      - "Enable Payedge to launch new Receivables service (not replacing existing service - this is greenfield)"
+      - "Provide employee portal for bank staff to efficiently manage online profile enrollment and monitor relationships"
+      - "Unlock new business model: allow commercial clients to extend receivables services to their business partners (payors)"
+      - "Empower indirect clients with self-service portal for user lifecycle, permission, and approval workflow management"
+      - "Adopt Okta for indirect client authentication and lifecycle management (modern identity platform)"
+      - "Provide generic approval workflow engine supporting flexible rules (single/dual approver, thresholds)"
+      - "Reduce operational costs for receivables onboarding through employee portal efficiency and payor self-service"
+      - "Create reusable platform components (dual portals, Okta integration, approval engine, three-tier model) for future services"
+      - "Reduce risk through standardized permission and approval controls for receivables workflows"
+      - "Establish modern identity foundation (Okta) for future migration of direct client users from A-and-P"
+
+    strategicThemes:
+      - "Enable Payedge Receivables initiative (MVP priority)"
+      - "Three-tier client relationship management (Bank → Client → Payors)"
+      - "Self-service empowerment for indirect clients"
+      - "Digital transformation of commercial banking"
+      - "Platform thinking for service innovation and reuse"
+      - "Operational efficiency and cost reduction"
+
+    successMetrics:
+      - name: "MVP launch date"
+        description: "Platform ready to support one large Receivables client with 700 payors"
+        target: 20260630
+        unit: "date"
+      - name: "Direct client onboarding"
+        description: "Large Receivables client onboarded via employee portal (bank-managed, not self-service)"
+        target: 1
+        current: 0
+        unit: "clients"
+      - name: "Indirect client (payor) onboarding"
+        description: "Number of business payors onboarded for the large Receivables client (NO individuals)"
+        target: 700
+        current: 0
+        unit: "payors"
+      - name: "Okta user creation"
+        description: "Number of indirect client users created and managed in Okta by platform"
+        target: 1050
+        current: 0
+        unit: "users"
+      - name: "Approval workflow configuration"
+        description: "Number of approval rules configured for indirect clients (single/dual approver, thresholds)"
+        target: 700
+        current: 0
+        unit: "rules"
+      - name: "Invoice approval processing"
+        description: "Average time for indirect client to approve invoice via receivable-approval workflow"
+        target: 24
+        unit: "hours"
+      - name: "Express user sync latency"
+        description: "Time from user add/update event in Express to replication in platform (direct clients)"
+        target: 5
+        unit: "minutes"
+      - name: "Okta user lifecycle latency"
+        description: "Time from platform user create/update to Okta provisioning (indirect clients)"
+        target: 2
+        unit: "seconds"
+      - name: "Platform uptime"
+        description: "System availability for client-facing services"
+        target: 99.95
+        current: 0
+        unit: "percent"
+      - name: "Indirect client self-service adoption"
+        description: "Percentage of indirect clients managing their own users (via Okta) and approval rules"
+        target: 75
+        current: 0
+        unit: "percent"
+
+    outcomes:
+      - "Payedge successfully launches NEW Receivables service by June 2026 with one large client and 700 business payors"
+      - "Bank employees can efficiently manage online profile enrollment via employee portal"
+      - "Bank employees have unified view into direct clients and their indirect client relationships"
+      - "700 indirect clients (BUSINESS payors only) successfully onboarded and using self-service portal with Okta authentication"
+      - "1050 indirect client users created and managed in Okta via platform lifecycle operations (avg 1.5 users per business)"
+      - "700 approval rules configured (single/dual approver, threshold-based) for receivables workflows"
+      - "Generic approval workflow engine processes invoice approvals with configurable rules"
+      - "Okta integration provides modern, secure identity foundation for indirect clients"
+      - "Near real-time user synchronization from Express platform eliminates manual user management for direct clients"
+      - "Indirect clients independently manage users (via platform → Okta), permissions, and approve invoices"
+      - "Dual identity provider strategy successfully implemented: A-and-P (direct via Express) + Okta (indirect via platform)"
+      - "Platform handles bank-managed permission and approval rules for large client"
+      - "Platform components (dual portals, Okta integration, approval engine, three-tier model) reusable for future services"
+      - "Foundation established for migrating direct client users to Okta (post-MVP), secondary client support, and US expansion"
+
+  motivationalNarrative: |
+    Payedge is ready to launch a brand-new Receivables service—something we've never offered before. A large commercial
+    client wants to bring 700 of their business partners (payors) onto the platform by June 2026. This isn't replacing
+    a manual process—we're creating a new digital service from scratch. And we can't launch without the right platform.
+
+    We need three things to succeed: First, an employee portal where our bank staff can efficiently enroll Canadian online
+    profiles and monitor 700 indirect client relationships. Second, a self-service portal where those 700 payors can
+    independently manage their users, set their approval rules, and process invoices. Third, a generic approval workflow
+    engine that supports flexible rules—single approver for small invoices, dual approval for large amounts, configurable
+    thresholds for each payor.
+
+    Today, none of this exists. We're manually managing users from our legacy Express system. We have no portal for
+    employees or payors. We have no approval engine—every service builds custom approval logic. We're at risk of losing
+    this client and missing the entire Receivables opportunity.
+
+    We're building the platform that makes this possible. Employee portal for efficient bank operations. Self-service
+    portal for payor independence. Generic approval workflow engine supporting flexible, configurable rules. Near
+    real-time Express integration so users flow automatically. A three-tier model that turns our client into a platform
+    for their partners.
+
+    This is our moment. By June 2026, we launch a new service with one large client, 700 payors, and 700 approval
+    workflows. We prove the model works. Then we scale—more clients, more services, corporate structure support, US
+    expansion. We're not just enabling Payedge. We're building the foundation for the next decade of commercial banking
+    innovation.
+
+  decisionFramework:
+    guidingPrinciples:
+      - "Client empowerment first - enable self-service wherever possible"
+      - "Build for reuse - every component should serve multiple services"
+      - "Domain-driven design - clear boundaries, ubiquitous language, loose coupling"
+      - "API-first - all capabilities exposed through well-defined APIs"
+      - "Security and compliance are non-negotiable - build controls into the platform"
+      - "Design for multi-region from day one - not a future retrofit"
+      - "Eventual consistency is acceptable where real-time is not required"
+      - "Anti-corruption layer is mandatory for legacy system integration - protect domain from Express big ball of mud"
+      - "Do not modify legacy systems (Express) - consume via events, translate into domain model"
+      - "Separate concerns: Express owns direct client users, platform owns indirect client users"
+
+    tradeoffCriteria:
+      - "Speed to market vs. perfect architecture - favor iterative delivery with solid foundations"
+      - "Feature richness vs. platform stability - stability wins, add features incrementally"
+      - "Custom solutions vs. generic patterns - always prefer generic, reusable patterns"
+      - "Real-time integration vs. batch - use batch where latency is acceptable to reduce coupling"
+      - "Build vs. buy - buy for identity, build for domain-specific capabilities"
+
+    alignmentMechanisms:
+      - "Bi-weekly product review with stakeholders to validate priorities"
+      - "Architecture review board for technical decisions impacting multiple teams"
+      - "Quarterly roadmap review aligned with business objectives"
+      - "Regular user feedback sessions with commercial banking clients"
+      - "Cross-functional working groups for domain modeling and API design"
+
+  lastUpdated: "2025-10-15"
+
+releases:
+  - id: "REL-1"
+    name: "MVP Release - Payedge Receivables Launch"
+    version: "1.0.0"
+    startDate: "2025-07-01"
+    endDate: "2026-06-30"
+    productId: "cash-mgmt-platform"
+
+    programIncrements:
+      - "PI-1"
+
+    vision:
+      releaseGoal: |
+        Launch the Payedge Receivables service by enabling one large Canadian commercial client to onboard
+        700 business payors with full self-service capabilities for user management, permission configuration,
+        and invoice approval workflows. Deliver dual-portal architecture (employee portal for bank operations,
+        self-service portal for payors) with Okta identity integration and generic approval workflow engine
+        supporting configurable rules.
+
+      targetCustomers:
+        - "One large Canadian commercial client requiring Payedge Receivables service"
+        - "700 business payors (indirect clients) managed by the direct client"
+        - "Bank operations staff using employee portal for enrollment and monitoring"
+        - "~1050 indirect client users across 700 business payors"
+
+      keyCapabilities:
+        - "Employee portal for bank staff to manage Canadian online profile enrollment"
+        - "Employee portal providing unified view into direct client and 700 indirect client relationships"
+        - "Okta integration for 1050 indirect client users (full lifecycle: create, update, activate, deactivate, lock, unlock)"
+        - "Self-service portal for 700 business payors to manage users, permissions, and approval rules independently"
+        - "Generic approval workflow engine with configurable rules (single/dual approver, amount-based thresholds, parallel approval)"
+        - "Receivable-approval service enabling 700 payors to approve invoices via configurable workflows"
+        - "Anti-corruption layer for Express user event synchronization (direct client users only, <5 min latency)"
+        - "Daily batch synchronization from SRF for client-owned Canadian bank accounts"
+        - "Online profile with single primary client (no secondary client support in MVP)"
+        - "Bank-managed permission and approval rules for the large direct client (not self-service)"
+
+      customerValue: |
+        For the large commercial client: Ability to extend receivables services to 700 business partners,
+        reducing manual processes and improving operational efficiency. For payors: Self-service independence
+        to manage their own users and approval workflows without bank intervention. For bank staff: Efficient
+        employee portal for enrollment and monitoring of three-tier relationships (Bank → Client → Payors).
+
+      businessValue: |
+        Unlock new revenue stream through Payedge Receivables service (greenfield - not replacing existing).
+        Establish reusable platform components (dual portals, Okta integration, approval engine) for future
+        services. Demonstrate three-tier client model enabling commercial clients to offer services to their
+        business partners. Prove scalability from 1 client to enterprise-wide adoption.
+
+      themes:
+        - "Enable Payedge Receivables service launch (new revenue stream)"
+        - "Three-tier client relationship model (Bank → Client → Payors)"
+        - "Self-service empowerment for indirect clients"
+        - "Modern identity foundation with Okta"
+        - "Generic approval workflow engine (reusable across services)"
+        - "Dual-portal architecture (employee + self-service)"
+
+      differentiators:
+        - "Three-tier business model: Large client extends services to 700 business partners"
+        - "Dual identity providers: Okta (indirect clients, platform-managed) + A-and-P (direct clients, Express-managed)"
+        - "Generic approval workflow engine: Single/dual approver, amount thresholds, parallel approval (all configurable)"
+        - "Employee portal: Unified view across direct client enrollment and 700 indirect client relationships"
+        - "Self-service portal: Payors manage users (via Okta), permissions, and approval rules independently"
+        - "Platform creates and manages 1050 users in Okta (<2 second latency)"
+        - "Anti-corruption layer: Replicate Express users without polluting domain model"
+
+      boundaries:
+        inScope:
+          - "One large Canadian commercial client onboarded via employee portal"
+          - "700 business payors (indirect clients) - NO individual persons in MVP"
+          - "~1050 indirect client users created and managed in Okta by platform"
+          - "Employee portal for online profile enrollment and relationship monitoring"
+          - "Self-service portal for payors (user management, permissions, approval rules, invoice approval)"
+          - "Okta integration: Full user lifecycle for indirect clients (create, update, activate, deactivate, lock, unlock)"
+          - "Generic approval workflow engine: Single/dual approver, amount thresholds, parallel approval only"
+          - "Approval workflow states: pending, approved, rejected, expired"
+          - "Receivable-approval service for indirect clients"
+          - "Express user event synchronization for direct client users (add/update events, <5 min latency)"
+          - "SRF daily batch synchronization for client-owned accounts"
+          - "Online profile with single primary client (no secondary client linking)"
+          - "Bank-managed permission and approval rules for large direct client"
+          - "Account enrollment supporting Canadian bank accounts (for payor invoice payments)"
+
+        outOfScope:
+          - "Individual person indirect clients (deferred to post-MVP)"
+          - "Sequential approval workflows (only parallel approval in MVP)"
+          - "Self-service enrollment for direct client (bank-managed via employee portal)"
+          - "Secondary client linking for corporate structures (head office/subsidiary)"
+          - "Account enrollment from multiple clients (primary + secondary)"
+          - "Self-service permission/approval rule configuration for direct client (bank-managed)"
+          - "Migration of direct client users from A-and-P to Okta (post-MVP)"
+          - "US or UK geographic expansion (architecture supports, but not in MVP)"
+          - "Additional cash management services (BTR, Interac Send, etc.)"
+
+        deferredToFuture:
+          - "Individual person indirect clients (post-MVP)"
+          - "Secondary client support for corporate structures (Phase 2)"
+          - "Sequential approval workflows (Phase 2)"
+          - "Self-service direct client enrollment (Phase 2)"
+          - "Self-service permission/approval configuration for direct clients (Phase 2)"
+          - "Unified identity provider (migrate direct clients to Okta when Express decommissioned)"
+          - "US and UK expansion (Phase 3)"
+          - "Additional online services (BTR, Interac Send, etc.)"
+
+      successCriteria:
+        - name: "MVP launch date achieved"
+          description: "Platform ready to support Payedge Receivables launch"
+          target: 20260630
+          unit: "date"
+        - name: "Direct client onboarded"
+          description: "Large Canadian commercial client onboarded via employee portal"
+          target: 1
+          unit: "clients"
+        - name: "Business payors onboarded"
+          description: "Business payors onboarded for receivables service (NO individuals)"
+          target: 700
+          unit: "payors"
+        - name: "Okta users provisioned"
+          description: "Indirect client users created in Okta via platform"
+          target: 1050
+          unit: "users"
+        - name: "Approval rules configured"
+          description: "Approval rules configured for indirect clients (single/dual, thresholds)"
+          target: 700
+          unit: "rules"
+        - name: "Approval workflow latency"
+          description: "Average time for payor to approve invoice via workflow"
+          target: 24
+          current: 0
+          unit: "hours"
+        - name: "Express sync latency"
+          description: "User event replication latency from Express"
+          target: 5
+          current: 0
+          unit: "minutes"
+        - name: "Okta provisioning latency"
+          description: "Platform to Okta user provisioning latency"
+          target: 2
+          current: 0
+          unit: "seconds"
+        - name: "Platform uptime"
+          description: "System availability for client-facing services"
+          target: 99.95
+          current: 0
+          unit: "percent"
+        - name: "Self-service adoption"
+          description: "Payors managing own users and approval rules"
+          target: 75
+          current: 0
+          unit: "percent"
+
+      risks:
+        - id: "RISK-001"
+          description: "Express event streaming may not achieve <5 min latency target due to legacy architecture constraints"
+          impact: "medium"
+          probability: "medium"
+          roam: "owned"
+          owner: "Integration Team"
+          mitigation: "Establish event streaming POC by Q3 2025; fallback to batch sync if real-time not achievable"
+
+        - id: "RISK-002"
+          description: "Okta integration complexity may delay user lifecycle management for 1050 users"
+          impact: "high"
+          probability: "low"
+          roam: "mitigated"
+          owner: "Identity Team"
+          mitigation: "Complete Okta integration POC by Q4 2025; validate full lifecycle operations before PI-1"
+
+        - id: "RISK-003"
+          description: "Generic approval workflow engine may not support all payor requirements (amount thresholds, parallel approval)"
+          impact: "high"
+          probability: "medium"
+          roam: "owned"
+          owner: "Product Team"
+          mitigation: "Conduct payor requirements workshops by Q3 2025; validate approval patterns with large client"
+
+        - id: "RISK-004"
+          description: "700 business payors may have diverse user management needs that exceed MVP self-service portal capabilities"
+          impact: "medium"
+          probability: "medium"
+          roam: "accepted"
+          owner: "Product Team"
+          mitigation: "Define MVP self-service scope clearly; defer advanced features to post-MVP releases"
+
+        - id: "RISK-005"
+          description: "SRF daily batch feed may have data quality issues impacting account enrollment for payors"
+          impact: "medium"
+          probability: "low"
+          roam: "owned"
+          owner: "Data Engineering Team"
+          mitigation: "Implement data quality checks and validation rules; establish SLA with SRF team"
+
+      alignmentToProductVision: |
+        This MVP release directly enables the core product vision of launching Payedge Receivables service
+        and establishing the platform foundation for future services. It delivers the three-tier client model
+        (Bank → Client → Payors), dual-portal architecture (employee + self-service), modern identity
+        integration (Okta), and generic approval workflow engine that are central to the platform's strategic
+        value. By proving the model with one large client and 700 payors, this release validates the business
+        case for enterprise-wide scaling and additional service launches.
+
+      motivationalNarrative: |
+        We're not just launching a product—we're launching a new business model. A large commercial client
+        wants to bring 700 of their business partners onto our receivables platform by June 2026. This is
+        greenfield territory: a brand-new service we've never offered before.
+
+        Today, we have no portal for bank staff to manage enrollments. We have no self-service portal for
+        payors. We have no approval workflow engine. We're manually managing users from a legacy system.
+        We're at risk of losing this client and missing the entire Payedge opportunity.
+
+        By June 2026, we deliver: An employee portal where bank staff efficiently enroll clients and monitor
+        700 payor relationships. A self-service portal where payors independently manage their 1050 users
+        (via Okta), set permissions, and approve invoices. A generic approval workflow engine supporting
+        flexible rules—single approver for small invoices, dual approval for large amounts.
+
+        This is our proof point. One client, 700 payors, 1050 Okta users, 700 approval workflows. We prove
+        the three-tier model works. Then we scale—more clients, more services, US expansion, corporate
+        structures. We're building the foundation for the next decade of commercial banking innovation.
+
+      lastUpdated: "2025-10-15"
+
+    releaseObjectives:
+      - description: "Employee portal operational for online profile enrollment and relationship monitoring"
+        businessValue: 10
+        targetPI: "PI-1"
+
+      - description: "Self-service portal operational for 700 payors with Okta authentication"
+        businessValue: 10
+        targetPI: "PI-2"
+
+      - description: "Generic approval workflow engine operational with configurable rules"
+        businessValue: 10
+        targetPI: "PI-2"
+
+      - description: "Okta integration complete: 1050 indirect client users provisioned (<2 sec latency)"
+        businessValue: 9
+        targetPI: "PI-2"
+
+      - description: "Express user synchronization operational (<5 min latency for direct client users)"
+        businessValue: 8
+        targetPI: "PI-1"
+
+      - description: "SRF account synchronization operational (daily batch for client-owned accounts)"
+        businessValue: 7
+        targetPI: "PI-1"
+
+      - description: "700 business payors onboarded with receivable-approval service"
+        businessValue: 10
+        targetPI: "PI-3"
+
+      - description: "700 approval rules configured and operational (single/dual, thresholds)"
+        businessValue: 9
+        targetPI: "PI-3"
+
+    milestones:
+      - name: "Platform Architecture Finalized"
+        date: "2025-09-30"
+        type: "planning"
+        status: "upcoming"
+
+      - name: "Employee Portal MVP Complete"
+        date: "2025-12-31"
+        type: "development"
+        status: "upcoming"
+
+      - name: "Okta Integration POC Validated"
+        date: "2025-12-31"
+        type: "development"
+        status: "upcoming"
+
+      - name: "Express Event Streaming POC Validated"
+        date: "2025-09-30"
+        type: "development"
+        status: "upcoming"
+
+      - name: "Self-Service Portal MVP Complete"
+        date: "2026-03-31"
+        type: "development"
+        status: "upcoming"
+
+      - name: "Generic Approval Workflow Engine Operational"
+        date: "2026-03-31"
+        type: "development"
+        status: "upcoming"
+
+      - name: "Large Client Onboarded (Direct Client)"
+        date: "2026-04-30"
+        type: "deployment"
+        status: "upcoming"
+
+      - name: "700 Business Payors Onboarded"
+        date: "2026-06-15"
+        type: "deployment"
+        status: "upcoming"
+
+      - name: "MVP Launch: Payedge Receivables Service Live"
+        date: "2026-06-30"
+        type: "deployment"
+        status: "upcoming"
+
+    stakeholders:
+      - id: "STAKE-001"
+        name: "Payedge Product Owner"
+        role: "Business Sponsor"
+        influence: "high"
+        interest: "high"
+
+      - id: "STAKE-002"
+        name: "Commercial Banking VP"
+        role: "Executive Sponsor"
+        influence: "high"
+        interest: "high"
+
+      - id: "STAKE-003"
+        name: "Large Canadian Commercial Client"
+        role: "Customer"
+        influence: "high"
+        interest: "high"
+
+      - id: "STAKE-004"
+        name: "Bank Operations Manager"
+        role: "Employee Portal User"
+        influence: "medium"
+        interest: "high"
+
+      - id: "STAKE-005"
+        name: "Technology Architecture Board"
+        role: "Technical Governance"
+        influence: "high"
+        interest: "medium"
+
+      - id: "STAKE-006"
+        name: "Security and Compliance Team"
+        role: "Risk and Compliance"
+        influence: "high"
+        interest: "high"
+
+    metrics:
+      - name: "Sprint velocity"
+        description: "Average story points completed per sprint across teams"
+        target: 50
+        current: 0
+        unit: "points"
+
+      - name: "Feature completion rate"
+        description: "Percentage of planned features completed"
+        target: 95
+        current: 0
+        unit: "percent"
+
+      - name: "Defect density"
+        description: "Number of production defects per feature"
+        target: 2
+        current: 0
+        unit: "defects"
+
+      - name: "Test automation coverage"
+        description: "Percentage of test cases automated"
+        target: 80
+        current: 0
+        unit: "percent"
+
+    status: "planning"
+    releaseType: "major"
+    deploymentStrategy: "phased"
+
+
+metadata:
+  created: "2025-10-15T00:00:00Z"
+  createdBy: "Product Team"
+  tags:
+    - "commercial-banking"
+    - "cash-management"
+    - "digital-transformation"
+    - "platform"

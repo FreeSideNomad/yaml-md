@@ -36,12 +36,86 @@
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="" href="#">Home</a>
           </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="sys-payment-processing" href="#sys-payment-processing">System: Payment Processing System</a>
+          </li>
         </ul>
       </aside>
       <main class="Layout-main p-4" id="content">
         <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
           <h2>Top Level Types</h2>
-          <p>No top-level types discovered.</p>
+          <div class="home-index">
+            <a href="#sys-payment-processing">System: Payment Processing System</a>
+          </div>
+        </section>
+        <section id="sys-payment-processing" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Payment Processing System", "href": "#sys-payment-processing"}]'>
+          <header><h2>System: Payment Processing System</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>sys-payment-processing</dd>
+            <dt>Name</dt>
+            <dd>Payment Processing System</dd>
+            <dt>Description</dt>
+            <dd>Real-time payment processing with CDC outbox pattern for exactly-once delivery guarantees</dd>
+            <dt>X-vendor</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="sys-payment-processing-owners-tab" data-tab-target="sys-payment-processing-owners-tab">Owners</button>
+            <button role="tab" aria-selected="false" aria-controls="sys-payment-processing-domains-tab" data-tab-target="sys-payment-processing-domains-tab">Domains</button>
+            <button role="tab" aria-selected="false" aria-controls="sys-payment-processing-tags-tab" data-tab-target="sys-payment-processing-tags-tab">Tags</button>
+            </nav>
+          <div role="tabpanel" id="sys-payment-processing-owners-tab" class="TabPanel" data-tab-label="Owners">
+            <ul class="ActionList">
+              <li class="ActionList-item">Team: payments-platform Contact: payments@fintech.com</li>
+            </ul>
+          </div>
+          <div role="tabpanel" id="sys-payment-processing-domains-tab" class="TabPanel hidden" data-tab-label="Domains">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Domains</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>dom-payment-ingestion</td>
+                  </tr>
+                  <tr>
+                    <td>dom-fraud-detection</td>
+                  </tr>
+                  <tr>
+                    <td>dom-reconciliation</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="sys-payment-processing-tags-tab" class="TabPanel hidden" data-tab-label="Tags">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>pci-dss</td>
+                  </tr>
+                  <tr>
+                    <td>financial</td>
+                  </tr>
+                  <tr>
+                    <td>mission-critical</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
         </section>
       </main>
     </div>
@@ -172,7 +246,7 @@
           if (window.location.hash) {
             handleHashChange();
           } else {
-            showSection("home");
+            window.location.hash = "#sys-payment-processing";
           }
         })();
         

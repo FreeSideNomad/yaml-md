@@ -36,12 +36,195 @@
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="" href="#">Home</a>
           </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="vo_user_id" href="#vo_user_id">Value Object: UserId</a>
+          </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="vo_client_id" href="#vo_client_id">Value Object: ClientId</a>
+          </li>
         </ul>
       </aside>
       <main class="Layout-main p-4" id="content">
         <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
           <h2>Top Level Types</h2>
-          <p>No top-level types discovered.</p>
+          <div class="home-index">
+            <a href="#vo_user_id">Value Object: UserId</a>
+            <a href="#vo_client_id">Value Object: ClientId</a>
+          </div>
+        </section>
+        <section id="vo_user_id" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Value Object: UserId", "href": "#vo_user_id"}]'>
+          <header><h2>Value Object: UserId</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>vo_user_id</dd>
+            <dt>Name</dt>
+            <dd>UserId</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd>bc_user_management</dd>
+            <dt>Description</dt>
+            <dd>Unique identifier for a user (UUID-based)</dd>
+            <dt>Name</dt>
+            <dd>id</dd>
+            <dt>Type</dt>
+            <dd>String</dd>
+            <dt>Required</dt>
+            <dd>true</dd>
+            <dt>Validation</dt>
+            <dd>UUID format</dd>
+            <dt>Immutability</dt>
+            <dd>true</dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vo-user-id-attributes-tab" data-tab-target="vo-user-id-attributes-tab">Attributes</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-user-id-validation-rules-tab" data-tab-target="vo-user-id-validation-rules-tab">Validation Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-user-id-equality-criteria-tab" data-tab-target="vo-user-id-equality-criteria-tab">Equality Criteria</button>
+            </nav>
+          <div role="tabpanel" id="vo-user-id-attributes-tab" class="TabPanel" data-tab-label="Attributes">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Validation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>id</td>
+                    <td>String</td>
+                    <td>true</td>
+                    <td>UUID format</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-user-id-validation-rules-tab" class="TabPanel hidden" data-tab-label="Validation Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Validation Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Cannot be null or blank</td>
+                  </tr>
+                  <tr>
+                    <td>Must be valid UUID string</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-user-id-equality-criteria-tab" class="TabPanel hidden" data-tab-label="Equality Criteria">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Equality Criteria</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>id</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section id="vo_client_id" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Value Object: ClientId", "href": "#vo_client_id"}]'>
+          <header><h2>Value Object: ClientId</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>vo_client_id</dd>
+            <dt>Name</dt>
+            <dd>ClientId</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd>bc_user_management</dd>
+            <dt>Description</dt>
+            <dd>URN-based identifier for clients (srf, gid, ind)</dd>
+            <dt>Name</dt>
+            <dd>urn</dd>
+            <dt>Type</dt>
+            <dd>String</dd>
+            <dt>Required</dt>
+            <dd>true</dd>
+            <dt>Validation</dt>
+            <dd>^(srf|gid|ind):[A-Za-z0-9_-]+$</dd>
+            <dt>Immutability</dt>
+            <dd>true</dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vo-client-id-attributes-tab" data-tab-target="vo-client-id-attributes-tab">Attributes</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-client-id-validation-rules-tab" data-tab-target="vo-client-id-validation-rules-tab">Validation Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-client-id-equality-criteria-tab" data-tab-target="vo-client-id-equality-criteria-tab">Equality Criteria</button>
+            </nav>
+          <div role="tabpanel" id="vo-client-id-attributes-tab" class="TabPanel" data-tab-label="Attributes">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Validation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>urn</td>
+                    <td>String</td>
+                    <td>true</td>
+                    <td>^(srf|gid|ind):[a Za Z0 9  ]+$</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-client-id-validation-rules-tab" class="TabPanel hidden" data-tab-label="Validation Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Validation Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Must match pattern {system}:{clientNumber}</td>
+                  </tr>
+                  <tr>
+                    <td>System must be srf, gid, or ind</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-client-id-equality-criteria-tab" class="TabPanel hidden" data-tab-label="Equality Criteria">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Equality Criteria</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>urn</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
         </section>
       </main>
     </div>

@@ -127,6 +127,15 @@
             <a class="ActionList-content" data-target="svc_app_submit_application" href="#svc_app_submit_application">Application Service: SubmitApplicationService</a>
           </li>
           <li class="ActionList-item">
+            <a class="ActionList-content" data-target="vo_skills" href="#vo_skills">Value Object: Skills</a>
+          </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="vo_match_score" href="#vo_match_score">Value Object: MatchScore</a>
+          </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="bc_applications" href="#bc_applications">Specification: Application Tracking</a>
+          </li>
+          <li class="ActionList-item">
             <a class="ActionList-content" data-target="cm_profile_to_matching" href="#cm_profile_to_matching">Context Mapping: Profile To Matching</a>
           </li>
           <li class="ActionList-item">
@@ -148,6 +157,9 @@
             <a class="ActionList-content" data-target="bc_project_recommendations" href="#bc_project_recommendations">Bounded Context: Project Recommendations</a>
           </li>
           <li class="ActionList-item">
+            <a class="ActionList-content" data-target="bc_project_recommendations" href="#bc_project_recommendations">Specification: Project Recommendations</a>
+          </li>
+          <li class="ActionList-item">
             <a class="ActionList-content" data-target="cm_skills_to_projects" href="#cm_skills_to_projects">Context Mapping: Skills To Projects</a>
           </li>
           <li class="ActionList-item">
@@ -163,28 +175,16 @@
             <a class="ActionList-content" data-target="dom_notifications" href="#dom_notifications">Domain: Notifications</a>
           </li>
           <li class="ActionList-item">
-            <a class="ActionList-content" data-target="cm_applications_to_notifications" href="#cm_applications_to_notifications">Context Mapping: Applications To Notifications</a>
-          </li>
-          <li class="ActionList-item">
             <a class="ActionList-content" data-target="bc_notifications" href="#bc_notifications">Specification: Notifications</a>
           </li>
           <li class="ActionList-item">
-            <a class="ActionList-content" data-target="vo_skills" href="#vo_skills">Value Object: Skills</a>
-          </li>
-          <li class="ActionList-item">
-            <a class="ActionList-content" data-target="vo_match_score" href="#vo_match_score">Value Object: MatchScore</a>
-          </li>
-          <li class="ActionList-item">
-            <a class="ActionList-content" data-target="bc_project_recommendations" href="#bc_project_recommendations">Specification: Project Recommendations</a>
+            <a class="ActionList-content" data-target="cm_applications_to_notifications" href="#cm_applications_to_notifications">Context Mapping: Applications To Notifications</a>
           </li>
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="agg_skills_gap_report" href="#agg_skills_gap_report">Aggregate: Skills Gap Report</a>
           </li>
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="bc_skills_analysis" href="#bc_skills_analysis">Specification: Skills Gap Analysis</a>
-          </li>
-          <li class="ActionList-item">
-            <a class="ActionList-content" data-target="bc_applications" href="#bc_applications">Specification: Application Tracking</a>
           </li>
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="svc_dom_requirement_extractor" href="#svc_dom_requirement_extractor">Domain Service: RequirementExtractor</a>
@@ -535,9 +535,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-profile-application-services-tab" data-tab-target="bc-profile-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-profile-domain-events-tab" data-tab-target="bc-profile-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-profile-factories-tab" data-tab-target="bc-profile-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-profile-value-objects-tab" data-tab-target="bc-profile-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-profile-entities-tab" data-tab-target="bc-profile-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-profile-context-mappings-tab" data-tab-target="bc-profile-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-profile-value-objects-tab" data-tab-target="bc-profile-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-profile-aggregates-tab" class="TabPanel" data-tab-label="Aggregates">
             <div class="table-wrapper">
@@ -708,6 +708,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bc-profile-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bc-profile-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -827,46 +867,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bc-profile-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -2209,9 +2209,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-job-catalog-application-services-tab" data-tab-target="bc-job-catalog-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-job-catalog-domain-events-tab" data-tab-target="bc-job-catalog-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-job-catalog-factories-tab" data-tab-target="bc-job-catalog-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-job-catalog-value-objects-tab" data-tab-target="bc-job-catalog-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-job-catalog-entities-tab" data-tab-target="bc-job-catalog-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-job-catalog-context-mappings-tab" data-tab-target="bc-job-catalog-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-job-catalog-value-objects-tab" data-tab-target="bc-job-catalog-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-job-catalog-aggregates-tab" class="TabPanel" data-tab-label="Aggregates">
             <div class="table-wrapper">
@@ -2365,6 +2365,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bc-job-catalog-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bc-job-catalog-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -2484,46 +2524,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bc-job-catalog-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -2725,9 +2725,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-scrapers-application-services-tab" data-tab-target="bc-scrapers-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-scrapers-domain-events-tab" data-tab-target="bc-scrapers-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-scrapers-factories-tab" data-tab-target="bc-scrapers-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-scrapers-value-objects-tab" data-tab-target="bc-scrapers-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-scrapers-entities-tab" data-tab-target="bc-scrapers-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-scrapers-context-mappings-tab" data-tab-target="bc-scrapers-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-scrapers-value-objects-tab" data-tab-target="bc-scrapers-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-scrapers-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -2839,6 +2839,46 @@
                     <td>Job Match</td>
                     <td>Domain Layer</td>
                     <td>false</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bc-scrapers-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -2963,46 +3003,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bc-scrapers-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -3165,9 +3165,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-matching-application-services-tab" data-tab-target="bc-matching-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-matching-domain-events-tab" data-tab-target="bc-matching-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-matching-factories-tab" data-tab-target="bc-matching-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-matching-value-objects-tab" data-tab-target="bc-matching-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-matching-entities-tab" data-tab-target="bc-matching-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-matching-context-mappings-tab" data-tab-target="bc-matching-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-matching-value-objects-tab" data-tab-target="bc-matching-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-matching-aggregates-tab" class="TabPanel" data-tab-label="Aggregates">
             <div class="table-wrapper">
@@ -3337,6 +3337,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bc-matching-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bc-matching-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -3456,46 +3496,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bc-matching-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -4322,9 +4322,9 @@
             <button role="tab" aria-selected="false" aria-controls="bounded-context-application-services-tab" data-tab-target="bounded-context-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-domain-events-tab" data-tab-target="bounded-context-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-factories-tab" data-tab-target="bounded-context-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bounded-context-value-objects-tab" data-tab-target="bounded-context-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-entities-tab" data-tab-target="bounded-context-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-context-mappings-tab" data-tab-target="bounded-context-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bounded-context-value-objects-tab" data-tab-target="bounded-context-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bounded-context-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -4586,6 +4586,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bounded-context-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bounded-context-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -4710,46 +4750,6 @@
               </table>
             </div>
           </div>
-          <div role="tabpanel" id="bounded-context-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
           </div>
         </section>
         <section id="domain" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}]'>
@@ -4868,9 +4868,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-requirements-application-services-tab" data-tab-target="bc-requirements-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-requirements-domain-events-tab" data-tab-target="bc-requirements-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-requirements-factories-tab" data-tab-target="bc-requirements-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-requirements-value-objects-tab" data-tab-target="bc-requirements-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-requirements-entities-tab" data-tab-target="bc-requirements-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-requirements-context-mappings-tab" data-tab-target="bc-requirements-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-requirements-value-objects-tab" data-tab-target="bc-requirements-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-requirements-aggregates-tab" class="TabPanel" data-tab-label="Aggregates">
             <div class="table-wrapper">
@@ -5004,6 +5004,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bc-requirements-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bc-requirements-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -5123,46 +5163,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bc-requirements-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -6828,9 +6828,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-applications-application-services-tab" data-tab-target="bc-applications-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-applications-domain-events-tab" data-tab-target="bc-applications-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-applications-factories-tab" data-tab-target="bc-applications-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-applications-value-objects-tab" data-tab-target="bc-applications-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-applications-entities-tab" data-tab-target="bc-applications-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-applications-context-mappings-tab" data-tab-target="bc-applications-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-applications-value-objects-tab" data-tab-target="bc-applications-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-applications-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -6983,6 +6983,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bc-applications-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bc-applications-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -7102,46 +7142,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bc-applications-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -7520,6 +7520,460 @@
           </div>
           </div>
         </section>
+        <section id="vo_skills" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Value Objects", "href": "#bc_applications|bc-applications-value-objects-tab"}, {"label": "Value Object: Skills", "href": "#vo_skills"}]'>
+          <header><h2>Value Object: Skills</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>vo_skills</dd>
+            <dt>Name</dt>
+            <dd>Skills</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd><a href="#bc_profile">Profile Management</a></dd>
+            <dt>Description</dt>
+            <dd>Collection of candidate skills with proficiency levels</dd>
+            <dt>Name</dt>
+            <dd>technical_skills</dd>
+            <dt>Type</dt>
+            <dd>Map&lt;SkillName, ProficiencyLevel&gt;</dd>
+            <dt>Required</dt>
+            <dd>true</dd>
+            <dt>Validation</dt>
+            <dd></dd>
+            <dt>Name</dt>
+            <dd>soft_skills</dd>
+            <dt>Type</dt>
+            <dd>Set&lt;SkillName&gt;</dd>
+            <dt>Required</dt>
+            <dd>false</dd>
+            <dt>Validation</dt>
+            <dd></dd>
+            <dt>Immutability</dt>
+            <dd>true</dd>
+            <dt>Name</dt>
+            <dd>hasSkill</dd>
+            <dt>Description</dt>
+            <dd>Check if skill exists</dd>
+            <dt>Returns</dt>
+            <dd>boolean</dd>
+            <dt>Name</dt>
+            <dd>proficiencyFor</dd>
+            <dt>Description</dt>
+            <dd>Get proficiency for skill</dd>
+            <dt>Returns</dt>
+            <dd>ProficiencyLevel</dd>
+            <dt>Name</dt>
+            <dd>addSkill</dd>
+            <dt>Description</dt>
+            <dd>Return new Skills with added skill</dd>
+            <dt>Returns</dt>
+            <dd>Skills</dd>
+            <dt>Name</dt>
+            <dd>overlapWith</dd>
+            <dt>Description</dt>
+            <dd>Calculate overlap with other Skills</dd>
+            <dt>Returns</dt>
+            <dd>Percentage</dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vo-skills-attributes-tab" data-tab-target="vo-skills-attributes-tab">Attributes</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-skills-validation-rules-tab" data-tab-target="vo-skills-validation-rules-tab">Validation Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-skills-equality-criteria-tab" data-tab-target="vo-skills-equality-criteria-tab">Equality Criteria</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-skills-side-effect-free-methods-tab" data-tab-target="vo-skills-side-effect-free-methods-tab">Side Effect Free Methods</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-skills-common-values-tab" data-tab-target="vo-skills-common-values-tab">Common Values</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-skills-entities-tab" data-tab-target="vo-skills-entities-tab">Entities</button>
+            </nav>
+          <div role="tabpanel" id="vo-skills-attributes-tab" class="TabPanel" data-tab-label="Attributes">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>technical_skills</td>
+                    <td>Map&lt;SkillName, ProficiencyLevel&gt;</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td>soft_skills</td>
+                    <td>Set&lt;SkillName&gt;</td>
+                    <td>false</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-skills-validation-rules-tab" class="TabPanel hidden" data-tab-label="Validation Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Validation Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Technical skills map must not be empty</td>
+                  </tr>
+                  <tr>
+                    <td>Proficiency levels must be: beginner, intermediate, advanced, expert</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-skills-equality-criteria-tab" class="TabPanel hidden" data-tab-label="Equality Criteria">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Equality Criteria</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>technical_skills</td>
+                  </tr>
+                  <tr>
+                    <td>soft_skills</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-skills-side-effect-free-methods-tab" class="TabPanel hidden" data-tab-label="Side Effect Free Methods">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Side Effect Free Method</th>
+                    <th>Description</th>
+                    <th>Returns</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>hasSkill</td>
+                    <td>Check if skill exists</td>
+                    <td>boolean</td>
+                  </tr>
+                  <tr>
+                    <td>proficiencyFor</td>
+                    <td>Get proficiency for skill</td>
+                    <td>ProficiencyLevel</td>
+                  </tr>
+                  <tr>
+                    <td>addSkill</td>
+                    <td>Return new Skills with added skill</td>
+                    <td>Skills</td>
+                  </tr>
+                  <tr>
+                    <td>overlapWith</td>
+                    <td>Calculate overlap with other Skills</td>
+                    <td>Percentage</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-skills-common-values-tab" class="TabPanel hidden" data-tab-label="Common Values">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Common Values</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-skills-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Entity</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Aggregate Ref</th>
+                    <th>Is Aggregate Root</th>
+                    <th>Identity Field</th>
+                    <th>Identity Generation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#ent_candidate">Candidate</a></td>
+                    <td>Profile</td>
+                    <td>Candidate Profile</td>
+                    <td>true</td>
+                    <td>Candidate Id</td>
+                    <td>Auto Generated</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#ent_job_posting">Job Posting</a></td>
+                    <td>Job Catalog</td>
+                    <td>Job Posting</td>
+                    <td>true</td>
+                    <td>Job Id</td>
+                    <td>Auto Generated</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#ent_job_match">Job Match</a></td>
+                    <td>Matching</td>
+                    <td>Job Match</td>
+                    <td>true</td>
+                    <td>Match Id</td>
+                    <td>Auto Generated</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section id="vo_match_score" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Value Objects", "href": "#bc_applications|bc-applications-value-objects-tab"}, {"label": "Value Object: MatchScore", "href": "#vo_match_score"}]'>
+          <header><h2>Value Object: MatchScore</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>vo_match_score</dd>
+            <dt>Name</dt>
+            <dd>MatchScore</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd><a href="#bc_matching">Job Matching Engine</a></dd>
+            <dt>Description</dt>
+            <dd>Calculated match score between 0 and 100</dd>
+            <dt>Name</dt>
+            <dd>value</dd>
+            <dt>Type</dt>
+            <dd>int</dd>
+            <dt>Required</dt>
+            <dd>true</dd>
+            <dt>Validation</dt>
+            <dd>0 &lt;= value &lt;= 100</dd>
+            <dt>Immutability</dt>
+            <dd>true</dd>
+            <dt>Name</dt>
+            <dd>isHighMatch</dd>
+            <dt>Description</dt>
+            <dd>Score &gt;= 80</dd>
+            <dt>Returns</dt>
+            <dd>boolean</dd>
+            <dt>Name</dt>
+            <dd>isMediumMatch</dd>
+            <dt>Description</dt>
+            <dd>50 &lt;= Score &lt; 80</dd>
+            <dt>Returns</dt>
+            <dd>boolean</dd>
+            <dt>Name</dt>
+            <dd>isLowMatch</dd>
+            <dt>Description</dt>
+            <dd>Score &lt; 50</dd>
+            <dt>Returns</dt>
+            <dd>boolean</dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vo-match-score-attributes-tab" data-tab-target="vo-match-score-attributes-tab">Attributes</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-match-score-validation-rules-tab" data-tab-target="vo-match-score-validation-rules-tab">Validation Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-match-score-equality-criteria-tab" data-tab-target="vo-match-score-equality-criteria-tab">Equality Criteria</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-match-score-side-effect-free-methods-tab" data-tab-target="vo-match-score-side-effect-free-methods-tab">Side Effect Free Methods</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-match-score-common-values-tab" data-tab-target="vo-match-score-common-values-tab">Common Values</button>
+            <button role="tab" aria-selected="false" aria-controls="vo-match-score-entities-tab" data-tab-target="vo-match-score-entities-tab">Entities</button>
+            </nav>
+          <div role="tabpanel" id="vo-match-score-attributes-tab" class="TabPanel" data-tab-label="Attributes">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Type</th>
+                    <th>Required</th>
+                    <th>Validation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>value</td>
+                    <td>int</td>
+                    <td>true</td>
+                    <td>0 &lt;= value &lt;= 100</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-match-score-validation-rules-tab" class="TabPanel hidden" data-tab-label="Validation Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Validation Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Score must be between 0 and 100 inclusive</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-match-score-equality-criteria-tab" class="TabPanel hidden" data-tab-label="Equality Criteria">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Equality Criteria</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>value</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-match-score-side-effect-free-methods-tab" class="TabPanel hidden" data-tab-label="Side Effect Free Methods">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Side Effect Free Method</th>
+                    <th>Description</th>
+                    <th>Returns</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>isHighMatch</td>
+                    <td>Score &gt;= 80</td>
+                    <td>boolean</td>
+                  </tr>
+                  <tr>
+                    <td>isMediumMatch</td>
+                    <td>50 &lt;= Score &lt; 80</td>
+                    <td>boolean</td>
+                  </tr>
+                  <tr>
+                    <td>isLowMatch</td>
+                    <td>Score &lt; 50</td>
+                    <td>boolean</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-match-score-common-values-tab" class="TabPanel hidden" data-tab-label="Common Values">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Common Values</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ZERO</td>
+                  </tr>
+                  <tr>
+                    <td>PERFECT (100)</td>
+                  </tr>
+                  <tr>
+                    <td>MINIMUM_ACCEPTABLE (50)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vo-match-score-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Entity</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Aggregate Ref</th>
+                    <th>Is Aggregate Root</th>
+                    <th>Identity Field</th>
+                    <th>Identity Generation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#ent_candidate">Candidate</a></td>
+                    <td>Profile</td>
+                    <td>Candidate Profile</td>
+                    <td>true</td>
+                    <td>Candidate Id</td>
+                    <td>Auto Generated</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#ent_job_posting">Job Posting</a></td>
+                    <td>Job Catalog</td>
+                    <td>Job Posting</td>
+                    <td>true</td>
+                    <td>Job Id</td>
+                    <td>Auto Generated</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#ent_job_match">Job Match</a></td>
+                    <td>Matching</td>
+                    <td>Job Match</td>
+                    <td>true</td>
+                    <td>Match Id</td>
+                    <td>Auto Generated</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section id="bc_applications" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Bounded Contexts", "href": "#dom_application_tracking|dom-application-tracking-bounded-contexts-tab"}, {"label": "Specification: Application Tracking", "href": "#bc_applications"}]'>
+          <header><h2>Specification: Application Tracking</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>bc_applications</dd>
+            <dt>Name</dt>
+            <dd>Application Tracking</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd></dd>
+            <dt>Applies To</dt>
+            <dd></dd>
+            <dt>Rule</dt>
+            <dd></dd>
+            <dt>Composable</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="bc-applications-use-cases-tab" data-tab-target="bc-applications-use-cases-tab">Use Cases</button>
+            </nav>
+          <div role="tabpanel" id="bc-applications-use-cases-tab" class="TabPanel" data-tab-label="Use Cases">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Use Cases</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </section>
         <section id="cm_profile_to_matching" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Profile To Matching", "href": "#cm_profile_to_matching"}]'>
           <header><h2>Context Mapping: Profile To Matching</h2></header>
           <dl class="type-attributes">
@@ -7889,9 +8343,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-skills-analysis-application-services-tab" data-tab-target="bc-skills-analysis-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-skills-analysis-domain-events-tab" data-tab-target="bc-skills-analysis-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-skills-analysis-factories-tab" data-tab-target="bc-skills-analysis-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-skills-analysis-value-objects-tab" data-tab-target="bc-skills-analysis-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-skills-analysis-entities-tab" data-tab-target="bc-skills-analysis-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-skills-analysis-context-mappings-tab" data-tab-target="bc-skills-analysis-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-skills-analysis-value-objects-tab" data-tab-target="bc-skills-analysis-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-skills-analysis-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -8033,6 +8487,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bc-skills-analysis-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bc-skills-analysis-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -8157,46 +8651,6 @@
               </table>
             </div>
           </div>
-          <div role="tabpanel" id="bc-skills-analysis-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
           </div>
         </section>
         <section id="dom_career_development" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Requirements To Skills", "href": "#cm_requirements_to_skills"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Skills Gap Analysis", "href": "#bc_skills_analysis"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Career Development", "href": "#dom_career_development"}]'>
@@ -8280,9 +8734,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-project-recommendations-application-services-tab" data-tab-target="bc-project-recommendations-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-project-recommendations-domain-events-tab" data-tab-target="bc-project-recommendations-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-project-recommendations-factories-tab" data-tab-target="bc-project-recommendations-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-project-recommendations-value-objects-tab" data-tab-target="bc-project-recommendations-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-project-recommendations-entities-tab" data-tab-target="bc-project-recommendations-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-project-recommendations-context-mappings-tab" data-tab-target="bc-project-recommendations-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-project-recommendations-value-objects-tab" data-tab-target="bc-project-recommendations-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-project-recommendations-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -8412,6 +8866,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bc-project-recommendations-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bc-project-recommendations-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -8536,42 +9030,38 @@
               </table>
             </div>
           </div>
-          <div role="tabpanel" id="bc-project-recommendations-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+          </div>
+        </section>
+        <section id="bc_project_recommendations" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Requirements To Skills", "href": "#cm_requirements_to_skills"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Skills Gap Analysis", "href": "#bc_skills_analysis"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Career Development", "href": "#dom_career_development"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Project Recommendations", "href": "#bc_project_recommendations"}, {"label": "Specification: Project Recommendations", "href": "#bc_project_recommendations"}]'>
+          <header><h2>Specification: Project Recommendations</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>bc_project_recommendations</dd>
+            <dt>Name</dt>
+            <dd>Project Recommendations</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd></dd>
+            <dt>Applies To</dt>
+            <dd></dd>
+            <dt>Rule</dt>
+            <dd></dd>
+            <dt>Composable</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="bc-project-recommendations-use-cases-tab" data-tab-target="bc-project-recommendations-use-cases-tab">Use Cases</button>
+            </nav>
+          <div role="tabpanel" id="bc-project-recommendations-use-cases-tab" class="TabPanel" data-tab-label="Use Cases">
             <div class="table-wrapper">
               <table class="Table">
                 <thead>
                   <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
+                    <th>Use Cases</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
-                  </tr>
+                  <tr><td><em>None</em></td></tr>
                 </tbody>
               </table>
             </div>
@@ -8861,9 +9351,9 @@
             <button role="tab" aria-selected="false" aria-controls="bc-notifications-application-services-tab" data-tab-target="bc-notifications-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bc-notifications-domain-events-tab" data-tab-target="bc-notifications-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bc-notifications-factories-tab" data-tab-target="bc-notifications-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bc-notifications-value-objects-tab" data-tab-target="bc-notifications-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bc-notifications-entities-tab" data-tab-target="bc-notifications-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bc-notifications-context-mappings-tab" data-tab-target="bc-notifications-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bc-notifications-value-objects-tab" data-tab-target="bc-notifications-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bc-notifications-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -8972,6 +9462,46 @@
                     <td>Job Match</td>
                     <td>Domain Layer</td>
                     <td>false</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bc-notifications-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -9101,46 +9631,6 @@
               </table>
             </div>
           </div>
-          <div role="tabpanel" id="bc-notifications-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
           </div>
         </section>
         <section id="dom_notifications" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Requirements To Skills", "href": "#cm_requirements_to_skills"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Skills Gap Analysis", "href": "#bc_skills_analysis"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Career Development", "href": "#dom_career_development"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Project Recommendations", "href": "#bc_project_recommendations"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Matching To Notifications", "href": "#cm_matching_to_notifications"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Notifications", "href": "#bc_notifications"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Notifications", "href": "#dom_notifications"}]'>
@@ -9183,6 +9673,42 @@
                     <td>Send email, SMS, push notifications</td>
                     <td>Infrastructure Team</td>
                   </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </section>
+        <section id="bc_notifications" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Requirements To Skills", "href": "#cm_requirements_to_skills"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Skills Gap Analysis", "href": "#bc_skills_analysis"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Career Development", "href": "#dom_career_development"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Project Recommendations", "href": "#bc_project_recommendations"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Matching To Notifications", "href": "#cm_matching_to_notifications"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Notifications", "href": "#bc_notifications"}, {"label": "Bounded Contexts", "href": "#dom_notifications|dom-notifications-bounded-contexts-tab"}, {"label": "Specification: Notifications", "href": "#bc_notifications"}]'>
+          <header><h2>Specification: Notifications</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>bc_notifications</dd>
+            <dt>Name</dt>
+            <dd>Notifications</dd>
+            <dt>Bounded Context Ref</dt>
+            <dd></dd>
+            <dt>Applies To</dt>
+            <dd></dd>
+            <dt>Rule</dt>
+            <dd></dd>
+            <dt>Composable</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="bc-notifications-use-cases-tab" data-tab-target="bc-notifications-use-cases-tab">Use Cases</button>
+            </nav>
+          <div role="tabpanel" id="bc-notifications-use-cases-tab" class="TabPanel" data-tab-label="Use Cases">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Use Cases</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
                 </tbody>
               </table>
             </div>
@@ -9264,496 +9790,6 @@
                 <thead>
                   <tr>
                     <th>Translators</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td><em>None</em></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          </div>
-        </section>
-        <section id="bc_notifications" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Requirements To Skills", "href": "#cm_requirements_to_skills"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Skills Gap Analysis", "href": "#bc_skills_analysis"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Career Development", "href": "#dom_career_development"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Project Recommendations", "href": "#bc_project_recommendations"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Matching To Notifications", "href": "#cm_matching_to_notifications"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Notifications", "href": "#bc_notifications"}, {"label": "Bounded Contexts", "href": "#dom_notifications|dom-notifications-bounded-contexts-tab"}, {"label": "Specification: Notifications", "href": "#bc_notifications"}]'>
-          <header><h2>Specification: Notifications</h2></header>
-          <dl class="type-attributes">
-            <dt>Id</dt>
-            <dd>bc_notifications</dd>
-            <dt>Name</dt>
-            <dd>Notifications</dd>
-            <dt>Bounded Context Ref</dt>
-            <dd></dd>
-            <dt>Applies To</dt>
-            <dd></dd>
-            <dt>Rule</dt>
-            <dd></dd>
-            <dt>Composable</dt>
-            <dd></dd>
-          </dl>
-          <div class="tabbed-tables" data-tab-root>
-            <nav class="TabNav" role="tablist">
-            <button role="tab" aria-selected="true" aria-controls="bc-notifications-use-cases-tab" data-tab-target="bc-notifications-use-cases-tab">Use Cases</button>
-            </nav>
-          <div role="tabpanel" id="bc-notifications-use-cases-tab" class="TabPanel" data-tab-label="Use Cases">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Use Cases</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td><em>None</em></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          </div>
-        </section>
-        <section id="vo_skills" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Requirements To Skills", "href": "#cm_requirements_to_skills"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Skills Gap Analysis", "href": "#bc_skills_analysis"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Career Development", "href": "#dom_career_development"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Project Recommendations", "href": "#bc_project_recommendations"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Matching To Notifications", "href": "#cm_matching_to_notifications"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Notifications", "href": "#bc_notifications"}, {"label": "Value Objects", "href": "#bc_notifications|bc-notifications-value-objects-tab"}, {"label": "Value Object: Skills", "href": "#vo_skills"}]'>
-          <header><h2>Value Object: Skills</h2></header>
-          <dl class="type-attributes">
-            <dt>Id</dt>
-            <dd>vo_skills</dd>
-            <dt>Name</dt>
-            <dd>Skills</dd>
-            <dt>Bounded Context Ref</dt>
-            <dd><a href="#bc_profile">Profile Management</a></dd>
-            <dt>Description</dt>
-            <dd>Collection of candidate skills with proficiency levels</dd>
-            <dt>Name</dt>
-            <dd>technical_skills</dd>
-            <dt>Type</dt>
-            <dd>Map&lt;SkillName, ProficiencyLevel&gt;</dd>
-            <dt>Required</dt>
-            <dd>true</dd>
-            <dt>Validation</dt>
-            <dd></dd>
-            <dt>Name</dt>
-            <dd>soft_skills</dd>
-            <dt>Type</dt>
-            <dd>Set&lt;SkillName&gt;</dd>
-            <dt>Required</dt>
-            <dd>false</dd>
-            <dt>Validation</dt>
-            <dd></dd>
-            <dt>Immutability</dt>
-            <dd>true</dd>
-            <dt>Name</dt>
-            <dd>hasSkill</dd>
-            <dt>Description</dt>
-            <dd>Check if skill exists</dd>
-            <dt>Returns</dt>
-            <dd>boolean</dd>
-            <dt>Name</dt>
-            <dd>proficiencyFor</dd>
-            <dt>Description</dt>
-            <dd>Get proficiency for skill</dd>
-            <dt>Returns</dt>
-            <dd>ProficiencyLevel</dd>
-            <dt>Name</dt>
-            <dd>addSkill</dd>
-            <dt>Description</dt>
-            <dd>Return new Skills with added skill</dd>
-            <dt>Returns</dt>
-            <dd>Skills</dd>
-            <dt>Name</dt>
-            <dd>overlapWith</dd>
-            <dt>Description</dt>
-            <dd>Calculate overlap with other Skills</dd>
-            <dt>Returns</dt>
-            <dd>Percentage</dd>
-          </dl>
-          <div class="tabbed-tables" data-tab-root>
-            <nav class="TabNav" role="tablist">
-            <button role="tab" aria-selected="true" aria-controls="vo-skills-attributes-tab" data-tab-target="vo-skills-attributes-tab">Attributes</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-skills-validation-rules-tab" data-tab-target="vo-skills-validation-rules-tab">Validation Rules</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-skills-equality-criteria-tab" data-tab-target="vo-skills-equality-criteria-tab">Equality Criteria</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-skills-side-effect-free-methods-tab" data-tab-target="vo-skills-side-effect-free-methods-tab">Side Effect Free Methods</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-skills-common-values-tab" data-tab-target="vo-skills-common-values-tab">Common Values</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-skills-entities-tab" data-tab-target="vo-skills-entities-tab">Entities</button>
-            </nav>
-          <div role="tabpanel" id="vo-skills-attributes-tab" class="TabPanel" data-tab-label="Attributes">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Attribute</th>
-                    <th>Type</th>
-                    <th>Required</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>technical_skills</td>
-                    <td>Map&lt;SkillName, ProficiencyLevel&gt;</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td>soft_skills</td>
-                    <td>Set&lt;SkillName&gt;</td>
-                    <td>false</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-skills-validation-rules-tab" class="TabPanel hidden" data-tab-label="Validation Rules">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Validation Rules</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Technical skills map must not be empty</td>
-                  </tr>
-                  <tr>
-                    <td>Proficiency levels must be: beginner, intermediate, advanced, expert</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-skills-equality-criteria-tab" class="TabPanel hidden" data-tab-label="Equality Criteria">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Equality Criteria</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>technical_skills</td>
-                  </tr>
-                  <tr>
-                    <td>soft_skills</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-skills-side-effect-free-methods-tab" class="TabPanel hidden" data-tab-label="Side Effect Free Methods">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Side Effect Free Method</th>
-                    <th>Description</th>
-                    <th>Returns</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>hasSkill</td>
-                    <td>Check if skill exists</td>
-                    <td>boolean</td>
-                  </tr>
-                  <tr>
-                    <td>proficiencyFor</td>
-                    <td>Get proficiency for skill</td>
-                    <td>ProficiencyLevel</td>
-                  </tr>
-                  <tr>
-                    <td>addSkill</td>
-                    <td>Return new Skills with added skill</td>
-                    <td>Skills</td>
-                  </tr>
-                  <tr>
-                    <td>overlapWith</td>
-                    <td>Calculate overlap with other Skills</td>
-                    <td>Percentage</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-skills-common-values-tab" class="TabPanel hidden" data-tab-label="Common Values">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Common Values</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td><em>None</em></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-skills-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Entity</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Aggregate Ref</th>
-                    <th>Is Aggregate Root</th>
-                    <th>Identity Field</th>
-                    <th>Identity Generation</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#ent_candidate">Candidate</a></td>
-                    <td>Profile</td>
-                    <td>Candidate Profile</td>
-                    <td>true</td>
-                    <td>Candidate Id</td>
-                    <td>Auto Generated</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#ent_job_posting">Job Posting</a></td>
-                    <td>Job Catalog</td>
-                    <td>Job Posting</td>
-                    <td>true</td>
-                    <td>Job Id</td>
-                    <td>Auto Generated</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#ent_job_match">Job Match</a></td>
-                    <td>Matching</td>
-                    <td>Job Match</td>
-                    <td>true</td>
-                    <td>Match Id</td>
-                    <td>Auto Generated</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          </div>
-        </section>
-        <section id="vo_match_score" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Requirements To Skills", "href": "#cm_requirements_to_skills"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Skills Gap Analysis", "href": "#bc_skills_analysis"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Career Development", "href": "#dom_career_development"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Project Recommendations", "href": "#bc_project_recommendations"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Matching To Notifications", "href": "#cm_matching_to_notifications"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Notifications", "href": "#bc_notifications"}, {"label": "Value Objects", "href": "#bc_notifications|bc-notifications-value-objects-tab"}, {"label": "Value Object: MatchScore", "href": "#vo_match_score"}]'>
-          <header><h2>Value Object: MatchScore</h2></header>
-          <dl class="type-attributes">
-            <dt>Id</dt>
-            <dd>vo_match_score</dd>
-            <dt>Name</dt>
-            <dd>MatchScore</dd>
-            <dt>Bounded Context Ref</dt>
-            <dd><a href="#bc_matching">Job Matching Engine</a></dd>
-            <dt>Description</dt>
-            <dd>Calculated match score between 0 and 100</dd>
-            <dt>Name</dt>
-            <dd>value</dd>
-            <dt>Type</dt>
-            <dd>int</dd>
-            <dt>Required</dt>
-            <dd>true</dd>
-            <dt>Validation</dt>
-            <dd>0 &lt;= value &lt;= 100</dd>
-            <dt>Immutability</dt>
-            <dd>true</dd>
-            <dt>Name</dt>
-            <dd>isHighMatch</dd>
-            <dt>Description</dt>
-            <dd>Score &gt;= 80</dd>
-            <dt>Returns</dt>
-            <dd>boolean</dd>
-            <dt>Name</dt>
-            <dd>isMediumMatch</dd>
-            <dt>Description</dt>
-            <dd>50 &lt;= Score &lt; 80</dd>
-            <dt>Returns</dt>
-            <dd>boolean</dd>
-            <dt>Name</dt>
-            <dd>isLowMatch</dd>
-            <dt>Description</dt>
-            <dd>Score &lt; 50</dd>
-            <dt>Returns</dt>
-            <dd>boolean</dd>
-          </dl>
-          <div class="tabbed-tables" data-tab-root>
-            <nav class="TabNav" role="tablist">
-            <button role="tab" aria-selected="true" aria-controls="vo-match-score-attributes-tab" data-tab-target="vo-match-score-attributes-tab">Attributes</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-match-score-validation-rules-tab" data-tab-target="vo-match-score-validation-rules-tab">Validation Rules</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-match-score-equality-criteria-tab" data-tab-target="vo-match-score-equality-criteria-tab">Equality Criteria</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-match-score-side-effect-free-methods-tab" data-tab-target="vo-match-score-side-effect-free-methods-tab">Side Effect Free Methods</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-match-score-common-values-tab" data-tab-target="vo-match-score-common-values-tab">Common Values</button>
-            <button role="tab" aria-selected="false" aria-controls="vo-match-score-entities-tab" data-tab-target="vo-match-score-entities-tab">Entities</button>
-            </nav>
-          <div role="tabpanel" id="vo-match-score-attributes-tab" class="TabPanel" data-tab-label="Attributes">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Attribute</th>
-                    <th>Type</th>
-                    <th>Required</th>
-                    <th>Validation</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>value</td>
-                    <td>int</td>
-                    <td>true</td>
-                    <td>0 &lt;= value &lt;= 100</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-match-score-validation-rules-tab" class="TabPanel hidden" data-tab-label="Validation Rules">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Validation Rules</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Score must be between 0 and 100 inclusive</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-match-score-equality-criteria-tab" class="TabPanel hidden" data-tab-label="Equality Criteria">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Equality Criteria</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>value</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-match-score-side-effect-free-methods-tab" class="TabPanel hidden" data-tab-label="Side Effect Free Methods">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Side Effect Free Method</th>
-                    <th>Description</th>
-                    <th>Returns</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>isHighMatch</td>
-                    <td>Score &gt;= 80</td>
-                    <td>boolean</td>
-                  </tr>
-                  <tr>
-                    <td>isMediumMatch</td>
-                    <td>50 &lt;= Score &lt; 80</td>
-                    <td>boolean</td>
-                  </tr>
-                  <tr>
-                    <td>isLowMatch</td>
-                    <td>Score &lt; 50</td>
-                    <td>boolean</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-match-score-common-values-tab" class="TabPanel hidden" data-tab-label="Common Values">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Common Values</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>ZERO</td>
-                  </tr>
-                  <tr>
-                    <td>PERFECT (100)</td>
-                  </tr>
-                  <tr>
-                    <td>MINIMUM_ACCEPTABLE (50)</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="vo-match-score-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Entity</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Aggregate Ref</th>
-                    <th>Is Aggregate Root</th>
-                    <th>Identity Field</th>
-                    <th>Identity Generation</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#ent_candidate">Candidate</a></td>
-                    <td>Profile</td>
-                    <td>Candidate Profile</td>
-                    <td>true</td>
-                    <td>Candidate Id</td>
-                    <td>Auto Generated</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#ent_job_posting">Job Posting</a></td>
-                    <td>Job Catalog</td>
-                    <td>Job Posting</td>
-                    <td>true</td>
-                    <td>Job Id</td>
-                    <td>Auto Generated</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#ent_job_match">Job Match</a></td>
-                    <td>Matching</td>
-                    <td>Job Match</td>
-                    <td>true</td>
-                    <td>Match Id</td>
-                    <td>Auto Generated</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          </div>
-        </section>
-        <section id="bc_project_recommendations" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Context Mappings", "href": "#bc_applications|bc-applications-context-mappings-tab"}, {"label": "Context Mapping: Requirements To Skills", "href": "#cm_requirements_to_skills"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Skills Gap Analysis", "href": "#bc_skills_analysis"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Career Development", "href": "#dom_career_development"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Project Recommendations", "href": "#bc_project_recommendations"}, {"label": "Downstream Context", "href": "#cm_skills_to_projects"}, {"label": "Specification: Project Recommendations", "href": "#bc_project_recommendations"}]'>
-          <header><h2>Specification: Project Recommendations</h2></header>
-          <dl class="type-attributes">
-            <dt>Id</dt>
-            <dd>bc_project_recommendations</dd>
-            <dt>Name</dt>
-            <dd>Project Recommendations</dd>
-            <dt>Bounded Context Ref</dt>
-            <dd></dd>
-            <dt>Applies To</dt>
-            <dd></dd>
-            <dt>Rule</dt>
-            <dd></dd>
-            <dt>Composable</dt>
-            <dd></dd>
-          </dl>
-          <div class="tabbed-tables" data-tab-root>
-            <nav class="TabNav" role="tablist">
-            <button role="tab" aria-selected="true" aria-controls="bc-project-recommendations-use-cases-tab" data-tab-target="bc-project-recommendations-use-cases-tab">Use Cases</button>
-            </nav>
-          <div role="tabpanel" id="bc-project-recommendations-use-cases-tab" class="TabPanel" data-tab-label="Use Cases">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Use Cases</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -10021,42 +10057,6 @@
             <button role="tab" aria-selected="true" aria-controls="bc-skills-analysis-use-cases-tab" data-tab-target="bc-skills-analysis-use-cases-tab">Use Cases</button>
             </nav>
           <div role="tabpanel" id="bc-skills-analysis-use-cases-tab" class="TabPanel" data-tab-label="Use Cases">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Use Cases</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr><td><em>None</em></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          </div>
-        </section>
-        <section id="bc_applications" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Job Seeker Application", "href": "#sys_job_seeker"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Matching", "href": "#dom_job_matching"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Profile Management", "href": "#bc_profile"}, {"label": "Aggregates", "href": "#bc_profile|bc-profile-aggregates-tab"}, {"label": "Aggregate: Candidate Profile", "href": "#agg_candidate_profile"}, {"label": "Root Ref", "href": "#agg_candidate_profile"}, {"label": "Entity: Candidate", "href": "#ent_candidate"}, {"label": "Value Object Ref", "href": "#ent_candidate"}, {"label": "Value Object: Email", "href": "#vo_email"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Posting", "href": "#ent_job_posting"}, {"label": "Bounded Context Ref", "href": "#ent_job_posting"}, {"label": "Bounded Context: Job Catalog", "href": "#bc_job_catalog"}, {"label": "Domains", "href": "#sys_job_seeker|sys-job-seeker-domains-tab"}, {"label": "Domain: Job Aggregation", "href": "#dom_job_aggregation"}, {"label": "Bounded Contexts", "href": "#dom_job_aggregation|dom-job-aggregation-bounded-contexts-tab"}, {"label": "Bounded Context: Job Scrapers", "href": "#bc_scrapers"}, {"label": "Factories", "href": "#bc_scrapers|bc-scrapers-factories-tab"}, {"label": "Factory: JobMatchFactory", "href": "#factory_job_match"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Job Matching Engine", "href": "#bc_matching"}, {"label": "Aggregates", "href": "#bc_matching|bc-matching-aggregates-tab"}, {"label": "Aggregate: Job Match", "href": "#agg_job_match"}, {"label": "Entities", "href": "#vo_email|vo-email-entities-tab"}, {"label": "Entity: Job Match", "href": "#ent_job_match"}, {"label": "Value Object: match_id", "href": "#value-object"}, {"label": "Bounded Context: match_id", "href": "#bounded-context"}, {"label": "Domain: match_id", "href": "#domain"}, {"label": "Bounded Contexts", "href": "#dom_job_matching|dom-job-matching-bounded-contexts-tab"}, {"label": "Bounded Context: Requirements Analysis", "href": "#bc_requirements"}, {"label": "Aggregates", "href": "#bc_requirements|bc-requirements-aggregates-tab"}, {"label": "Aggregate: Requirements Analysis", "href": "#agg_requirements_analysis"}, {"label": "Repositories", "href": "#agg_requirements_analysis|agg-requirements-analysis-repositories-tab"}, {"label": "Repository: JobPostingRepository", "href": "#repo_job_posting"}, {"label": "Aggregate Ref", "href": "#repo_job_posting"}, {"label": "Aggregate: Job Posting", "href": "#agg_job_posting"}, {"label": "Domain Events", "href": "#agg_job_posting|agg-job-posting-domain-events-tab"}, {"label": "Domain Event: ApplicationSubmitted", "href": "#evt_application_submitted"}, {"label": "Bounded Contexts", "href": "#domain|domain-bounded-contexts-tab"}, {"label": "Bounded Context: Application Tracking", "href": "#bc_applications"}, {"label": "Bounded Contexts", "href": "#dom_application_tracking|dom-application-tracking-bounded-contexts-tab"}, {"label": "Specification: Application Tracking", "href": "#bc_applications"}]'>
-          <header><h2>Specification: Application Tracking</h2></header>
-          <dl class="type-attributes">
-            <dt>Id</dt>
-            <dd>bc_applications</dd>
-            <dt>Name</dt>
-            <dd>Application Tracking</dd>
-            <dt>Bounded Context Ref</dt>
-            <dd></dd>
-            <dt>Applies To</dt>
-            <dd></dd>
-            <dt>Rule</dt>
-            <dd></dd>
-            <dt>Composable</dt>
-            <dd></dd>
-          </dl>
-          <div class="tabbed-tables" data-tab-root>
-            <nav class="TabNav" role="tablist">
-            <button role="tab" aria-selected="true" aria-controls="bc-applications-use-cases-tab" data-tab-target="bc-applications-use-cases-tab">Use Cases</button>
-            </nav>
-          <div role="tabpanel" id="bc-applications-use-cases-tab" class="TabPanel" data-tab-label="Use Cases">
             <div class="table-wrapper">
               <table class="Table">
                 <thead>
@@ -10788,9 +10788,9 @@
             <button role="tab" aria-selected="false" aria-controls="bounded-context-1-application-services-tab" data-tab-target="bounded-context-1-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-1-domain-events-tab" data-tab-target="bounded-context-1-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-1-factories-tab" data-tab-target="bounded-context-1-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bounded-context-1-value-objects-tab" data-tab-target="bounded-context-1-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-1-entities-tab" data-tab-target="bounded-context-1-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-1-context-mappings-tab" data-tab-target="bounded-context-1-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bounded-context-1-value-objects-tab" data-tab-target="bounded-context-1-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bounded-context-1-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -11052,6 +11052,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bounded-context-1-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bounded-context-1-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -11171,46 +11211,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bounded-context-1-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -11498,9 +11498,9 @@
             <button role="tab" aria-selected="false" aria-controls="bounded-context-2-application-services-tab" data-tab-target="bounded-context-2-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-2-domain-events-tab" data-tab-target="bounded-context-2-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-2-factories-tab" data-tab-target="bounded-context-2-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bounded-context-2-value-objects-tab" data-tab-target="bounded-context-2-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-2-entities-tab" data-tab-target="bounded-context-2-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-2-context-mappings-tab" data-tab-target="bounded-context-2-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bounded-context-2-value-objects-tab" data-tab-target="bounded-context-2-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bounded-context-2-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -11762,6 +11762,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bounded-context-2-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bounded-context-2-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -11881,46 +11921,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bounded-context-2-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -12208,9 +12208,9 @@
             <button role="tab" aria-selected="false" aria-controls="bounded-context-3-application-services-tab" data-tab-target="bounded-context-3-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-3-domain-events-tab" data-tab-target="bounded-context-3-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-3-factories-tab" data-tab-target="bounded-context-3-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bounded-context-3-value-objects-tab" data-tab-target="bounded-context-3-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-3-entities-tab" data-tab-target="bounded-context-3-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-3-context-mappings-tab" data-tab-target="bounded-context-3-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bounded-context-3-value-objects-tab" data-tab-target="bounded-context-3-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bounded-context-3-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -12472,6 +12472,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bounded-context-3-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bounded-context-3-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -12591,46 +12631,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bounded-context-3-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -13026,9 +13026,9 @@
             <button role="tab" aria-selected="false" aria-controls="bounded-context-4-application-services-tab" data-tab-target="bounded-context-4-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-4-domain-events-tab" data-tab-target="bounded-context-4-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-4-factories-tab" data-tab-target="bounded-context-4-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bounded-context-4-value-objects-tab" data-tab-target="bounded-context-4-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-4-entities-tab" data-tab-target="bounded-context-4-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-4-context-mappings-tab" data-tab-target="bounded-context-4-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bounded-context-4-value-objects-tab" data-tab-target="bounded-context-4-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bounded-context-4-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -13290,6 +13290,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bounded-context-4-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bounded-context-4-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -13409,46 +13449,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bounded-context-4-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -13736,9 +13736,9 @@
             <button role="tab" aria-selected="false" aria-controls="bounded-context-5-application-services-tab" data-tab-target="bounded-context-5-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-5-domain-events-tab" data-tab-target="bounded-context-5-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-5-factories-tab" data-tab-target="bounded-context-5-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bounded-context-5-value-objects-tab" data-tab-target="bounded-context-5-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-5-entities-tab" data-tab-target="bounded-context-5-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-5-context-mappings-tab" data-tab-target="bounded-context-5-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bounded-context-5-value-objects-tab" data-tab-target="bounded-context-5-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bounded-context-5-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -14000,6 +14000,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bounded-context-5-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bounded-context-5-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -14119,46 +14159,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bounded-context-5-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>
@@ -14446,9 +14446,9 @@
             <button role="tab" aria-selected="false" aria-controls="bounded-context-6-application-services-tab" data-tab-target="bounded-context-6-application-services-tab">Application Services</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-6-domain-events-tab" data-tab-target="bounded-context-6-domain-events-tab">Domain Events</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-6-factories-tab" data-tab-target="bounded-context-6-factories-tab">Factories</button>
+            <button role="tab" aria-selected="false" aria-controls="bounded-context-6-value-objects-tab" data-tab-target="bounded-context-6-value-objects-tab">Value Objects</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-6-entities-tab" data-tab-target="bounded-context-6-entities-tab">Entities</button>
             <button role="tab" aria-selected="false" aria-controls="bounded-context-6-context-mappings-tab" data-tab-target="bounded-context-6-context-mappings-tab">Context Mappings</button>
-            <button role="tab" aria-selected="false" aria-controls="bounded-context-6-value-objects-tab" data-tab-target="bounded-context-6-value-objects-tab">Value Objects</button>
             </nav>
           <div role="tabpanel" id="bounded-context-6-examples-tab" class="TabPanel" data-tab-label="Examples">
             <div class="table-wrapper">
@@ -14710,6 +14710,46 @@
               </table>
             </div>
           </div>
+          <div role="tabpanel" id="bounded-context-6-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Value Object</th>
+                    <th>Bounded Context Ref</th>
+                    <th>Description</th>
+                    <th>Immutability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#vo_email">Email</a></td>
+                    <td>Profile</td>
+                    <td>Email address value object with validation</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_skills">Skills</a></td>
+                    <td>Profile</td>
+                    <td>Collection of candidate skills with proficiency levels</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_match_score">MatchScore</a></td>
+                    <td>Matching</td>
+                    <td>Calculated match score between 0 and 100</td>
+                    <td>true</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#vo_location">Location</a></td>
+                    <td>Profile</td>
+                    <td>Canadian location (city, province)</td>
+                    <td>true</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
           <div role="tabpanel" id="bounded-context-6-entities-tab" class="TabPanel hidden" data-tab-label="Entities">
             <div class="table-wrapper">
               <table class="Table">
@@ -14829,46 +14869,6 @@
                     <td>conformist</td>
                     <td>Third-party service API</td>
                     <td>Application updates trigger notifications.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div role="tabpanel" id="bounded-context-6-value-objects-tab" class="TabPanel hidden" data-tab-label="Value Objects">
-            <div class="table-wrapper">
-              <table class="Table">
-                <thead>
-                  <tr>
-                    <th>Value Object</th>
-                    <th>Bounded Context Ref</th>
-                    <th>Description</th>
-                    <th>Immutability</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><a href="#vo_email">Email</a></td>
-                    <td>Profile</td>
-                    <td>Email address value object with validation</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_skills">Skills</a></td>
-                    <td>Profile</td>
-                    <td>Collection of candidate skills with proficiency levels</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_match_score">MatchScore</a></td>
-                    <td>Matching</td>
-                    <td>Calculated match score between 0 and 100</td>
-                    <td>true</td>
-                  </tr>
-                  <tr>
-                    <td><a href="#vo_location">Location</a></td>
-                    <td>Profile</td>
-                    <td>Canadian location (city, province)</td>
-                    <td>true</td>
                   </tr>
                 </tbody>
               </table>

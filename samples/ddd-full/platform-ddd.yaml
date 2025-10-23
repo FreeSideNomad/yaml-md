@@ -1,0 +1,2428 @@
+# Commercial Banking Platform - DDD Model (Restructured)
+# Phase 2 - Strategic Focus
+# Version: 0.2.0
+
+system:
+  id: sys_cash_mgmt_platform
+  name: Commercial Banking Cash Management Platform
+  version: 0.2.0
+  domains:
+    - dom_service_profiles
+    - dom_user_management
+    - dom_approval_workflows
+    - dom_external_data
+
+# ==============================================================================
+# DOMAINS
+# ==============================================================================
+
+domains:
+  dom_service_profiles:
+    id: dom_service_profiles
+    name: Service Profiles
+    type: core
+    strategic_importance: critical
+    description: >
+      Core domain managing SERVICE PROFILES for clients (not clients themselves - client
+      data from SRF/GID). Three profile types: servicing, online (direct client), indirect
+      (payor). Service enrollment managed through application services (stand-alone like BTR,
+      online like Receivables, indirect like receivable-approval). Indirect client management
+      is part of this domain since indirect clients exist only to serve indirect service profiles.
+    bounded_contexts:
+      - bc_service_profile_management
+      - bc_indirect_client_management
+
+  dom_user_management:
+    id: dom_user_management
+    name: User Management
+    type: core
+    strategic_importance: critical
+    description: >
+      User lifecycle for direct clients (Express sync) and indirect clients (Okta managed).
+      Identity provider integration with dual providers. Permission and approval policy
+      management (AWS IAM-inspired). Policies define WHO can DO WHAT on WHICH resources.
+    bounded_contexts:
+      - bc_users
+      - bc_identity_integration
+      - bc_policy
+
+  dom_approval_workflows:
+    id: dom_approval_workflows
+    name: Approval Workflows
+    type: core
+    strategic_importance: critical
+    description: >
+      Generic approval workflow execution engine. Executes approval workflows based on
+      policies defined in User Management domain. Parallel approval only (MVP). Reusable
+      across all services. Critical for business operations requiring approval controls.
+    bounded_contexts:
+      - bc_approval_engine
+
+  dom_external_data:
+    id: dom_external_data
+    name: External Data
+    type: supporting
+    strategic_importance: important
+    description: >
+      Provides SERVING LAYER (read-only) for Service Profile domain to access external data: client
+      demographics (SRF), account data (SRF), and user data (Express). Consumes gold copy data created
+      by data engineering pipelines. Serving layer abstracts external systems from domain model.
+    bounded_contexts:
+      - bc_external_data_serving
+
+# ==============================================================================
+# BOUNDED CONTEXTS
+# ==============================================================================
+
+bounded_contexts:
+  bc_service_profile_management:
+    id: bc_service_profile_management
+    name: Service Profile Management
+    domain_ref: dom_service_profiles
+    description: >
+      Manages SERVICE PROFILES (not clients). Links to client data (SRF/GID/IND). Three
+      types: servicing, online, indirect. Enrolls services and accounts through application
+      services. Consumes account and client data from serving layers (read-only).
+    responsibilities:
+      - Create/manage service profiles (servicing, online, indirect)
+      - Link profile to SRF/GID client data (external)
+      - Enroll services to profiles through application services
+      - Enroll accounts to profiles (via serving layer)
+      - Link online profile to Express (site-id)
+      - Store permission/approval policies (owned by profile)
+    application_services:
+      - svc_app_servicing_profile
+      - svc_app_online_profile
+      - svc_app_indirect_profile
+
+  bc_indirect_client_management:
+    id: bc_indirect_client_management
+    name: Indirect Client Management
+    domain_ref: dom_service_profiles
+    description: >
+      Manages indirect clients (BUSINESS payors only, MVP). Part of Service Profiles domain
+      since indirect clients exist only for indirect service profiles. IND identification,
+      business info, related persons. Self-service user/permission/approval management.
+    responsibilities:
+      - Create/manage indirect client profiles (IND ID)
+      - Store business info and related persons
+      - Link to direct client service profile
+      - Support self-service management
+
+  svc_app_servicing_profile:
+    id: svc_app_servicing_profile
+    name: Servicing Profile Service
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Application service for managing servicing profiles. Creates new servicing profile linked
+      to SRF/GID client. Adds, modifies, and removes services linked to this profile. Enrolls
+      accounts. Manages permission/approval policies owned by servicing profile.
+    responsibilities:
+      - Create new servicing profile (link to SRF/GID client)
+      - Add services to servicing profile
+      - Modify service configurations on profile
+      - Remove services from profile
+      - Enroll accounts to services on profile
+      - Manage permission/approval policies for profile
+      - Use users and user groups as policy subjects
+
+  svc_app_online_profile:
+    id: svc_app_online_profile
+    name: Online Profile Service
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Application service for managing online profiles (direct client). Creates new online profile
+      with single primary client (MVP). Links to Express via site-id. Adds, modifies, removes
+      services like Receivables. Onboards indirect clients (payors). Manages bank-configured
+      permission/approval policies.
+    responsibilities:
+      - Create new online profile (link to SRF primary client + Express site-id)
+      - Add services to online profile (Receivables, etc.)
+      - Modify service configurations on profile
+      - Remove services from profile
+      - Enroll GSAN and other accounts to services
+      - Onboard indirect clients for Receivables service
+      - Manage permission/approval policies (bank-configured, MVP)
+      - Use users and user groups as policy subjects
+
+  svc_app_indirect_profile:
+    id: svc_app_indirect_profile
+    name: Indirect Profile Service
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Application service for managing indirect profiles (business payors). Creates new indirect
+      profile linked to IND client. Adds, modifies, removes services like Receivable-Approval.
+      Links Canadian bank accounts. Manages self-service permission/approval policies configured
+      by payor.
+    responsibilities:
+      - Create new indirect profile (link to IND indirect client)
+      - Add services to indirect profile (Receivable-Approval, etc.)
+      - Modify service configurations on profile
+      - Remove services from profile
+      - Link payor Canadian bank accounts for invoice payments
+      - Manage permission/approval policies (self-service configured)
+      - Use users and user groups as policy subjects
+      - Coordinate invoice approvals via bc_approval_engine
+
+  bc_users:
+    id: bc_users
+    name: Users
+    domain_ref: dom_user_management
+    description: >
+      Manages users and user groups. Direct client users (replicated from Express) and indirect
+      client users (managed in Okta). ~1050 indirect users across 700 business payors (MVP).
+      Users and user groups used as subjects in permission/approval policies.
+    responsibilities:
+      - Replicate direct client users from Express (read-only)
+      - Manage indirect client users in Okta (full lifecycle)
+      - Manage user groups for policy subjects
+      - Track user roles and states
+      - Enforce dual admin requirement
+      - Provide users and user groups for policy evaluation
+
+  bc_identity_integration:
+    id: bc_identity_integration
+    name: Identity Integration
+    domain_ref: dom_user_management
+    description: >
+      Anti-corruption layer for dual identity providers. Consumes Express user events
+      (add, update) via streaming. Integrates with Okta APIs for indirect client users.
+    responsibilities:
+      - Consume Express user events (anti-corruption layer)
+      - Integrate with Okta APIs for indirect users
+      - Abstract identity provider differences
+      - Translate to platform user model
+
+  bc_policy:
+    id: bc_policy
+    name: Policy
+    domain_ref: dom_user_management
+    description: >
+      Permission and approval policy management (AWS IAM-inspired). Policies owned by service
+      profiles. Subject (user/user group from bc_users), action (URN), resource (accounts/services).
+      Approval policy adds approver count and thresholds. Defines WHO can DO WHAT on WHICH resources.
+      Policies consumed by Approval Engine for workflow execution.
+    responsibilities:
+      - Store permission policies owned by service profiles
+      - Store approval policies with approver rules owned by profiles
+      - Use users and user groups from bc_users as policy subjects
+      - Validate user/user group permissions
+      - Determine approval requirements for actions
+      - Provide policy evaluation API for approval workflows
+
+  bc_approval_engine:
+    id: bc_approval_engine
+    name: Approval Engine
+    domain_ref: dom_approval_workflows
+    description: >
+      Generic approval workflow execution engine. Executes workflows based on policies from
+      Permission Management. Parallel approval only (MVP). Single or multiple approvers.
+      Amount-based thresholds. States: pending, approved, rejected, expired.
+      Reusable across all services.
+    responsibilities:
+      - Create approval workflow instances
+      - Enforce approval rules (parallel approval)
+      - Track approval progress
+      - Update workflow state
+      - Notify participants
+
+  bc_account_data_sync:
+    id: bc_account_data_sync
+    name: Account Data Sync
+    description: >
+      Data engineering ETL infrastructure. Daily batch from SRF for client-owned accounts.
+      Creates GOLD COPY of account data consumed by serving layer. Detects new/closed accounts.
+      Data quality checks. Infrastructure supporting External Data domain.
+    responsibilities:
+      - Consume SRF daily batch feed
+      - Create gold copy of account data
+      - Detect account status changes (new, closed)
+      - Data quality and transformation
+      - Trigger auto-enrollment notifications
+
+  bc_external_data_serving:
+    id: bc_external_data_serving
+    name: External Data Serving
+    domain_ref: dom_external_data
+    description: >
+      SERVING LAYER providing READ-ONLY access to gold copy external data from SRF and Express.
+      Service Profile domain consumes this for profile creation, account enrollment, and user
+      synchronization. Three application services provide specialized access: client demographics,
+      account data, and user data.
+    responsibilities:
+      - Provide read-only API to external data gold copies
+      - Abstract SRF and Express systems from domain model
+      - Support profile creation and validation workflows
+      - Support account enrollment workflows
+      - Support user synchronization for permission/approval enforcement
+    application_services:
+      - svc_app_client_data
+      - svc_app_account_data
+      - svc_app_user_data
+
+  svc_app_client_data:
+    id: svc_app_client_data
+    name: Client Data Service
+    bounded_context_ref: bc_external_data_serving
+    description: >
+      Application service providing read-only access to client demographics gold copy from SRF.
+      Service Profile domain consumes this for profile creation and client validation.
+    responsibilities:
+      - Provide read-only API to client gold copy (SRF demographics)
+      - Query client demographics by client ID (SRF/GID)
+      - Validate client existence and status
+      - Support online and servicing profile creation workflows
+
+  svc_app_account_data:
+    id: svc_app_account_data
+    name: Account Data Service
+    bounded_context_ref: bc_external_data_serving
+    description: >
+      Application service providing read-only access to account data gold copy from SRF daily batch.
+      Service Profile domain consumes this for account enrollment and validation.
+    responsibilities:
+      - Provide read-only API to account gold copy (SRF batch)
+      - Query account data by client ID
+      - Validate account existence and status
+      - Support account enrollment workflows for all profile types
+
+  svc_app_user_data:
+    id: svc_app_user_data
+    name: User Data Service
+    bounded_context_ref: bc_external_data_serving
+    description: >
+      Application service providing read-only access to user data gold copy from Express events.
+      User Management domain (bc_users) consumes this for direct client user synchronization and
+      Policy domain (bc_policy) consumes for permission/approval enforcement.
+    responsibilities:
+      - Provide read-only API to user gold copy (Express events)
+      - Query user data by Express site-id
+      - Validate user existence and status
+      - Support user synchronization for bc_users
+      - Support policy evaluation for bc_policy (permission/approval enforcement)
+
+# ==============================================================================
+# CONTEXT MAPPINGS
+# ==============================================================================
+
+context_mappings:
+  cm_service_profile_to_external_data:
+    id: cm_service_profile_to_external_data
+    upstream_context: bc_external_data_serving
+    downstream_context: bc_service_profile_management
+    relationship_type: customer_supplier
+    description: >
+      Service Profile Management (downstream) consumes external data from External Data Serving
+      (upstream) for profile creation, account enrollment, and validation. Read-only access to
+      gold copies via three application services: svc_app_client_data (SRF demographics),
+      svc_app_account_data (SRF batch), svc_app_user_data (Express events).
+
+  cm_approval_engine_to_policy:
+    id: cm_approval_engine_to_policy
+    upstream_context: bc_policy
+    downstream_context: bc_approval_engine
+    relationship_type: customer_supplier
+    description: >
+      Approval Engine (downstream) consumes permission and approval policies from Policy
+      (upstream). Evaluates policies owned by service profiles to determine approval requirements
+      and enforce rules during workflow execution. Policies use users/user groups from bc_users
+      as subjects.
+
+  cm_receivable_approval_to_approval_engine:
+    id: cm_receivable_approval_to_approval_engine
+    upstream_context: bc_service_profile_management
+    downstream_context: bc_approval_engine
+    relationship_type: customer_supplier
+    description: >
+      Service Profile Management (via Receivable-Approval Enrollment application service)
+      triggers invoice approvals via generic Approval Engine. Approval Engine provides
+      reusable workflow execution.
+
+  cm_service_profile_to_indirect_clients:
+    id: cm_service_profile_to_indirect_clients
+    upstream_context: bc_service_profile_management
+    downstream_context: bc_indirect_client_management
+    relationship_type: customer_supplier
+    description: >
+      Direct client service profile onboards indirect clients. One-to-many (1 profile →
+      700 indirect clients, MVP).
+
+  cm_identity_integration_to_express:
+    id: cm_identity_integration_to_express
+    upstream_context: express_platform
+    downstream_context: bc_identity_integration
+    relationship_type: anti_corruption_layer
+    description: >
+      Express publishes user events. Identity Integration consumes via ACL to protect
+      domain from Express complexity (big ball of mud). Unidirectional: Express → Platform.
+
+  cm_account_sync_to_srf:
+    id: cm_account_sync_to_srf
+    upstream_context: srf_system
+    downstream_context: bc_account_data_sync
+    relationship_type: anti_corruption_layer
+    description: >
+      SRF provides daily batch. Account Data Sync consumes via ACL to protect domain from
+      SRF complexity. Creates gold copy.
+
+# ==============================================================================
+# TACTICAL PATTERNS
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# VALUE OBJECTS
+# ------------------------------------------------------------------------------
+
+value_objects:
+  vo_client_id:
+    id: vo_client_id
+    name: ClientId
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Client identifier as URN: {system}:{client_number} where system is srf, gid, or ind.
+      Example: srf:12345, gid:G789, ind:IND001
+    attributes:
+      - name: system
+        type: string
+        description: "System identifier (srf, gid, ind)"
+        validation: "Must be one of: srf, gid, ind"
+      - name: client_number
+        type: string
+        description: "Client number within system"
+        validation: "Non-empty string"
+      - name: urn
+        type: string
+        description: "Full URN representation: {system}:{client_number}"
+    immutable: true
+    validation_rules:
+      - "system must be srf, gid, or ind"
+      - "client_number must not be empty"
+      - "URN format: {system}:{client_number}"
+
+  vo_profile_id_base:
+    id: vo_profile_id_base
+    name: ProfileId
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Base class for profile identifiers. All profiles stored as URN for polymorphic handling.
+      Subclasses: ServicingProfileId, OnlineProfileId, IndirectProfileId.
+    attributes:
+      - name: urn
+        type: string
+        description: "URN representation of profile ID"
+    immutable: true
+    is_abstract: true
+
+  vo_servicing_profile_id:
+    id: vo_servicing_profile_id
+    name: ServicingProfileId
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Servicing profile identifier: ServicingProfileId(clientId). Stored as URN.
+    extends: vo_profile_id_base
+    attributes:
+      - name: client_id
+        type: value_object
+        value_object_ref: vo_client_id
+        description: "Client identifier (SRF or GID)"
+    immutable: true
+    validation_rules:
+      - "client_id system must be srf or gid"
+
+  vo_online_profile_id:
+    id: vo_online_profile_id
+    name: OnlineProfileId
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Online profile identifier: OnlineProfileId(clientId, sequence). Sequence unique within client.
+      Stored as URN.
+    extends: vo_profile_id_base
+    attributes:
+      - name: client_id
+        type: value_object
+        value_object_ref: vo_client_id
+        description: "Client identifier (SRF)"
+      - name: sequence
+        type: integer
+        description: "Sequence number unique within client"
+        validation: "Must be positive integer"
+    immutable: true
+    validation_rules:
+      - "client_id system must be srf"
+      - "sequence must be positive integer"
+
+  vo_indirect_profile_id:
+    id: vo_indirect_profile_id
+    name: IndirectProfileId
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Indirect profile identifier: IndirectProfileId(clientId, indirectClientId). Stored as URN.
+      IndirectClientId has its own sequence within client.
+    extends: vo_profile_id_base
+    attributes:
+      - name: client_id
+        type: value_object
+        value_object_ref: vo_client_id
+        description: "Direct client identifier (SRF)"
+      - name: indirect_client_id
+        type: value_object
+        value_object_ref: vo_indirect_client_id
+        description: "Indirect client identifier with sequence"
+    immutable: true
+    validation_rules:
+      - "client_id system must be srf"
+
+  vo_indirect_client_id:
+    id: vo_indirect_client_id
+    name: IndirectClientId
+    bounded_context_ref: bc_indirect_client_management
+    description: >
+      Indirect client identifier: IndirectClientId(clientId, sequence). Sequence unique within client.
+    attributes:
+      - name: client_id
+        type: value_object
+        value_object_ref: vo_client_id
+        description: "Parent direct client identifier"
+      - name: sequence
+        type: integer
+        description: "Sequence number unique within direct client"
+        validation: "Must be positive integer"
+    immutable: true
+    validation_rules:
+      - "sequence must be positive integer unique within client"
+
+# ------------------------------------------------------------------------------
+# AGGREGATES
+# ------------------------------------------------------------------------------
+
+aggregates:
+  agg_servicing_profile:
+    id: agg_servicing_profile
+    name: ServicingProfile
+    bounded_context_ref: bc_service_profile_management
+    root_ref: ent_servicing_profile
+    entities:
+      - ent_servicing_profile
+      - ent_service_enrollment
+      - ent_account_enrollment
+    value_objects:
+      - vo_servicing_profile_id
+      - vo_client_id
+    consistency_rules:
+      - "ServicingProfile must be linked to valid SRF or GID client"
+      - "Services can only be enrolled if profile is ACTIVE"
+      - "Accounts enrolled must belong to the linked client"
+    invariants:
+      - "profile_id must be unique"
+      - "client_id cannot change after creation"
+      - "At least one service must be enrolled for profile to be ACTIVE"
+    lifecycle_hooks:
+      on_create:
+        - "Validate client exists via svc_app_client_data"
+        - "Publish ServicingProfileCreated event"
+      on_update:
+        - "Publish ServicingProfileUpdated event"
+    size_estimate: medium
+
+  agg_online_profile:
+    id: agg_online_profile
+    name: OnlineProfile
+    bounded_context_ref: bc_service_profile_management
+    root_ref: ent_online_profile
+    entities:
+      - ent_online_profile
+      - ent_service_enrollment
+      - ent_account_enrollment
+    value_objects:
+      - vo_online_profile_id
+      - vo_client_id
+    consistency_rules:
+      - "OnlineProfile must be linked to valid SRF primary client"
+      - "Express site-id must exist and link to same client"
+      - "Services can only be enrolled if profile is ACTIVE"
+      - "Indirect clients can only be onboarded for Receivables service"
+    invariants:
+      - "profile_id must be unique"
+      - "client_id cannot change after creation"
+      - "site_id cannot change after creation"
+      - "sequence must be unique within client"
+    lifecycle_hooks:
+      on_create:
+        - "Validate client exists via svc_app_client_data"
+        - "Validate site-id exists via svc_app_client_data"
+        - "Generate next sequence number for client"
+        - "Publish OnlineProfileCreated event"
+      on_update:
+        - "Publish OnlineProfileUpdated event"
+    size_estimate: large
+
+  agg_indirect_profile:
+    id: agg_indirect_profile
+    name: IndirectProfile
+    bounded_context_ref: bc_service_profile_management
+    root_ref: ent_indirect_profile
+    entities:
+      - ent_indirect_profile
+      - ent_service_enrollment
+      - ent_account_enrollment
+    value_objects:
+      - vo_indirect_profile_id
+      - vo_indirect_client_id
+      - vo_client_id
+    consistency_rules:
+      - "IndirectProfile must be linked to valid indirect client"
+      - "Indirect client must belong to a valid direct client (online profile)"
+      - "Services can only be enrolled if profile is ACTIVE"
+      - "Accounts enrolled must be Canadian bank accounts for invoice payments"
+    invariants:
+      - "profile_id must be unique"
+      - "indirect_client_id cannot change after creation"
+      - "parent client_id cannot change after creation"
+    lifecycle_hooks:
+      on_create:
+        - "Validate indirect client exists"
+        - "Validate parent direct client exists"
+        - "Publish IndirectProfileCreated event"
+      on_update:
+        - "Publish IndirectProfileUpdated event"
+    size_estimate: medium
+
+  agg_permission_statement:
+    id: agg_permission_statement
+    name: PermissionStatement
+    bounded_context_ref: bc_policy
+    root_ref: ent_permission_statement
+    entities:
+      - ent_permission_statement
+    value_objects:
+      - vo_profile_id_base
+    consistency_rules:
+      - "PermissionStatement must be owned by a valid profile"
+      - "Subject (user/user group) must exist in bc_users"
+      - "Action must be valid URN"
+      - "Resource must reference valid profile resource"
+    invariants:
+      - "statement_id must be unique"
+      - "profile_id (owner) cannot change after creation"
+      - "Effect must be ALLOW or DENY"
+    lifecycle_hooks:
+      on_create:
+        - "Validate profile exists"
+        - "Validate subject exists in bc_users"
+        - "Publish PermissionStatementCreated event"
+      on_update:
+        - "Publish PermissionStatementUpdated event"
+      on_delete:
+        - "Publish PermissionStatementDeleted event"
+    size_estimate: small
+
+  agg_approval_statement:
+    id: agg_approval_statement
+    name: ApprovalStatement
+    bounded_context_ref: bc_policy
+    root_ref: ent_approval_statement
+    entities:
+      - ent_approval_statement
+    value_objects:
+      - vo_profile_id_base
+    consistency_rules:
+      - "ApprovalStatement extends PermissionStatement with approver requirements"
+      - "Must specify approver count (1 or N for parallel approval)"
+      - "Amount thresholds must be positive if specified"
+      - "Approvers must exist in bc_users"
+    invariants:
+      - "statement_id must be unique"
+      - "profile_id (owner) cannot change after creation"
+      - "approver_count must be >= 1"
+      - "If amount_threshold specified, must be positive"
+    lifecycle_hooks:
+      on_create:
+        - "Validate profile exists"
+        - "Validate approvers exist in bc_users"
+        - "Publish ApprovalStatementCreated event"
+      on_update:
+        - "Publish ApprovalStatementUpdated event"
+      on_delete:
+        - "Publish ApprovalStatementDeleted event"
+    size_estimate: small
+
+  agg_indirect_client:
+    id: agg_indirect_client
+    name: IndirectClient
+    bounded_context_ref: bc_indirect_client_management
+    root_ref: ent_indirect_client
+    entities:
+      - ent_indirect_client
+      - ent_related_person
+    value_objects:
+      - vo_indirect_client_id
+      - vo_client_id
+    consistency_rules:
+      - "IndirectClient must be BUSINESS type (no individuals in MVP)"
+      - "Business must have at least one related person"
+      - "Related person must have valid role (signing-officer, administrator, director)"
+      - "Must be linked to valid direct client (online profile)"
+    invariants:
+      - "indirect_client_id must be unique"
+      - "parent client_id cannot change after creation"
+      - "type must be BUSINESS"
+      - "sequence must be unique within parent client"
+    lifecycle_hooks:
+      on_create:
+        - "Validate parent direct client exists"
+        - "Generate next sequence number within client"
+        - "Publish IndirectClientOnboarded event"
+      on_update:
+        - "Publish IndirectClientUpdated event"
+    size_estimate: small
+
+  agg_user:
+    id: agg_user
+    name: User
+    bounded_context_ref: bc_users
+    root_ref: ent_user
+    entities:
+      - ent_user
+    value_objects:
+      - vo_profile_id_base
+    consistency_rules:
+      - "Direct client users replicated from Express (read-only)"
+      - "Indirect client users managed in Okta (full lifecycle)"
+      - "Users must be linked to a profile"
+      - "Dual admin requirement: at least 2 admins per profile"
+    invariants:
+      - "user_id must be unique"
+      - "profile_id link cannot change after creation"
+      - "source must be EXPRESS or OKTA"
+      - "If source=EXPRESS, user is read-only in platform"
+    lifecycle_hooks:
+      on_create:
+        - "If source=OKTA, create user in Okta via bc_identity_integration"
+        - "Publish UserCreated event"
+      on_update:
+        - "If source=OKTA, update user in Okta via bc_identity_integration"
+        - "Publish UserUpdated event"
+    size_estimate: small
+
+  agg_user_group:
+    id: agg_user_group
+    name: UserGroup
+    bounded_context_ref: bc_users
+    root_ref: ent_user_group
+    entities:
+      - ent_user_group
+      - ent_user_group_membership
+    value_objects:
+      - vo_profile_id_base
+    consistency_rules:
+      - "UserGroup must be linked to a profile"
+      - "Group members must be users from same profile"
+      - "User can belong to multiple groups"
+    invariants:
+      - "group_id must be unique"
+      - "profile_id link cannot change after creation"
+      - "All members must belong to same profile"
+    lifecycle_hooks:
+      on_create:
+        - "Publish UserGroupCreated event"
+      on_update:
+        - "Publish UserGroupUpdated event"
+    size_estimate: small
+
+# ------------------------------------------------------------------------------
+# DOMAIN EVENTS
+# ------------------------------------------------------------------------------
+
+domain_events:
+  evt_permission_statement_created:
+    id: evt_permission_statement_created
+    name: PermissionStatementCreated
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_permission_statement
+    description: >
+      Published when a permission statement is created for a service profile. Contains
+      profile_id (owner), subject (user/user group), action URN, resource, and effect (ALLOW/DENY).
+    payload:
+      - name: statement_id
+        type: string
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+      - name: subject
+        type: string
+        description: "User or user group ID"
+      - name: action
+        type: string
+        description: "Action URN"
+      - name: resource
+        type: string
+        description: "Resource identifier"
+      - name: effect
+        type: string
+        description: "ALLOW or DENY"
+      - name: created_at
+        type: timestamp
+      - name: created_by
+        type: string
+
+  evt_permission_statement_updated:
+    id: evt_permission_statement_updated
+    name: PermissionStatementUpdated
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_permission_statement
+    description: >
+      Published when a permission statement is updated. May include changes to subject,
+      action, resource, or effect.
+    payload:
+      - name: statement_id
+        type: string
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+      - name: updated_fields
+        type: object
+        description: "Map of field name to new value"
+      - name: updated_at
+        type: timestamp
+      - name: updated_by
+        type: string
+
+  evt_permission_statement_deleted:
+    id: evt_permission_statement_deleted
+    name: PermissionStatementDeleted
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_permission_statement
+    description: >
+      Published when a permission statement is deleted. Consumers should revoke cached permissions.
+    payload:
+      - name: statement_id
+        type: string
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+      - name: deleted_at
+        type: timestamp
+      - name: deleted_by
+        type: string
+
+  evt_approval_statement_created:
+    id: evt_approval_statement_created
+    name: ApprovalStatementCreated
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_approval_statement
+    description: >
+      Published when an approval statement is created for a service profile. Extends permission
+      statement with approver count, amount thresholds, and approver list.
+    payload:
+      - name: statement_id
+        type: string
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+      - name: subject
+        type: string
+        description: "User or user group ID"
+      - name: action
+        type: string
+        description: "Action URN requiring approval"
+      - name: resource
+        type: string
+        description: "Resource identifier"
+      - name: approver_count
+        type: integer
+        description: "Number of required approvals (parallel)"
+      - name: approvers
+        type: array
+        description: "List of approver user/user group IDs"
+      - name: amount_threshold
+        type: decimal
+        description: "Optional amount threshold for approval requirement"
+      - name: created_at
+        type: timestamp
+      - name: created_by
+        type: string
+
+  evt_approval_statement_updated:
+    id: evt_approval_statement_updated
+    name: ApprovalStatementUpdated
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_approval_statement
+    description: >
+      Published when an approval statement is updated. May include changes to approver count,
+      approvers, or thresholds.
+    payload:
+      - name: statement_id
+        type: string
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+      - name: updated_fields
+        type: object
+        description: "Map of field name to new value"
+      - name: updated_at
+        type: timestamp
+      - name: updated_by
+        type: string
+
+  evt_approval_statement_deleted:
+    id: evt_approval_statement_deleted
+    name: ApprovalStatementDeleted
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_approval_statement
+    description: >
+      Published when an approval statement is deleted. Consumers should remove approval requirements.
+    payload:
+      - name: statement_id
+        type: string
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+      - name: deleted_at
+        type: timestamp
+      - name: deleted_by
+        type: string
+
+  evt_approval_workflow_started:
+    id: evt_approval_workflow_started
+    name: ApprovalWorkflowStarted
+    bounded_context_ref: bc_approval_engine
+    description: >
+      Published when an approval workflow is initiated. Contains workflow ID, approval statement
+      reference, requester, resource being approved, and approver list.
+    payload:
+      - name: workflow_id
+        type: string
+      - name: statement_id
+        type: string
+        description: "Reference to approval statement"
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+      - name: requester_id
+        type: string
+        description: "User initiating the action requiring approval"
+      - name: action
+        type: string
+        description: "Action URN requiring approval"
+      - name: resource
+        type: string
+        description: "Resource being approved"
+      - name: amount
+        type: decimal
+        description: "Optional amount for threshold-based approval"
+      - name: required_approvals
+        type: integer
+        description: "Number of approvals required"
+      - name: approvers
+        type: array
+        description: "List of eligible approvers"
+      - name: started_at
+        type: timestamp
+
+  evt_approval_completed:
+    id: evt_approval_completed
+    name: ApprovalCompleted
+    bounded_context_ref: bc_approval_engine
+    description: >
+      Published when an approval workflow reaches terminal state (approved, rejected, or expired).
+      Contains final workflow state and outcome.
+    payload:
+      - name: workflow_id
+        type: string
+      - name: statement_id
+        type: string
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+      - name: outcome
+        type: string
+        description: "APPROVED, REJECTED, or EXPIRED"
+      - name: approvals_received
+        type: array
+        description: "List of approver IDs who approved"
+      - name: rejection_reason
+        type: string
+        description: "Optional reason if rejected"
+      - name: completed_at
+        type: timestamp
+
+# ------------------------------------------------------------------------------
+# ENTITIES
+# ------------------------------------------------------------------------------
+
+entities:
+  ent_servicing_profile:
+    id: ent_servicing_profile
+    name: ServicingProfile
+    bounded_context_ref: bc_service_profile_management
+    aggregate_ref: agg_servicing_profile
+    is_aggregate_root: true
+    identity_field: profile_id
+    identity_generation: derived
+    attributes:
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_servicing_profile_id
+        required: true
+        description: "Unique profile identifier (clientId)"
+      - name: client_id
+        type: value_object
+        value_object_ref: vo_client_id
+        required: true
+        description: "SRF or GID client reference"
+      - name: status
+        type: string
+        required: true
+        description: "Profile status (PENDING, ACTIVE, SUSPENDED, CLOSED)"
+      - name: created_at
+        type: timestamp
+        required: true
+      - name: updated_at
+        type: timestamp
+        required: true
+      - name: created_by
+        type: string
+        required: true
+        description: "User who created profile"
+    business_methods:
+      - name: enrollService
+        description: "Enroll a stand-alone service to this profile"
+        parameters:
+          - name: service_type
+            type: string
+            description: "BTR, ACH_DEBIT_BLOCK, ADDITIONAL_DEPOSIT_NARRATIVE"
+          - name: configuration
+            type: object
+        returns: "ServiceEnrollment entity"
+        publishes_events:
+          - evt_service_enrolled
+      - name: enrollAccount
+        description: "Enroll account to a service"
+        parameters:
+          - name: service_enrollment_id
+            type: string
+          - name: account_id
+            type: string
+        returns: "AccountEnrollment entity"
+        publishes_events:
+          - evt_account_enrolled
+      - name: suspend
+        description: "Suspend profile (bank or admin action)"
+        parameters:
+          - name: reason
+            type: string
+        returns: void
+        publishes_events:
+          - evt_servicing_profile_suspended
+    invariants:
+      - "profile_id must be unique"
+      - "client_id cannot change after creation"
+      - "At least one service must be enrolled for ACTIVE status"
+    lifecycle_states:
+      - PENDING
+      - ACTIVE
+      - SUSPENDED
+      - CLOSED
+
+  ent_online_profile:
+    id: ent_online_profile
+    name: OnlineProfile
+    bounded_context_ref: bc_service_profile_management
+    aggregate_ref: agg_online_profile
+    is_aggregate_root: true
+    identity_field: profile_id
+    identity_generation: derived
+    attributes:
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_online_profile_id
+        required: true
+        description: "Unique profile identifier (clientId + sequence)"
+      - name: client_id
+        type: value_object
+        value_object_ref: vo_client_id
+        required: true
+        description: "SRF primary client reference"
+      - name: site_id
+        type: string
+        required: true
+        description: "Express site-id for user synchronization"
+      - name: status
+        type: string
+        required: true
+        description: "Profile status"
+      - name: created_at
+        type: timestamp
+        required: true
+      - name: updated_at
+        type: timestamp
+        required: true
+      - name: created_by
+        type: string
+        required: true
+    business_methods:
+      - name: enrollService
+        description: "Enroll online service (Receivables, Interac Send)"
+        parameters:
+          - name: service_type
+            type: string
+            description: "RECEIVABLES, INTERAC_SEND"
+          - name: configuration
+            type: object
+        returns: "ServiceEnrollment entity"
+        publishes_events:
+          - evt_service_enrolled
+      - name: onboardIndirectClient
+        description: "Onboard indirect client (payor) for Receivables"
+        parameters:
+          - name: indirect_client_id
+            type: value_object
+            value_object_ref: vo_indirect_client_id
+        returns: "IndirectClient entity reference"
+        publishes_events:
+          - evt_indirect_client_onboarded
+      - name: enrollAccount
+        description: "Enroll GSAN or other account to service"
+        parameters:
+          - name: service_enrollment_id
+            type: string
+          - name: account_id
+            type: string
+        returns: "AccountEnrollment entity"
+        publishes_events:
+          - evt_account_enrolled
+    invariants:
+      - "profile_id must be unique"
+      - "client_id cannot change after creation"
+      - "site_id cannot change after creation"
+      - "sequence must be unique within client"
+    lifecycle_states:
+      - PENDING
+      - ACTIVE
+      - SUSPENDED
+      - CLOSED
+
+  ent_indirect_profile:
+    id: ent_indirect_profile
+    name: IndirectProfile
+    bounded_context_ref: bc_service_profile_management
+    aggregate_ref: agg_indirect_profile
+    is_aggregate_root: true
+    identity_field: profile_id
+    identity_generation: derived
+    attributes:
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_indirect_profile_id
+        required: true
+        description: "Unique profile identifier (clientId + indirectClientId)"
+      - name: indirect_client_id
+        type: value_object
+        value_object_ref: vo_indirect_client_id
+        required: true
+        description: "IND indirect client reference"
+      - name: parent_client_id
+        type: value_object
+        value_object_ref: vo_client_id
+        required: true
+        description: "Direct client (SRF) reference"
+      - name: status
+        type: string
+        required: true
+      - name: created_at
+        type: timestamp
+        required: true
+      - name: updated_at
+        type: timestamp
+        required: true
+    business_methods:
+      - name: enrollService
+        description: "Enroll indirect service (Receivable-Approval)"
+        parameters:
+          - name: service_type
+            type: string
+            description: "RECEIVABLE_APPROVAL"
+          - name: configuration
+            type: object
+        returns: "ServiceEnrollment entity"
+        publishes_events:
+          - evt_service_enrolled
+      - name: linkPaymentAccount
+        description: "Link Canadian bank account for invoice payments"
+        parameters:
+          - name: account_id
+            type: string
+            description: "Canadian DDA account"
+        returns: "AccountEnrollment entity"
+        publishes_events:
+          - evt_account_enrolled
+    invariants:
+      - "profile_id must be unique"
+      - "indirect_client_id cannot change after creation"
+      - "parent_client_id cannot change after creation"
+    lifecycle_states:
+      - PENDING
+      - ACTIVE
+      - SUSPENDED
+      - CLOSED
+
+  ent_service_enrollment:
+    id: ent_service_enrollment
+    name: ServiceEnrollment
+    bounded_context_ref: bc_service_profile_management
+    is_aggregate_root: false
+    identity_field: enrollment_id
+    identity_generation: auto_generated
+    attributes:
+      - name: enrollment_id
+        type: string
+        required: true
+        description: "Unique enrollment identifier (UUID)"
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+        required: true
+        description: "Profile owning this enrollment"
+      - name: service_type
+        type: string
+        required: true
+        description: "BTR, RECEIVABLES, INTERAC_SEND, RECEIVABLE_APPROVAL, etc."
+      - name: configuration
+        type: object
+        required: false
+        description: "Service-specific configuration"
+      - name: status
+        type: string
+        required: true
+        description: "ACTIVE, SUSPENDED, CANCELLED"
+      - name: enrolled_at
+        type: timestamp
+        required: true
+    business_methods:
+      - name: updateConfiguration
+        description: "Update service configuration"
+        parameters:
+          - name: new_configuration
+            type: object
+        returns: void
+        publishes_events:
+          - evt_service_configuration_updated
+      - name: suspend
+        description: "Suspend service enrollment"
+        parameters:
+          - name: reason
+            type: string
+        returns: void
+        publishes_events:
+          - evt_service_suspended
+    lifecycle_states:
+      - ACTIVE
+      - SUSPENDED
+      - CANCELLED
+
+  ent_account_enrollment:
+    id: ent_account_enrollment
+    name: AccountEnrollment
+    bounded_context_ref: bc_service_profile_management
+    is_aggregate_root: false
+    identity_field: enrollment_id
+    identity_generation: auto_generated
+    attributes:
+      - name: enrollment_id
+        type: string
+        required: true
+        description: "Unique enrollment identifier (UUID)"
+      - name: service_enrollment_id
+        type: string
+        required: true
+        description: "Service this account is enrolled to"
+      - name: account_id
+        type: string
+        required: true
+        description: "Account identifier from SRF"
+      - name: account_type
+        type: string
+        required: true
+        description: "DDA, FCA, OLB, GSAN, etc."
+      - name: status
+        type: string
+        required: true
+        description: "ACTIVE, SUSPENDED, CLOSED"
+      - name: enrolled_at
+        type: timestamp
+        required: true
+    business_methods:
+      - name: suspend
+        description: "Suspend account from service"
+        parameters:
+          - name: reason
+            type: string
+        returns: void
+        publishes_events:
+          - evt_account_suspended
+    lifecycle_states:
+      - ACTIVE
+      - SUSPENDED
+      - CLOSED
+
+  ent_permission_statement:
+    id: ent_permission_statement
+    name: PermissionStatement
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_permission_statement
+    is_aggregate_root: true
+    identity_field: statement_id
+    identity_generation: auto_generated
+    attributes:
+      - name: statement_id
+        type: string
+        required: true
+        description: "Unique statement identifier (UUID)"
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+        required: true
+        description: "Profile owning this permission (policy owner)"
+      - name: subject
+        type: string
+        required: true
+        description: "User ID or user group ID from bc_users"
+      - name: action
+        type: string
+        required: true
+        description: "Action URN (e.g., receivables:invoice:create)"
+      - name: resource
+        type: string
+        required: true
+        description: "Resource identifier (e.g., account:*, service:receivables)"
+      - name: effect
+        type: string
+        required: true
+        description: "ALLOW or DENY"
+      - name: created_at
+        type: timestamp
+        required: true
+      - name: updated_at
+        type: timestamp
+        required: true
+    business_methods:
+      - name: updateEffect
+        description: "Change effect from ALLOW to DENY or vice versa"
+        parameters:
+          - name: new_effect
+            type: string
+        returns: void
+        publishes_events:
+          - evt_permission_statement_updated
+      - name: updateResource
+        description: "Update resource scope"
+        parameters:
+          - name: new_resource
+            type: string
+        returns: void
+        publishes_events:
+          - evt_permission_statement_updated
+    invariants:
+      - "statement_id must be unique"
+      - "profile_id cannot change after creation"
+      - "effect must be ALLOW or DENY"
+      - "subject must exist in bc_users"
+
+  ent_approval_statement:
+    id: ent_approval_statement
+    name: ApprovalStatement
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_approval_statement
+    is_aggregate_root: true
+    identity_field: statement_id
+    identity_generation: auto_generated
+    attributes:
+      - name: statement_id
+        type: string
+        required: true
+        description: "Unique statement identifier (UUID)"
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+        required: true
+        description: "Profile owning this approval policy"
+      - name: subject
+        type: string
+        required: true
+        description: "User ID or user group ID initiating action"
+      - name: action
+        type: string
+        required: true
+        description: "Action URN requiring approval"
+      - name: resource
+        type: string
+        required: true
+        description: "Resource identifier"
+      - name: approver_count
+        type: integer
+        required: true
+        description: "Number of required approvals (parallel)"
+      - name: approvers
+        type: array
+        required: true
+        description: "List of approver user/user group IDs"
+      - name: amount_threshold
+        type: decimal
+        required: false
+        description: "Optional amount threshold for approval requirement"
+      - name: created_at
+        type: timestamp
+        required: true
+      - name: updated_at
+        type: timestamp
+        required: true
+    business_methods:
+      - name: updateApprovers
+        description: "Update list of approvers"
+        parameters:
+          - name: new_approvers
+            type: array
+        returns: void
+        publishes_events:
+          - evt_approval_statement_updated
+      - name: updateThreshold
+        description: "Update amount threshold"
+        parameters:
+          - name: new_threshold
+            type: decimal
+        returns: void
+        publishes_events:
+          - evt_approval_statement_updated
+    invariants:
+      - "statement_id must be unique"
+      - "profile_id cannot change after creation"
+      - "approver_count must be >= 1"
+      - "All approvers must exist in bc_users"
+      - "If amount_threshold specified, must be positive"
+
+  ent_indirect_client:
+    id: ent_indirect_client
+    name: IndirectClient
+    bounded_context_ref: bc_indirect_client_management
+    aggregate_ref: agg_indirect_client
+    is_aggregate_root: true
+    identity_field: indirect_client_id
+    identity_generation: derived
+    attributes:
+      - name: indirect_client_id
+        type: value_object
+        value_object_ref: vo_indirect_client_id
+        required: true
+        description: "Unique identifier (clientId + sequence)"
+      - name: parent_client_id
+        type: value_object
+        value_object_ref: vo_client_id
+        required: true
+        description: "Direct client (SRF) reference"
+      - name: type
+        type: string
+        required: true
+        description: "BUSINESS (MVP only - no individuals)"
+      - name: business_name
+        type: string
+        required: true
+        description: "Business legal name"
+      - name: tax_id
+        type: string
+        required: false
+        description: "Business tax identifier"
+      - name: status
+        type: string
+        required: true
+        description: "ACTIVE, SUSPENDED, CLOSED"
+      - name: created_at
+        type: timestamp
+        required: true
+      - name: updated_at
+        type: timestamp
+        required: true
+    business_methods:
+      - name: addRelatedPerson
+        description: "Add related person (signing officer, administrator, director)"
+        parameters:
+          - name: person_name
+            type: string
+          - name: role
+            type: string
+        returns: "RelatedPerson entity"
+        publishes_events:
+          - evt_related_person_added
+      - name: updateBusinessInfo
+        description: "Update business information"
+        parameters:
+          - name: new_business_name
+            type: string
+          - name: new_tax_id
+            type: string
+        returns: void
+        publishes_events:
+          - evt_indirect_client_updated
+    invariants:
+      - "indirect_client_id must be unique"
+      - "parent_client_id cannot change after creation"
+      - "type must be BUSINESS (MVP)"
+      - "Must have at least one related person"
+    lifecycle_states:
+      - ACTIVE
+      - SUSPENDED
+      - CLOSED
+
+  ent_related_person:
+    id: ent_related_person
+    name: RelatedPerson
+    bounded_context_ref: bc_indirect_client_management
+    is_aggregate_root: false
+    identity_field: person_id
+    identity_generation: auto_generated
+    attributes:
+      - name: person_id
+        type: string
+        required: true
+        description: "Unique person identifier (UUID)"
+      - name: indirect_client_id
+        type: value_object
+        value_object_ref: vo_indirect_client_id
+        required: true
+        description: "Indirect client this person belongs to"
+      - name: name
+        type: string
+        required: true
+        description: "Person full name"
+      - name: role
+        type: string
+        required: true
+        description: "SIGNING_OFFICER, ADMINISTRATOR, DIRECTOR"
+      - name: email
+        type: string
+        required: false
+        description: "Contact email"
+      - name: phone
+        type: string
+        required: false
+        description: "Contact phone"
+    business_methods:
+      - name: updateContactInfo
+        description: "Update email and phone"
+        parameters:
+          - name: new_email
+            type: string
+          - name: new_phone
+            type: string
+        returns: void
+        publishes_events:
+          - evt_related_person_updated
+    invariants:
+      - "role must be SIGNING_OFFICER, ADMINISTRATOR, or DIRECTOR"
+
+  ent_user:
+    id: ent_user
+    name: User
+    bounded_context_ref: bc_users
+    aggregate_ref: agg_user
+    is_aggregate_root: true
+    identity_field: user_id
+    identity_generation: external
+    attributes:
+      - name: user_id
+        type: string
+        required: true
+        description: "Unique user identifier (from Okta or Express)"
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+        required: true
+        description: "Profile user belongs to"
+      - name: email
+        type: string
+        required: true
+        description: "User email"
+      - name: first_name
+        type: string
+        required: true
+      - name: last_name
+        type: string
+        required: true
+      - name: role
+        type: string
+        required: true
+        description: "ADMINISTRATOR, REGULAR_USER"
+      - name: source
+        type: string
+        required: true
+        description: "EXPRESS or OKTA"
+      - name: status
+        type: string
+        required: true
+        description: "PENDING, ACTIVE, LOCKED, DEACTIVATED"
+      - name: created_at
+        type: timestamp
+        required: true
+      - name: updated_at
+        type: timestamp
+        required: true
+    business_methods:
+      - name: lock
+        description: "Lock user (admin or bank action)"
+        parameters:
+          - name: locked_by
+            type: string
+            description: "ADMIN or BANK"
+          - name: reason
+            type: string
+        returns: void
+        publishes_events:
+          - evt_user_locked
+      - name: unlock
+        description: "Unlock user (bank can unlock bank locks, admin can unlock admin locks)"
+        parameters:
+          - name: unlocked_by
+            type: string
+        returns: void
+        publishes_events:
+          - evt_user_unlocked
+      - name: updateRole
+        description: "Change user role (enforce dual admin rule)"
+        parameters:
+          - name: new_role
+            type: string
+        returns: void
+        publishes_events:
+          - evt_user_updated
+    invariants:
+      - "user_id must be unique"
+      - "profile_id cannot change after creation"
+      - "source must be EXPRESS or OKTA"
+      - "If source=EXPRESS, user is read-only in platform"
+      - "Profile must have at least 2 ADMINISTRATOR users (dual admin)"
+    lifecycle_states:
+      - PENDING
+      - ACTIVE
+      - LOCKED
+      - DEACTIVATED
+
+  ent_user_group:
+    id: ent_user_group
+    name: UserGroup
+    bounded_context_ref: bc_users
+    aggregate_ref: agg_user_group
+    is_aggregate_root: true
+    identity_field: group_id
+    identity_generation: auto_generated
+    attributes:
+      - name: group_id
+        type: string
+        required: true
+        description: "Unique group identifier (UUID)"
+      - name: profile_id
+        type: value_object
+        value_object_ref: vo_profile_id_base
+        required: true
+        description: "Profile group belongs to"
+      - name: name
+        type: string
+        required: true
+        description: "Group name"
+      - name: description
+        type: string
+        required: false
+      - name: created_at
+        type: timestamp
+        required: true
+      - name: updated_at
+        type: timestamp
+        required: true
+    business_methods:
+      - name: addMember
+        description: "Add user to group"
+        parameters:
+          - name: user_id
+            type: string
+        returns: "UserGroupMembership entity"
+        publishes_events:
+          - evt_user_added_to_group
+      - name: removeMember
+        description: "Remove user from group"
+        parameters:
+          - name: user_id
+            type: string
+        returns: void
+        publishes_events:
+          - evt_user_removed_from_group
+    invariants:
+      - "group_id must be unique"
+      - "profile_id cannot change after creation"
+      - "All members must belong to same profile"
+
+  ent_user_group_membership:
+    id: ent_user_group_membership
+    name: UserGroupMembership
+    bounded_context_ref: bc_users
+    is_aggregate_root: false
+    identity_field: membership_id
+    identity_generation: auto_generated
+    attributes:
+      - name: membership_id
+        type: string
+        required: true
+        description: "Unique membership identifier (UUID)"
+      - name: group_id
+        type: string
+        required: true
+        description: "User group reference"
+      - name: user_id
+        type: string
+        required: true
+        description: "User reference"
+      - name: added_at
+        type: timestamp
+        required: true
+    invariants:
+      - "User must belong to same profile as group"
+
+# ------------------------------------------------------------------------------
+# DOMAIN SERVICES
+# ------------------------------------------------------------------------------
+
+domain_services:
+  svc_dom_profile_validation:
+    id: svc_dom_profile_validation
+    name: ProfileValidationService
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Validates profile creation rules across contexts. Checks client existence via External
+      Data serving layer, validates business rules, ensures site-id linking.
+    operations:
+      - name: validateOnlineProfileCreation
+        description: "Validate online profile can be created for client and site-id"
+        parameters:
+          - name: client_id
+            type: vo_client_id
+          - name: site_id
+            type: string
+        returns: "ValidationResult {valid: boolean, errors: array}"
+        business_logic: >
+          1. Validate client exists in SRF via svc_app_client_data
+          2. Validate site-id exists in Express via svc_app_user_data
+          3. Validate site-id links to same client
+          4. Check no duplicate online profile for same client + site-id
+      - name: validateAccountEnrollmentEligibility
+        description: "Validate account can be enrolled to service"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+          - name: service_type
+            type: string
+          - name: account_id
+            type: string
+        returns: "ValidationResult"
+        business_logic: >
+          1. Validate account exists via svc_app_account_data
+          2. Validate account belongs to profile's client
+          3. Validate account type is compatible with service type
+          4. Check account is not already enrolled to service
+    dependencies:
+      - type: domain_service
+        ref: svc_app_client_data
+      - type: domain_service
+        ref: svc_app_account_data
+      - type: domain_service
+        ref: svc_app_user_data
+    stateless: true
+
+  svc_dom_sequence_generator:
+    id: svc_dom_sequence_generator
+    name: SequenceGeneratorService
+    bounded_context_ref: bc_service_profile_management
+    description: >
+      Generates unique sequence numbers within parent scope (e.g., online profile sequence
+      within client, indirect client sequence within client).
+    operations:
+      - name: generateOnlineProfileSequence
+        description: "Generate next sequence number for online profile within client"
+        parameters:
+          - name: client_id
+            type: vo_client_id
+        returns: "integer (next sequence)"
+        business_logic: >
+          1. Query repo_online_profile for max sequence for client
+          2. Return max + 1 (or 1 if none exist)
+      - name: generateIndirectClientSequence
+        description: "Generate next sequence number for indirect client within direct client"
+        parameters:
+          - name: client_id
+            type: vo_client_id
+        returns: "integer (next sequence)"
+        business_logic: >
+          1. Query repo_indirect_client for max sequence for client
+          2. Return max + 1 (or 1 if none exist)
+    dependencies:
+      - type: repository
+        ref: repo_online_profile
+      - type: repository
+        ref: repo_indirect_client
+    stateless: true
+
+  svc_dom_policy_evaluator:
+    id: svc_dom_policy_evaluator
+    name: PolicyEvaluatorService
+    bounded_context_ref: bc_policy
+    description: >
+      Evaluates permission and approval policies for authorization decisions. Determines if
+      user has permission and if approval is required.
+    operations:
+      - name: evaluatePermission
+        description: "Check if subject has permission for action on resource"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+          - name: subject
+            type: string
+          - name: action
+            type: string
+          - name: resource
+            type: string
+        returns: "PermissionResult {allowed: boolean, statements: array}"
+        business_logic: >
+          1. Query permission statements for profile
+          2. Filter by subject (user or user groups containing user)
+          3. Match action and resource patterns
+          4. Evaluate DENY first (explicit deny overrides allow)
+          5. Return allowed=true if any ALLOW matches
+      - name: evaluateApprovalRequirement
+        description: "Determine if approval is required and who can approve"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+          - name: subject
+            type: string
+          - name: action
+            type: string
+          - name: resource
+            type: string
+          - name: amount
+            type: decimal
+        returns: "ApprovalRequirement {required: boolean, approver_count: int, approvers: array}"
+        business_logic: >
+          1. Query approval statements for profile
+          2. Filter by action and resource
+          3. Check amount against thresholds
+          4. Return approval requirement details
+    dependencies:
+      - type: repository
+        ref: repo_permission_statement
+      - type: repository
+        ref: repo_approval_statement
+    stateless: true
+
+# ------------------------------------------------------------------------------
+# EXPANDED APPLICATION SERVICES
+# ------------------------------------------------------------------------------
+
+application_services_expanded:
+  svc_app_servicing_profile_expanded:
+    id: svc_app_servicing_profile
+    name: ServicingProfileApplicationService
+    bounded_context_ref: bc_service_profile_management
+    use_case: "Manage servicing profiles and service enrollment"
+    description: >
+      Orchestrates servicing profile lifecycle: create, add/modify services, enroll accounts,
+      suspend. Coordinates with validation service, repositories, and event publishing.
+    methods:
+      - name: createServicingProfile
+        description: "Create new servicing profile for SRF/GID client"
+        parameters:
+          - name: client_id
+            type: vo_client_id
+          - name: created_by
+            type: string
+        returns: agg_servicing_profile
+        transaction: true
+        publishes_events:
+          - evt_servicing_profile_created
+        workflow:
+          - "1. Validate client exists via svc_dom_profile_validation"
+          - "2. Create ServicingProfile aggregate with PENDING status"
+          - "3. Save via repo_servicing_profile"
+          - "4. Publish ServicingProfileCreated event"
+          - "5. Return created aggregate"
+      - name: enrollService
+        description: "Enroll stand-alone service (BTR, ACH Debit Block, etc.)"
+        parameters:
+          - name: profile_id
+            type: vo_servicing_profile_id
+          - name: service_type
+            type: string
+          - name: configuration
+            type: object
+        returns: ent_service_enrollment
+        transaction: true
+        publishes_events:
+          - evt_service_enrolled
+        workflow:
+          - "1. Load profile via repo_servicing_profile"
+          - "2. Validate profile status is ACTIVE"
+          - "3. Call profile.enrollService(service_type, configuration)"
+          - "4. Save updated aggregate"
+          - "5. Publish ServiceEnrolled event"
+      - name: enrollAccount
+        description: "Enroll account to a service"
+        parameters:
+          - name: profile_id
+            type: vo_servicing_profile_id
+          - name: service_enrollment_id
+            type: string
+          - name: account_id
+            type: string
+        returns: ent_account_enrollment
+        transaction: true
+        publishes_events:
+          - evt_account_enrolled
+        workflow:
+          - "1. Validate account eligibility via svc_dom_profile_validation"
+          - "2. Load profile via repo_servicing_profile"
+          - "3. Call profile.enrollAccount(service_enrollment_id, account_id)"
+          - "4. Save updated aggregate"
+          - "5. Publish AccountEnrolled event"
+    orchestrates:
+      - type: aggregate
+        ref: agg_servicing_profile
+      - type: domain_service
+        ref: svc_dom_profile_validation
+      - type: repository
+        ref: repo_servicing_profile
+    transaction_boundary: true
+
+  svc_app_online_profile_expanded:
+    id: svc_app_online_profile
+    name: OnlineProfileApplicationService
+    bounded_context_ref: bc_service_profile_management
+    use_case: "Manage online profiles and indirect client onboarding"
+    description: >
+      Orchestrates online profile lifecycle: create with Express linking, enroll online services,
+      onboard indirect clients, manage accounts. Bank-managed via employee portal (MVP).
+    methods:
+      - name: createOnlineProfile
+        description: "Create new online profile with primary client and Express site-id link"
+        parameters:
+          - name: client_id
+            type: vo_client_id
+          - name: site_id
+            type: string
+          - name: created_by
+            type: string
+        returns: agg_online_profile
+        transaction: true
+        publishes_events:
+          - evt_online_profile_created
+        workflow:
+          - "1. Validate client and site-id via svc_dom_profile_validation"
+          - "2. Generate sequence via svc_dom_sequence_generator"
+          - "3. Create OnlineProfile aggregate with PENDING status"
+          - "4. Save via repo_online_profile"
+          - "5. Publish OnlineProfileCreated event"
+      - name: enrollService
+        description: "Enroll online service (Receivables, Interac Send)"
+        parameters:
+          - name: profile_id
+            type: vo_online_profile_id
+          - name: service_type
+            type: string
+          - name: configuration
+            type: object
+        returns: ent_service_enrollment
+        transaction: true
+        publishes_events:
+          - evt_service_enrolled
+        workflow:
+          - "1. Load profile via repo_online_profile"
+          - "2. Validate profile status is ACTIVE"
+          - "3. Call profile.enrollService(service_type, configuration)"
+          - "4. Save updated aggregate"
+          - "5. Publish ServiceEnrolled event"
+      - name: onboardIndirectClient
+        description: "Onboard indirect client (payor) for Receivables service"
+        parameters:
+          - name: profile_id
+            type: vo_online_profile_id
+          - name: business_name
+            type: string
+          - name: tax_id
+            type: string
+        returns: ent_indirect_client
+        transaction: true
+        publishes_events:
+          - evt_indirect_client_onboarded
+        workflow:
+          - "1. Load profile via repo_online_profile"
+          - "2. Validate Receivables service is enrolled"
+          - "3. Generate sequence via svc_dom_sequence_generator"
+          - "4. Create IndirectClient aggregate"
+          - "5. Save via repo_indirect_client"
+          - "6. Link to profile via profile.onboardIndirectClient()"
+          - "7. Publish IndirectClientOnboarded event"
+    orchestrates:
+      - type: aggregate
+        ref: agg_online_profile
+      - type: aggregate
+        ref: agg_indirect_client
+      - type: domain_service
+        ref: svc_dom_profile_validation
+      - type: domain_service
+        ref: svc_dom_sequence_generator
+      - type: repository
+        ref: repo_online_profile
+      - type: repository
+        ref: repo_indirect_client
+    transaction_boundary: true
+
+  svc_app_indirect_profile_expanded:
+    id: svc_app_indirect_profile
+    name: IndirectProfileApplicationService
+    bounded_context_ref: bc_service_profile_management
+    use_case: "Manage indirect profiles and self-service policy configuration"
+    description: >
+      Orchestrates indirect profile lifecycle: create, enroll indirect services, link payment
+      accounts, manage self-service permission/approval policies.
+    methods:
+      - name: createIndirectProfile
+        description: "Create indirect profile for indirect client"
+        parameters:
+          - name: indirect_client_id
+            type: vo_indirect_client_id
+          - name: created_by
+            type: string
+        returns: agg_indirect_profile
+        transaction: true
+        publishes_events:
+          - evt_indirect_profile_created
+        workflow:
+          - "1. Validate indirect client exists via repo_indirect_client"
+          - "2. Create IndirectProfile aggregate with PENDING status"
+          - "3. Save via repo_indirect_profile"
+          - "4. Publish IndirectProfileCreated event"
+      - name: enrollService
+        description: "Enroll indirect service (Receivable-Approval)"
+        parameters:
+          - name: profile_id
+            type: vo_indirect_profile_id
+          - name: service_type
+            type: string
+          - name: configuration
+            type: object
+        returns: ent_service_enrollment
+        transaction: true
+        publishes_events:
+          - evt_service_enrolled
+        workflow:
+          - "1. Load profile via repo_indirect_profile"
+          - "2. Validate profile status is ACTIVE"
+          - "3. Call profile.enrollService(service_type, configuration)"
+          - "4. Save updated aggregate"
+          - "5. Publish ServiceEnrolled event"
+    orchestrates:
+      - type: aggregate
+        ref: agg_indirect_profile
+      - type: repository
+        ref: repo_indirect_profile
+      - type: repository
+        ref: repo_indirect_client
+    transaction_boundary: true
+
+# ------------------------------------------------------------------------------
+# REPOSITORIES
+# ------------------------------------------------------------------------------
+
+repositories:
+  repo_servicing_profile:
+    id: repo_servicing_profile
+    name: ServicingProfileRepository
+    bounded_context_ref: bc_service_profile_management
+    aggregate_ref: agg_servicing_profile
+    interface_methods:
+      - name: save
+        description: "Persist new or updated servicing profile"
+        parameters:
+          - name: profile
+            type: agg_servicing_profile
+        returns: void
+      - name: findById
+        description: "Find servicing profile by ID"
+        parameters:
+          - name: profile_id
+            type: vo_servicing_profile_id
+        returns: "ServicingProfile (nullable)"
+        query_type: by_id
+      - name: findByClientId
+        description: "Find servicing profile for client (should be one only)"
+        parameters:
+          - name: client_id
+            type: vo_client_id
+        returns: "ServicingProfile (nullable)"
+        query_type: by_criteria
+      - name: delete
+        description: "Delete profile (soft delete - set status=CLOSED)"
+        parameters:
+          - name: profile_id
+            type: vo_servicing_profile_id
+        returns: void
+    persistence_strategy: "SQL (PostgreSQL)"
+    implementation_notes: >
+      Single table for servicing profile with foreign key to service_enrollments and
+      account_enrollments. Profile ID is derived from client_id (no sequence).
+
+  repo_online_profile:
+    id: repo_online_profile
+    name: OnlineProfileRepository
+    bounded_context_ref: bc_service_profile_management
+    aggregate_ref: agg_online_profile
+    interface_methods:
+      - name: save
+        description: "Persist new or updated online profile"
+        parameters:
+          - name: profile
+            type: agg_online_profile
+        returns: void
+      - name: findById
+        description: "Find online profile by ID"
+        parameters:
+          - name: profile_id
+            type: vo_online_profile_id
+        returns: "OnlineProfile (nullable)"
+        query_type: by_id
+      - name: findByClientId
+        description: "Find all online profiles for client (paginated)"
+        parameters:
+          - name: client_id
+            type: vo_client_id
+          - name: page_number
+            type: integer
+          - name: page_size
+            type: integer
+        returns: "Page<OnlineProfile>"
+        query_type: by_criteria
+      - name: findBySiteId
+        description: "Find online profile by Express site-id"
+        parameters:
+          - name: site_id
+            type: string
+        returns: "OnlineProfile (nullable)"
+        query_type: by_criteria
+      - name: findMaxSequenceForClient
+        description: "Find max sequence number for client (for sequence generation)"
+        parameters:
+          - name: client_id
+            type: vo_client_id
+        returns: "integer (nullable)"
+        query_type: custom
+      - name: delete
+        description: "Delete profile (soft delete - set status=CLOSED)"
+        parameters:
+          - name: profile_id
+            type: vo_online_profile_id
+        returns: void
+    persistence_strategy: "SQL (PostgreSQL)"
+    implementation_notes: >
+      Single table for online profile with composite key (client_id, sequence). Foreign keys
+      to service_enrollments and account_enrollments. Index on site_id for Express linking.
+
+  repo_indirect_profile:
+    id: repo_indirect_profile
+    name: IndirectProfileRepository
+    bounded_context_ref: bc_service_profile_management
+    aggregate_ref: agg_indirect_profile
+    interface_methods:
+      - name: save
+        description: "Persist new or updated indirect profile"
+        parameters:
+          - name: profile
+            type: agg_indirect_profile
+        returns: void
+      - name: findById
+        description: "Find indirect profile by ID"
+        parameters:
+          - name: profile_id
+            type: vo_indirect_profile_id
+        returns: "IndirectProfile (nullable)"
+        query_type: by_id
+      - name: findByIndirectClientId
+        description: "Find indirect profile for indirect client"
+        parameters:
+          - name: indirect_client_id
+            type: vo_indirect_client_id
+        returns: "IndirectProfile (nullable)"
+        query_type: by_criteria
+      - name: findByParentClientId
+        description: "Find all indirect profiles for direct client (paginated)"
+        parameters:
+          - name: parent_client_id
+            type: vo_client_id
+          - name: page_number
+            type: integer
+          - name: page_size
+            type: integer
+        returns: "Page<IndirectProfile>"
+        query_type: by_criteria
+      - name: delete
+        description: "Delete profile (soft delete - set status=CLOSED)"
+        parameters:
+          - name: profile_id
+            type: vo_indirect_profile_id
+        returns: void
+    persistence_strategy: "SQL (PostgreSQL)"
+    implementation_notes: >
+      Single table for indirect profile with composite key (parent_client_id, indirect_client_id).
+
+  repo_permission_statement:
+    id: repo_permission_statement
+    name: PermissionStatementRepository
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_permission_statement
+    interface_methods:
+      - name: save
+        description: "Persist new or updated permission statement"
+        parameters:
+          - name: statement
+            type: agg_permission_statement
+        returns: void
+      - name: findById
+        description: "Find permission statement by ID"
+        parameters:
+          - name: statement_id
+            type: string
+        returns: "PermissionStatement (nullable)"
+        query_type: by_id
+      - name: findByProfileId
+        description: "Find all permission statements for profile"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+        returns: "List<PermissionStatement>"
+        query_type: by_criteria
+      - name: findByProfileAndSubject
+        description: "Find permission statements for profile and subject (user or group)"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+          - name: subject
+            type: string
+        returns: "List<PermissionStatement>"
+        query_type: by_criteria
+      - name: delete
+        description: "Delete permission statement (hard delete)"
+        parameters:
+          - name: statement_id
+            type: string
+        returns: void
+    persistence_strategy: "SQL (PostgreSQL)"
+    implementation_notes: >
+      Table with indexes on profile_id and subject for policy evaluation queries.
+
+  repo_approval_statement:
+    id: repo_approval_statement
+    name: ApprovalStatementRepository
+    bounded_context_ref: bc_policy
+    aggregate_ref: agg_approval_statement
+    interface_methods:
+      - name: save
+        description: "Persist new or updated approval statement"
+        parameters:
+          - name: statement
+            type: agg_approval_statement
+        returns: void
+      - name: findById
+        description: "Find approval statement by ID"
+        parameters:
+          - name: statement_id
+            type: string
+        returns: "ApprovalStatement (nullable)"
+        query_type: by_id
+      - name: findByProfileId
+        description: "Find all approval statements for profile"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+        returns: "List<ApprovalStatement>"
+        query_type: by_criteria
+      - name: findByProfileAndAction
+        description: "Find approval statements for profile and action"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+          - name: action
+            type: string
+        returns: "List<ApprovalStatement>"
+        query_type: by_criteria
+      - name: delete
+        description: "Delete approval statement (hard delete)"
+        parameters:
+          - name: statement_id
+            type: string
+        returns: void
+    persistence_strategy: "SQL (PostgreSQL)"
+    implementation_notes: >
+      Table with indexes on profile_id and action for approval requirement queries.
+
+  repo_indirect_client:
+    id: repo_indirect_client
+    name: IndirectClientRepository
+    bounded_context_ref: bc_indirect_client_management
+    aggregate_ref: agg_indirect_client
+    interface_methods:
+      - name: save
+        description: "Persist new or updated indirect client"
+        parameters:
+          - name: client
+            type: agg_indirect_client
+        returns: void
+      - name: findById
+        description: "Find indirect client by ID"
+        parameters:
+          - name: indirect_client_id
+            type: vo_indirect_client_id
+        returns: "IndirectClient (nullable)"
+        query_type: by_id
+      - name: findByParentClientId
+        description: "Find all indirect clients for direct client (paginated)"
+        parameters:
+          - name: parent_client_id
+            type: vo_client_id
+          - name: page_number
+            type: integer
+          - name: page_size
+            type: integer
+        returns: "Page<IndirectClient>"
+        query_type: by_criteria
+      - name: findMaxSequenceForClient
+        description: "Find max sequence number for client (for sequence generation)"
+        parameters:
+          - name: parent_client_id
+            type: vo_client_id
+        returns: "integer (nullable)"
+        query_type: custom
+      - name: delete
+        description: "Delete indirect client (soft delete - set status=CLOSED)"
+        parameters:
+          - name: indirect_client_id
+            type: vo_indirect_client_id
+        returns: void
+    persistence_strategy: "SQL (PostgreSQL)"
+    implementation_notes: >
+      Single table for indirect client with composite key (parent_client_id, sequence).
+      Foreign key to related_persons table.
+
+  repo_user:
+    id: repo_user
+    name: UserRepository
+    bounded_context_ref: bc_users
+    aggregate_ref: agg_user
+    interface_methods:
+      - name: save
+        description: "Persist new or updated user"
+        parameters:
+          - name: user
+            type: agg_user
+        returns: void
+      - name: findById
+        description: "Find user by ID"
+        parameters:
+          - name: user_id
+            type: string
+        returns: "User (nullable)"
+        query_type: by_id
+      - name: findByProfileId
+        description: "Find all users for profile (paginated)"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+          - name: page_number
+            type: integer
+          - name: page_size
+            type: integer
+        returns: "Page<User>"
+        query_type: by_criteria
+      - name: findByEmail
+        description: "Find user by email"
+        parameters:
+          - name: email
+            type: string
+        returns: "User (nullable)"
+        query_type: by_criteria
+      - name: findAdministratorsByProfileId
+        description: "Find all administrators for profile (for dual admin check)"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+        returns: "List<User>"
+        query_type: by_criteria
+      - name: delete
+        description: "Delete user (soft delete - set status=DEACTIVATED)"
+        parameters:
+          - name: user_id
+            type: string
+        returns: void
+    persistence_strategy: "SQL (PostgreSQL)"
+    implementation_notes: >
+      Table with indexes on profile_id and email for user queries.
+
+  repo_user_group:
+    id: repo_user_group
+    name: UserGroupRepository
+    bounded_context_ref: bc_users
+    aggregate_ref: agg_user_group
+    interface_methods:
+      - name: save
+        description: "Persist new or updated user group"
+        parameters:
+          - name: group
+            type: agg_user_group
+        returns: void
+      - name: findById
+        description: "Find user group by ID"
+        parameters:
+          - name: group_id
+            type: string
+        returns: "UserGroup (nullable)"
+        query_type: by_id
+      - name: findByProfileId
+        description: "Find all user groups for profile (paginated)"
+        parameters:
+          - name: profile_id
+            type: vo_profile_id_base
+          - name: page_number
+            type: integer
+          - name: page_size
+            type: integer
+        returns: "Page<UserGroup>"
+        query_type: by_criteria
+      - name: findByUserId
+        description: "Find all groups user belongs to"
+        parameters:
+          - name: user_id
+            type: string
+        returns: "List<UserGroup>"
+        query_type: by_criteria
+      - name: delete
+        description: "Delete user group (hard delete)"
+        parameters:
+          - name: group_id
+            type: string
+        returns: void
+    persistence_strategy: "SQL (PostgreSQL)"
+    implementation_notes: >
+      Table for user groups with join table for user_group_memberships.
+
+metadata:
+  phase: phase_4_tactical
+  last_updated: "2025-10-15"
+  key_changes:
+    - Merged Client Management + Service Management into Service Profiles domain
+    - Service profiles for clients, not client management itself
+    - Indirect clients part of Service Profiles (exist only for service profiles)
+    - Created Data Engineering domain with gold copy and serving layer
+    - Receivable-approval is separate business service (not part of Receivables)
+    - Serving layer provides read-only account data to Service Profile domain

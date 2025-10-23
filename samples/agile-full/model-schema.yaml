@@ -1,0 +1,1972 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://github.com/agile-schema/model/v1/schema
+title: Agile Project Schema
+description: Schema for modeling agile projects including product, vision, epics,
+  features, Stories, sprints, PIs, teams, and ARTs
+$defs:
+  product:
+    type: object
+    description: The primary organizational unit representing the solution being developed
+    required:
+    - id
+    - name
+    - vision
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the product
+        pattern: ^[a-z0-9-]+$
+      name:
+        type: string
+        description: product name
+        minLength: 1
+        maxLength: 100
+      description:
+        type: string
+        description: Brief product description
+      vision:
+        $ref: '#/$defs/vision'
+      roadmap:
+        $ref: '#/$defs/roadmap'
+      releases:
+        type: array
+        description: Planned and past releases for this product
+        items:
+          $ref: '#/$defs/release'
+      valueStreams:
+        type: array
+        description: Value streams this product belongs to
+        items:
+          $ref: '#/$defs/value_stream'
+      portfolio:
+        $ref: '#/$defs/portfolio'
+      programs:
+        type: array
+        description: Programs or ARTs delivering this product
+        items:
+          $ref: '#/$defs/agile_release_train'
+      stakeholders:
+        type: array
+        description: product stakeholders
+        items:
+          $ref: '#/$defs/stakeholder'
+      metrics:
+        type: object
+        description: Key product metrics
+        properties:
+          northStar:
+            type: string
+            description: Primary success metric
+          kpis:
+            type: array
+            items:
+              $ref: '#/$defs/metric'
+      metadata:
+        $ref: '#/$defs/metadata'
+  vision:
+    type: object
+    description: Comprehensive product vision following SAFe best practices
+    required:
+    - futureStateDescription
+    - customerNeeds
+    properties:
+      futureStateDescription:
+        type: string
+        description: Clear description of the intended future state
+        minLength: 50
+      customerNeeds:
+        type: object
+        description: Target customers and problems being solved
+        required:
+        - targetCustomers
+        - problemsBeingSolved
+        properties:
+          targetCustomers:
+            type: array
+            description: Target customer segments
+            items:
+              type: string
+            minItems: 1
+          problemsBeingSolved:
+            type: array
+            description: Key problems the product addresses
+            items:
+              type: string
+            minItems: 1
+          valueProposition:
+            type: string
+            description: Core value proposition
+      solutionIntent:
+        type: object
+        description: Proposed solution approach
+        properties:
+          approach:
+            type: string
+            description: High-level solution approach
+          keyCapabilities:
+            type: array
+            description: Key capabilities the solution will provide
+            items:
+              type: string
+          technicalDirection:
+            type: string
+            description: Overall technical direction
+          differentiators:
+            type: array
+            description: What makes this solution different
+            items:
+              type: string
+      boundaries:
+        type: object
+        description: Context and boundaries of the product
+        properties:
+          inScope:
+            type: array
+            description: What is included
+            items:
+              type: string
+          outOfScope:
+            type: array
+            description: What is explicitly excluded
+            items:
+              type: string
+          constraints:
+            type: array
+            description: Known constraints
+            items:
+              type: string
+          assumptions:
+            type: array
+            description: Key assumptions
+            items:
+              type: string
+          dependencies:
+            type: array
+            description: External dependencies
+            items:
+              type: string
+      strategicAlignment:
+        type: object
+        description: Connection to business objectives
+        properties:
+          businessObjectives:
+            type: array
+            description: Business objectives this supports
+            items:
+              type: string
+          strategicThemes:
+            type: array
+            description: Strategic themes this aligns with
+            items:
+              type: string
+          successMetrics:
+            type: array
+            description: How success will be measured
+            items:
+              $ref: '#/$defs/metric'
+          outcomes:
+            type: array
+            description: Desired business outcomes
+            items:
+              type: string
+      motivationalNarrative:
+        type: string
+        description: Inspiring description that engages team members
+        minLength: 100
+      decisionFramework:
+        type: object
+        description: Framework for making decisions
+        properties:
+          guidingPrinciples:
+            type: array
+            description: Principles that guide decisions
+            items:
+              type: string
+          tradeoffCriteria:
+            type: array
+            description: Criteria for making trade-offs
+            items:
+              type: string
+          alignmentMechanisms:
+            type: array
+            description: How alignment is maintained
+            items:
+              type: string
+      lastUpdated:
+        type: string
+        format: date
+        description: When vision was last updated
+  release_vision:
+    type: object
+    description: Focused vision for a specific release, derived from product vision
+    required:
+    - releaseGoal
+    - targetCustomers
+    - keyCapabilities
+    properties:
+      releaseGoal:
+        type: string
+        description: Clear statement of what this release aims to achieve
+        minLength: 50
+      targetCustomers:
+        type: array
+        description: Customer segments targeted by this release
+        items:
+          type: string
+        minItems: 1
+      keyCapabilities:
+        type: array
+        description: Top 3-5 capabilities being delivered in this release
+        items:
+          type: string
+        minItems: 1
+        maxItems: 10
+      customerValue:
+        type: string
+        description: Clear articulation of value to customers
+        minLength: 50
+      businessValue:
+        type: string
+        description: Business value expected from this release
+      themes:
+        type: array
+        description: Strategic themes this release addresses
+        items:
+          type: string
+      differentiators:
+        type: array
+        description: What makes this release special or different
+        items:
+          type: string
+      boundaries:
+        type: object
+        description: What's in and out of scope for this release
+        properties:
+          inScope:
+            type: array
+            items:
+              type: string
+          outOfScope:
+            type: array
+            items:
+              type: string
+          deferredToFuture:
+            type: array
+            description: features deferred to future releases
+            items:
+              type: string
+      successCriteria:
+        type: array
+        description: How we'll know this release is successful
+        items:
+          $ref: '#/$defs/metric'
+        minItems: 1
+      risks:
+        type: array
+        description: Key risks for this release
+        items:
+          $ref: '#/$defs/risk'
+      alignmentToProductVision:
+        type: string
+        description: How this release advances the overall product vision
+        minLength: 50
+      motivationalNarrative:
+        type: string
+        description: Inspiring story about this release
+        minLength: 100
+      lastUpdated:
+        type: string
+        format: date
+  epic:
+    type: object
+    description: Large body of work spanning multiple features
+    required:
+    - id
+    - title
+    - type
+    properties:
+      id:
+        type: string
+        pattern: ^EPIC-[0-9]+$
+      title:
+        type: string
+        minLength: 1
+        maxLength: 200
+      type:
+        type: string
+        enum:
+        - business
+        - enabler
+        description: Business epic delivers value, enabler extends runway
+      description:
+        type: string
+      hypothesis:
+        type: string
+        description: epic hypothesis statement
+      businessOutcome:
+        type: string
+        description: Expected business outcome
+      leadingIndicators:
+        type: array
+        description: metrics indicating progress toward outcome
+        items:
+          $ref: '#/$defs/metric'
+      leanBusinessCase:
+        type: object
+        description: Lean business case for portfolio approval
+        properties:
+          summary:
+            type: string
+          analysis:
+            type: object
+            properties:
+              costEstimate:
+                type: number
+              valueEstimate:
+                type: number
+              durationEstimate:
+                type: string
+          recommendation:
+            type: string
+      features:
+        type: array
+        description: features that implement this epic
+        items:
+          type: string
+          description: feature IDs
+      status:
+        type: string
+        enum:
+        - funnel
+        - reviewing
+        - analyzing
+        - portfolio-backlog
+        - implementing
+        - done
+      priority:
+        type: integer
+        minimum: 1
+      owner:
+        type: string
+        description: epic Owner
+      metadata:
+        $ref: '#/$defs/metadata'
+  feature:
+    type: object
+    description: Service provided by the system, sized for a Program increment
+    required:
+    - id
+    - title
+    - type
+    - bounded_context_ref
+    properties:
+      bounded_context_ref:
+        type: string
+        description: DDD bounded context this feature belongs to (required - explicit
+          grounding)
+        pattern: ^ddd:BoundedContext:[a-z0-9_-]+$
+        x-grounding:
+          target_canon: ddd
+          target_concept: BoundedContext
+          grounding_type: epistemic
+          strength: strong
+          rationale: features must be scoped to a bounded context to ensure domain
+            alignment
+      id:
+        type: string
+        pattern: ^FEAT-[0-9]+$
+      title:
+        type: string
+        minLength: 1
+        maxLength: 200
+      type:
+        type: string
+        enum:
+        - business
+        - enabler
+      description:
+        type: string
+      benefitHypothesis:
+        type: string
+        description: How this feature delivers value
+      acceptanceCriteria:
+        type: array
+        description: Conditions for feature acceptance
+        items:
+          type: string
+        minItems: 1
+      nonfunctionalRequirements:
+        type: array
+        description: NFRs for this feature
+        items:
+          type: string
+      nfrRefs:
+        type: array
+        description: References to non_functional_requirement definitions
+        items:
+          type: string
+          pattern: ^NFR-[0-9]+$
+      enablerRefs:
+        type: array
+        description: enablers that support this feature
+        items:
+          type: string
+          pattern: ^ENABL-[0-9]+$
+      epicId:
+        type: string
+        description: Parent epic ID
+      stories:
+        type: array
+        description: User stories implementing this feature
+        items:
+          type: string
+          description: Story IDs
+      status:
+        type: string
+        enum:
+        - backlog
+        - planned
+        - in-progress
+        - done
+        - accepted
+      wsjf:
+        type: object
+        description: WSJF prioritization scores
+        properties:
+          userBusinessValue:
+            type: integer
+            minimum: 1
+            maximum: 20
+          timeCriticality:
+            type: integer
+            minimum: 1
+            maximum: 20
+          riskReductionOpportunity:
+            type: integer
+            minimum: 1
+            maximum: 20
+          jobSize:
+            type: integer
+            minimum: 1
+            maximum: 20
+          wsjfScore:
+            type: number
+            description: Calculated WSJF = (UBV + TC + RR) / JobSize
+      piId:
+        type: string
+        description: Target Program increment
+      teamId:
+        type: string
+        description: Responsible team
+      metadata:
+        $ref: '#/$defs/metadata'
+  user_story:
+    type: object
+    description: Small, vertical slice of functionality
+    required:
+    - id
+    - title
+    - asA
+    - iWant
+    - soThat
+    properties:
+      ux_artifact_refs:
+        type: object
+        description: UX artifacts implementing this story (explicit grounding)
+        x-grounding:
+          target_canon: ux
+          grounding_type: procedural
+          strength: strong
+          rationale: Stories are implemented through UX artifacts (pages, components,
+            workflows)
+        properties:
+          page_refs:
+            type: array
+            items:
+              type: string
+              pattern: ^ux:Page:[a-z0-9_-]+$
+            description: Page IDs where this story is implemented
+          component_refs:
+            type: array
+            items:
+              type: string
+              pattern: ^ux:Component:[a-z0-9_-]+$
+            description: Component IDs implementing this story
+          workflow_refs:
+            type: array
+            items:
+              type: string
+              pattern: ^ux:Workflow:[a-z0-9_-]+$
+            description: Workflow IDs implementing this story
+      id:
+        type: string
+        pattern: ^US-[0-9]+$
+      title:
+        type: string
+        minLength: 1
+        maxLength: 200
+      asA:
+        type: string
+        description: User role (As a...)
+      iWant:
+        type: string
+        description: Goal (I want...)
+      soThat:
+        type: string
+        description: Benefit (So that...)
+      description:
+        type: string
+        description: Additional details
+      acceptanceCriteria:
+        type: array
+        description: Testable acceptance criteria
+        items:
+          type: object
+          required:
+          - given
+          - when
+          - then
+          properties:
+            given:
+              type: string
+              description: Precondition
+            when:
+              type: string
+              description: Action
+            then:
+              type: string
+              description: Expected result
+        minItems: 1
+      storyPoints:
+        type: integer
+        minimum: 0
+        maximum: 21
+        description: Relative effort estimate
+      investCheck:
+        type: object
+        description: INVEST criteria validation
+        properties:
+          independent:
+            type: boolean
+          negotiable:
+            type: boolean
+          valuable:
+            type: boolean
+          estimable:
+            type: boolean
+          small:
+            type: boolean
+          testable:
+            type: boolean
+      featureId:
+        type: string
+        description: Parent feature ID
+      sprintId:
+        type: string
+        description: sprint this story is in
+      iterationId:
+        type: string
+        description: iteration this story is in (SAFe)
+      status:
+        type: string
+        enum:
+        - backlog
+        - ready
+        - in-progress
+        - review
+        - done
+      assignee:
+        type: string
+        description: Currently assigned team member
+      tasks:
+        type: array
+        description: Technical tasks for this story
+        items:
+          $ref: '#/$defs/task'
+      impedimentRefs:
+        type: array
+        description: impediments blocking this story
+        items:
+          type: string
+          pattern: ^IMP-[0-9]+$
+      technicalDebtRefs:
+        type: array
+        description: Technical debt addressed by this story
+        items:
+          type: string
+          pattern: ^DEBT-[0-9]+$
+      metadata:
+        $ref: '#/$defs/metadata'
+  task:
+    type: object
+    description: Technical task for implementing a story
+    required:
+    - id
+    - description
+    properties:
+      id:
+        type: string
+      description:
+        type: string
+      estimateHours:
+        type: number
+        minimum: 0
+      remainingHours:
+        type: number
+        minimum: 0
+      status:
+        type: string
+        enum:
+        - todo
+        - in-progress
+        - done
+      assignee:
+        type: string
+  sprint:
+    type: object
+    description: Time-boxed iteration in Scrum (1-4 weeks)
+    required:
+    - id
+    - name
+    - startDate
+    - endDate
+    - goal
+    properties:
+      id:
+        type: string
+        pattern: ^SPRINT-[0-9]+$
+      name:
+        type: string
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      goal:
+        type: string
+        description: sprint Goal - objective for this sprint
+        minLength: 10
+      committedStories:
+        type: array
+        description: Stories committed to this sprint
+        items:
+          type: string
+          description: Story IDs
+      committedPoints:
+        type: integer
+        description: Total story points committed
+      completedPoints:
+        type: integer
+        description: Story points completed
+      velocity:
+        type: integer
+        description: Actual velocity for this sprint
+      teamId:
+        type: string
+        description: team running this sprint
+      definitionOfDone:
+        type: object
+        description: Checklist that must be met before story is considered done (explicit
+          grounding to QE)
+        x-grounding:
+          target_canon: qe
+          grounding_type: epistemic
+          strength: strong
+          rationale: DoD criteria must be validated through QE test strategies
+        properties:
+          test_criteria_refs:
+            type: array
+            description: QE test criteria IDs that validate DoD
+            items:
+              type: string
+              pattern: ^qe:TestCriteria:[a-z0-9_-]+$
+          checklist:
+            type: array
+            description: DoD checklist items
+            items:
+              type: object
+              properties:
+                item:
+                  type: string
+                  description: DoD requirement
+                qe_validation_ref:
+                  type: string
+                  pattern: ^qe:(TestCase|TestSuite|TestStrategy):[a-z0-9_-]+$
+                  description: QE artifact that validates this DoD item
+                verified:
+                  type: boolean
+                  description: Whether this DoD item has been verified
+      ceremonyRefs:
+        type: array
+        description: References to ceremony definitions for this sprint
+        items:
+          type: string
+          pattern: ^CERE-[0-9]+$
+      ceremonies:
+        type: object
+        properties:
+          planning:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date-time
+              attendees:
+                type: array
+                items:
+                  type: string
+          dailyStandup:
+            type: object
+            properties:
+              time:
+                type: string
+                description: Daily standup time
+              location:
+                type: string
+          review:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date-time
+              attendees:
+                type: array
+                items:
+                  type: string
+          retrospective:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date-time
+              improvements:
+                type: array
+                description: Improvement actions from retro
+                items:
+                  type: string
+      definitionOfReadyRef:
+        type: string
+        description: Definition of Ready for this sprint
+        pattern: ^DOR-[0-9]+$
+      incrementRef:
+        type: string
+        description: product increment delivered by this sprint
+        pattern: ^INC-[0-9]+$
+      impediments:
+        type: array
+        description: impediments identified during this sprint
+        items:
+          type: string
+          pattern: ^IMP-[0-9]+$
+      status:
+        type: string
+        enum:
+        - planned
+        - active
+        - completed
+      metadata:
+        $ref: '#/$defs/metadata'
+  iteration:
+    type: object
+    description: Time-boxed iteration in SAFe (typically 2 weeks)
+    required:
+    - id
+    - name
+    - startDate
+    - endDate
+    - piId
+    properties:
+      id:
+        type: string
+        pattern: ^ITER-[0-9]+$
+      name:
+        type: string
+      number:
+        type: integer
+        minimum: 1
+        description: iteration number within PI
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      piId:
+        type: string
+        description: Parent Program increment
+      goals:
+        type: array
+        description: iteration goals
+        items:
+          type: string
+      committedStories:
+        type: array
+        items:
+          type: string
+      teamId:
+        type: string
+      status:
+        type: string
+        enum:
+        - planned
+        - active
+        - completed
+      metadata:
+        $ref: '#/$defs/metadata'
+  program_increment:
+    type: object
+    description: Time-boxed planning increment in SAFe (8-12 weeks)
+    required:
+    - id
+    - name
+    - startDate
+    - endDate
+    - artId
+    properties:
+      id:
+        type: string
+        pattern: ^PI-[0-9]+$
+      name:
+        type: string
+      number:
+        type: integer
+        minimum: 1
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      artId:
+        type: string
+        description: Agile release Train running this PI
+      iterations:
+        type: array
+        description: iterations in this PI (typically 5 + 1 IP)
+        items:
+          type: string
+          description: iteration IDs
+        minItems: 4
+        maxItems: 6
+      objectives:
+        type: array
+        description: PI Objectives by team
+        items:
+          type: object
+          required:
+          - teamId
+          - objectives
+          properties:
+            teamId:
+              type: string
+            objectives:
+              type: array
+              items:
+                type: object
+                required:
+                - description
+                - businessValue
+                properties:
+                  description:
+                    type: string
+                  businessValue:
+                    type: integer
+                    minimum: 1
+                    maximum: 10
+                  committed:
+                    type: boolean
+                    description: Committed vs uncommitted objective
+                  status:
+                    type: string
+                    enum:
+                    - not-started
+                    - in-progress
+                    - completed
+                    - not-achieved
+      features:
+        type: array
+        description: features planned for this PI
+        items:
+          type: string
+          description: feature IDs
+      planning:
+        type: object
+        description: PI Planning event details
+        properties:
+          date:
+            type: string
+            format: date
+          location:
+            type: string
+          attendees:
+            type: array
+            items:
+              type: string
+          confidenceVote:
+            type: number
+            minimum: 1
+            maximum: 5
+            description: Average confidence vote (1-5)
+      risks:
+        type: array
+        description: Program risks identified
+        items:
+          $ref: '#/$defs/risk'
+      predictability:
+        type: number
+        description: Predictability measure (planned objectives achieved / total planned)
+        minimum: 0
+        maximum: 1
+      status:
+        type: string
+        enum:
+        - planning
+        - executing
+        - completed
+      metadata:
+        $ref: '#/$defs/metadata'
+  release:
+    type: object
+    description: Time-boxed delivery of value spanning one or more Program increments
+    required:
+    - id
+    - name
+    - vision
+    - startDate
+    - endDate
+    properties:
+      id:
+        type: string
+        pattern: ^REL-[0-9]+$
+      name:
+        type: string
+        description: release name (e.g., 'Spring 2025 release', 'Version 2.0')
+      version:
+        type: string
+        pattern: ^[0-9]+\.[0-9]+\.[0-9]+$
+        description: Semantic version number
+      vision:
+        $ref: '#/$defs/release_vision'
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      productId:
+        type: string
+        description: Parent product ID
+      programIncrements:
+        type: array
+        description: PIs included in this release
+        items:
+          type: string
+          description: PI IDs
+        minItems: 1
+        maxItems: 3
+      features:
+        type: array
+        description: features planned for this release
+        items:
+          type: string
+          description: feature IDs
+      roadmap:
+        $ref: '#/$defs/roadmap'
+        description: release-level roadmap showing PI-by-PI plan
+      releaseObjectives:
+        type: array
+        description: High-level objectives for this release
+        items:
+          type: object
+          required:
+          - description
+          - businessValue
+          properties:
+            description:
+              type: string
+            businessValue:
+              type: integer
+              minimum: 1
+              maximum: 10
+            targetPI:
+              type: string
+              description: Which PI this objective targets
+      milestones:
+        type: array
+        description: Key milestones for this release
+        items:
+          type: object
+          required:
+          - name
+          - date
+          properties:
+            name:
+              type: string
+            date:
+              type: string
+              format: date
+            type:
+              type: string
+              enum:
+              - planning
+              - development
+              - testing
+              - deployment
+              - marketing
+            status:
+              type: string
+              enum:
+              - upcoming
+              - in-progress
+              - completed
+              - at-risk
+      stakeholders:
+        type: array
+        description: release stakeholders
+        items:
+          $ref: '#/$defs/stakeholder'
+      metrics:
+        type: array
+        description: release success metrics
+        items:
+          $ref: '#/$defs/metric'
+      status:
+        type: string
+        enum:
+        - planning
+        - development
+        - hardening
+        - deployed
+        - closed
+      releaseType:
+        type: string
+        enum:
+        - major
+        - minor
+        - patch
+        - hotfix
+        description: Type of release following semantic versioning
+      deploymentStrategy:
+        type: string
+        enum:
+        - big-bang
+        - phased
+        - canary
+        - blue-green
+        - feature-flags
+        description: How this release will be deployed
+      metadata:
+        $ref: '#/$defs/metadata'
+  team:
+    type: object
+    description: Agile team (5-11 people)
+    required:
+    - id
+    - name
+    - members
+    properties:
+      id:
+        type: string
+        pattern: ^TEAM-[0-9]+$
+      name:
+        type: string
+      type:
+        type: string
+        enum:
+        - scrum
+        - kanban
+        - scrumban
+        description: team methodology
+      members:
+        type: array
+        description: team members
+        items:
+          $ref: '#/$defs/teamMember'
+        minItems: 3
+        maxItems: 11
+      roles:
+        type: object
+        properties:
+          productOwner:
+            type: string
+            description: product Owner ID
+          scrumMaster:
+            type: string
+            description: Scrum Master ID
+          techLead:
+            type: string
+            description: Technical Lead ID
+      capacity:
+        type: object
+        description: team capacity
+        properties:
+          velocityAverage:
+            type: integer
+            description: Average velocity (story points per sprint)
+          hoursPerSprint:
+            type: integer
+            description: Total available hours per sprint
+      backlog:
+        type: array
+        description: team backlog
+        items:
+          type: string
+          description: Story IDs
+      currentSprint:
+        type: string
+        description: Current sprint ID
+      currentIteration:
+        type: string
+        description: Current iteration ID (SAFe)
+      artId:
+        type: string
+        description: Parent ART (if SAFe)
+      practices:
+        type: array
+        description: Agile practices this team uses
+        items:
+          type: string
+      workingAgreementRef:
+        type: string
+        description: Working agreement for this team
+        pattern: ^WA-[0-9]+$
+      teamTopologyRef:
+        type: string
+        description: team topology classification
+        pattern: ^TOPO-[0-9]+$
+      definitionOfReadyRef:
+        type: string
+        description: Definition of Ready for this team
+        pattern: ^DOR-[0-9]+$
+      estimationTechniqueRef:
+        type: string
+        description: Estimation technique used by this team
+        pattern: ^TECH-[0-9]+$
+      feedbackLoops:
+        type: array
+        description: Feedback loops this team participates in
+        items:
+          type: string
+          pattern: ^LOOP-[0-9]+$
+      metadata:
+        $ref: '#/$defs/metadata'
+  team_member:
+    type: object
+    required:
+    - id
+    - name
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      email:
+        type: string
+        format: email
+      role:
+        type: string
+        description: Primary role
+      skills:
+        type: array
+        description: Skills this person has
+        items:
+          type: string
+      capacity:
+        type: number
+        description: '% available for sprint work (0-100)'
+        minimum: 0
+        maximum: 100
+  agile_release_train:
+    type: object
+    description: Long-lived team of agile teams (50-125 people)
+    required:
+    - id
+    - name
+    - teams
+    properties:
+      id:
+        type: string
+        pattern: ^ART-[0-9]+$
+      name:
+        type: string
+      mission:
+        type: string
+        description: ART mission statement
+      valueStream:
+        type: string
+        description: Value stream this ART supports
+      teams:
+        type: array
+        description: teams in this ART
+        items:
+          type: string
+          description: team IDs
+        minItems: 5
+        maxItems: 12
+      roles:
+        type: object
+        properties:
+          releaseTrainEngineer:
+            type: string
+            description: RTE ID
+          productManager:
+            type: string
+            description: product Manager ID
+          systemArchitect:
+            type: string
+            description: System Architect ID
+          businessOwners:
+            type: array
+            description: Business Owner IDs
+            items:
+              type: string
+      cadence:
+        type: object
+        properties:
+          piDurationWeeks:
+            type: integer
+            minimum: 8
+            maximum: 12
+            description: Program increment duration
+          iterationDurationWeeks:
+            type: integer
+            minimum: 1
+            maximum: 4
+            description: iteration duration
+      programBacklog:
+        type: array
+        description: Program backlog
+        items:
+          type: string
+          description: feature IDs
+      currentPI:
+        type: string
+        description: Current Program increment ID
+      metadata:
+        $ref: '#/$defs/metadata'
+  non_functional_requirement:
+    type: object
+    description: Quality attributes and constraints for system behavior (NFR)
+    required:
+    - nfrId
+    - category
+    - description
+    - acceptanceCriteria
+    properties:
+      nfrId:
+        type: string
+        pattern: ^NFR-[0-9]+$
+        description: Unique identifier for the NFR
+      category:
+        type: string
+        enum:
+        - performance
+        - security
+        - scalability
+        - usability
+        - reliability
+        - maintainability
+        description: NFR category
+      description:
+        type: string
+        description: Description of the non-functional requirement
+        minLength: 10
+      acceptanceCriteria:
+        type: array
+        description: Testable criteria for meeting this NFR
+        items:
+          type: string
+        minItems: 1
+      relatedFeatures:
+        type: array
+        description: features that must satisfy this NFR
+        items:
+          type: string
+      qualityMetricRef:
+        type: string
+        description: Reference to quality metric for measuring this NFR
+  architectural_runway:
+    type: object
+    description: Technical foundation enabling future business functionality
+    required:
+    - runwayId
+    - description
+    - enablers
+    properties:
+      runwayId:
+        type: string
+        pattern: ^RUNWAY-[0-9]+$
+        description: Unique identifier for the runway
+      description:
+        type: string
+        description: Description of architectural runway
+        minLength: 10
+      enablers:
+        type: array
+        description: enabler work items that build runway
+        items:
+          type: string
+        minItems: 1
+      technicalDebtRefs:
+        type: array
+        description: Technical debt items addressed by this runway
+        items:
+          type: string
+      runwayScore:
+        type: number
+        description: Assessment of runway adequacy (0-10)
+        minimum: 0
+        maximum: 10
+  enabler:
+    type: object
+    description: Work item that extends architectural runway
+    required:
+    - enablerId
+    - type
+    - description
+    properties:
+      enablerId:
+        type: string
+        pattern: ^ENABL-[0-9]+$
+        description: Unique identifier for the enabler
+      type:
+        type: string
+        enum:
+        - architectural
+        - infrastructure
+        - exploration
+        - compliance
+        description: Type of enabler work
+      description:
+        type: string
+        description: Description of what the enabler provides
+        minLength: 10
+      relatedFeatures:
+        type: array
+        description: features that depend on this enabler
+        items:
+          type: string
+      boundedContextRef:
+        type: string
+        description: DDD bounded context this enabler supports
+        pattern: ^ddd:BoundedContext:[a-z0-9_-]+$
+  ceremony:
+    type: object
+    description: Agile ceremony or event
+    required:
+    - ceremonyId
+    - type
+    - cadence
+    properties:
+      ceremonyId:
+        type: string
+        pattern: ^CERE-[0-9]+$
+        description: Unique identifier for the ceremony
+      type:
+        type: string
+        enum:
+        - sprint_planning
+        - daily_standup
+        - sprint_review
+        - retrospective
+        - pi_planning
+        - system_demo
+        - backlog_refinement
+        description: Type of ceremony
+      cadence:
+        type: string
+        description: How often ceremony occurs (e.g., 'daily', 'per sprint', 'per
+          PI')
+      durationMinutes:
+        type: integer
+        description: Typical duration in minutes
+        minimum: 15
+      participants:
+        type: array
+        description: Participants in this ceremony
+        items:
+          type: string
+  role:
+    type: object
+    description: Agile role with defined responsibilities
+    required:
+    - roleId
+    - type
+    - responsibilities
+    properties:
+      roleId:
+        type: string
+        pattern: ^ROLE-[0-9]+$
+        description: Unique identifier for the role
+      type:
+        type: string
+        enum:
+        - product_owner
+        - scrum_master
+        - developer
+        - rte
+        - product_manager
+        - architect
+        - business_owner
+        description: role type
+      responsibilities:
+        type: array
+        description: Key responsibilities of this role
+        items:
+          type: string
+        minItems: 1
+      authorityLevel:
+        type: string
+        enum:
+        - team
+        - program
+        - portfolio
+        - enterprise
+        description: Level at which this role operates
+  impediment:
+    type: object
+    description: Blocker or obstacle preventing progress
+    required:
+    - impedimentId
+    - description
+    - severity
+    - status
+    properties:
+      impedimentId:
+        type: string
+        pattern: ^IMP-[0-9]+$
+        description: Unique identifier for the impediment
+      description:
+        type: string
+        description: Description of the impediment
+        minLength: 10
+      severity:
+        type: string
+        enum:
+        - blocking
+        - high
+        - medium
+        - low
+        description: Impact severity
+      teamRef:
+        type: string
+        description: team affected by this impediment
+      resolutionPlan:
+        type: string
+        description: Plan for resolving the impediment
+      status:
+        type: string
+        enum:
+        - open
+        - in_progress
+        - resolved
+        description: Current status
+      createdDate:
+        type: string
+        format: date
+        description: When impediment was identified
+  technical_debt:
+    type: object
+    description: Technical debt requiring remediation
+    required:
+    - debtId
+    - description
+    - impact
+    - priority
+    properties:
+      debtId:
+        type: string
+        pattern: ^DEBT-[0-9]+$
+        description: Unique identifier for the debt
+      description:
+        type: string
+        description: Description of the technical debt
+        minLength: 10
+      impact:
+        type: string
+        enum:
+        - high
+        - medium
+        - low
+        description: Impact on system quality
+      priority:
+        type: integer
+        description: Priority for addressing debt (1=highest)
+        minimum: 1
+      boundedContextRef:
+        type: string
+        description: DDD bounded context containing this debt
+        pattern: ^ddd:BoundedContext:[a-z0-9_-]+$
+      aggregateRef:
+        type: string
+        description: DDD aggregate containing this debt
+        pattern: ^ddd:Aggregate:[a-z0-9_-]+$
+      resolutionEstimateHours:
+        type: number
+        description: Estimated hours to resolve
+        minimum: 0
+      createdDate:
+        type: string
+        format: date
+        description: When debt was identified
+  estimation_technique:
+    type: object
+    description: Technique for estimating work items
+    required:
+    - techniqueId
+    - name
+    - description
+    properties:
+      techniqueId:
+        type: string
+        pattern: ^TECH-[0-9]+$
+        description: Unique identifier for the technique
+      name:
+        type: string
+        enum:
+        - planning_poker
+        - t_shirt_sizes
+        - affinity
+        - ideal_days
+        - story_points
+        description: Name of estimation technique
+      description:
+        type: string
+        description: Description of how technique works
+        minLength: 10
+      whenToUse:
+        type: string
+        description: Guidance on when to use this technique
+  definition_of_ready:
+    type: object
+    description: Criteria that work items must meet before being pulled into sprint
+    required:
+    - dorId
+    - criteria
+    - teamRef
+    properties:
+      dorId:
+        type: string
+        pattern: ^DOR-[0-9]+$
+        description: Unique identifier for the DoR
+      criteria:
+        type: array
+        description: Readiness criteria
+        items:
+          type: string
+        minItems: 1
+      teamRef:
+        type: string
+        description: team that owns this DoR
+      lastUpdated:
+        type: string
+        format: date
+        description: When DoR was last updated
+  team_topology:
+    type: object
+    description: Team type and interaction patterns (Team Topologies model)
+    required:
+    - topologyId
+    - type
+    - responsibilities
+    properties:
+      topologyId:
+        type: string
+        pattern: ^TOPO-[0-9]+$
+        description: Unique identifier for the topology
+      type:
+        type: string
+        enum:
+        - stream_aligned
+        - platform
+        - enabling
+        - complicated_subsystem
+        description: team topology type
+      responsibilities:
+        type: array
+        description: Key responsibilities of this team type
+        items:
+          type: string
+        minItems: 1
+      interactionModes:
+        type: array
+        description: How this team interacts with others (collaboration, X-as-a-Service,
+          facilitating)
+        items:
+          type: string
+  working_agreement:
+    type: object
+    description: team norms and practices
+    required:
+    - agreementId
+    - teamRef
+    - norms
+    properties:
+      agreementId:
+        type: string
+        pattern: ^WA-[0-9]+$
+        description: Unique identifier for the working agreement
+      teamRef:
+        type: string
+        description: team that owns this agreement
+      norms:
+        type: array
+        description: team norms and behavioral agreements
+        items:
+          type: string
+        minItems: 1
+      practices:
+        type: array
+        description: Engineering and collaboration practices
+        items:
+          type: string
+      createdDate:
+        type: string
+        format: date
+        description: When agreement was created
+      reviewedDate:
+        type: string
+        format: date
+        description: When agreement was last reviewed
+  feedback_loop:
+    type: object
+    description: Mechanism for gathering and acting on feedback
+    required:
+    - loopId
+    - type
+    - cadence
+    properties:
+      loopId:
+        type: string
+        pattern: ^LOOP-[0-9]+$
+        description: Unique identifier for the feedback loop
+      type:
+        type: string
+        enum:
+        - sprint
+        - pi
+        - portfolio
+        - customer
+        description: Scope of feedback loop
+      cadence:
+        type: string
+        description: How often feedback is collected (e.g., 'per sprint', 'quarterly')
+      participants:
+        type: array
+        description: Who participates in this feedback loop
+        items:
+          type: string
+      metricsReviewed:
+        type: array
+        description: metrics reviewed in this feedback loop
+        items:
+          type: string
+  increment:
+    type: object
+    description: Potentially shippable product increment from a sprint
+    required:
+    - incrementId
+    - sprintRef
+    - deliverables
+    - acceptanceStatus
+    properties:
+      incrementId:
+        type: string
+        pattern: ^INC-[0-9]+$
+        description: Unique identifier for the increment
+      sprintRef:
+        type: string
+        description: sprint that produced this increment
+      deliverables:
+        type: array
+        description: What was delivered in this increment
+        items:
+          type: string
+        minItems: 1
+      acceptanceStatus:
+        type: string
+        enum:
+        - accepted
+        - rejected
+        - pending
+        description: Whether increment was accepted
+      demoDate:
+        type: string
+        format: date
+        description: When increment was demonstrated
+  cadence:
+    type: object
+    description: Regular rhythm or heartbeat for team activities
+    required:
+    - cadenceId
+    - name
+    - frequency
+    properties:
+      cadenceId:
+        type: string
+        pattern: ^CAD-[0-9]+$
+        description: Unique identifier for the cadence
+      name:
+        type: string
+        description: Name of the cadence (e.g., 'sprint cadence', 'PI cadence')
+      frequency:
+        type: string
+        enum:
+        - daily
+        - weekly
+        - biweekly
+        - monthly
+        - quarterly
+        description: How often activities occur
+      duration:
+        type: string
+        description: Duration of each cycle (e.g., '2 weeks', '10 weeks')
+      purpose:
+        type: string
+        description: Purpose of this cadence
+  roadmap:
+    type: object
+    description: Strategic view of deliverables over time
+    required:
+    - timeHorizon
+    - level
+    - items
+    properties:
+      level:
+        type: string
+        enum:
+        - portfolio
+        - product
+        - release
+        - pi
+        description: Level of roadmap (portfolio, product, release, or PI)
+      timeHorizon:
+        type: string
+        description: roadmap time horizon (e.g., '12 months', '4 PIs', '3 releases')
+      items:
+        type: array
+        description: roadmap items organized by timeframe
+        items:
+          type: object
+          required:
+          - timeframe
+          properties:
+            timeframe:
+              type: string
+              description: When (e.g., 'Q1 2025', 'PI 3', 'release 2.1')
+            theme:
+              type: string
+              description: Theme or objective for this period
+            objectives:
+              type: array
+              description: High-level objectives for this timeframe
+              items:
+                type: string
+            epics:
+              type: array
+              description: epic IDs planned for this timeframe
+              items:
+                type: string
+            features:
+              type: array
+              description: feature IDs planned for this timeframe
+              items:
+                type: string
+            milestones:
+              type: array
+              description: Key milestones in this timeframe
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  date:
+                    type: string
+                    format: date
+                  type:
+                    type: string
+            confidence:
+              type: string
+              enum:
+              - high
+              - medium
+              - low
+              description: Confidence level in this timeframe's plan
+            dependencies:
+              type: array
+              description: Key dependencies for this timeframe
+              items:
+                type: string
+        minItems: 1
+      lastReviewed:
+        type: string
+        format: date
+        description: When roadmap was last reviewed/updated
+      reviewCadence:
+        type: string
+        description: How often roadmap is reviewed (e.g., 'quarterly', 'per PI')
+      notes:
+        type: string
+        description: Additional context or assumptions
+  value_stream:
+    type: object
+    required:
+    - id
+    - name
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      type:
+        type: string
+        enum:
+        - operational
+        - development
+      steps:
+        type: array
+        description: Steps in the value stream
+        items:
+          type: string
+  portfolio:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      strategicThemes:
+        type: array
+        items:
+          type: string
+      budgets:
+        type: array
+        items:
+          type: object
+          properties:
+            valueStream:
+              type: string
+            allocation:
+              type: number
+  stakeholder:
+    type: object
+    required:
+    - id
+    - name
+    - role
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      influence:
+        type: string
+        enum:
+        - high
+        - medium
+        - low
+      interest:
+        type: string
+        enum:
+        - high
+        - medium
+        - low
+  metric:
+    type: object
+    required:
+    - name
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      target:
+        type: number
+      current:
+        type: number
+      unit:
+        type: string
+  risk:
+    type: object
+    required:
+    - id
+    - description
+    - roam
+    properties:
+      id:
+        type: string
+      description:
+        type: string
+      impact:
+        type: string
+        enum:
+        - high
+        - medium
+        - low
+      probability:
+        type: string
+        enum:
+        - high
+        - medium
+        - low
+      roam:
+        type: string
+        enum:
+        - resolved
+        - owned
+        - accepted
+        - mitigated
+        description: ROAM classification
+      owner:
+        type: string
+      mitigation:
+        type: string
+  metadata:
+    type: object
+    properties:
+      created:
+        type: string
+        format: date-time
+      updated:
+        type: string
+        format: date-time
+      createdBy:
+        type: string
+      updatedBy:
+        type: string
+      tags:
+        type: array
+        items:
+          type: string
+      customFields:
+        type: object
+        additionalProperties: true
+type: object
+oneOf:
+- $ref: '#/$defs/product'
+- $ref: '#/$defs/epic'
+- $ref: '#/$defs/feature'
+- $ref: '#/$defs/user_story'
+- $ref: '#/$defs/sprint'
+- $ref: '#/$defs/iteration'
+- $ref: '#/$defs/program_increment'
+- $ref: '#/$defs/release'
+- $ref: '#/$defs/team'
+- $ref: '#/$defs/agile_release_train'
+- $ref: '#/$defs/non_functional_requirement'
+- $ref: '#/$defs/architectural_runway'
+- $ref: '#/$defs/enabler'
+- $ref: '#/$defs/ceremony'
+- $ref: '#/$defs/role'
+- $ref: '#/$defs/impediment'
+- $ref: '#/$defs/technical_debt'
+- $ref: '#/$defs/estimation_technique'
+- $ref: '#/$defs/definition_of_ready'
+- $ref: '#/$defs/team_topology'
+- $ref: '#/$defs/working_agreement'
+- $ref: '#/$defs/feedback_loop'
+- $ref: '#/$defs/increment'
+- $ref: '#/$defs/cadence'

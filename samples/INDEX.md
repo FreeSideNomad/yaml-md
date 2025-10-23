@@ -11,6 +11,7 @@ Curated catalog of the sample schemas and companion models included in `samples/
 | `agile/program-agile.schema.yaml` | `agile/program-example.yaml` | Program-level structures including programs, program increments, and release planning. | Mobile platform program with PI cadence, releases, and architectural runway details. |
 | `agile/safe-agile.schema.yaml` | `agile/safe-example.yaml` | SAFe-specific extensions for ARTs and cadence patterns. | Mobile platform Agile Release Train with SAFe ceremonies and synchronization cadence. |
 | `agile/team-agile.schema.yaml` | `agile/team-example.yaml` | Team-level execution patterns including sprints, ceremonies, and impediments. | iOS development team showcasing sprint ceremonies, velocity, and impediment tracking. |
+| `agile-full/model-schema.yaml` | `agile-full/platform-agile.yaml` | End-to-end agile operating model schema spanning portfolio, program, and team structures. | Enterprise agile platform example demonstrating multi-level governance and delivery flows. |
 
 ## Data Engineering Systems
 
@@ -20,6 +21,7 @@ Curated catalog of the sample schemas and companion models included in `samples/
 | `data-eng/model.schema.yaml` | `data-eng/ml.example.yaml` | Holistic data engineering model schema for domains, pipelines, storage, SLAs, and governance. | ML feature store platform focusing on feature engineering, point-in-time joins, and drift monitoring. |
 | `data-eng/model.schema.yaml` | `data-eng/payments.example.yaml` | Holistic data engineering model schema for domains, pipelines, storage, SLAs, and governance. | Payment processing system highlighting CDC outbox, exactly-once semantics, and fraud detection pipelines. |
 | `data-eng/model.schema.yaml` | `data-eng/retail.example.yaml` | Holistic data engineering model schema for domains, pipelines, storage, SLAs, and governance. | Retail order processing medallion architecture with bronze/silver/gold layers and SCD Type 2 patterns. |
+| `data-eng/model.schema.yaml` | `data-eng/platform-data-eng.yaml` | Holistic data engineering model schema for domains, pipelines, storage, SLAs, and governance. | Data engineering platform blueprint spanning data products, contracts, lineage, and governance modules. |
 
 ## Domain-Driven Design
 
@@ -30,6 +32,7 @@ Curated catalog of the sample schemas and companion models included in `samples/
 | `ddd-part/strategic-ddd.schema.yaml` | `ddd-part/bff-example.yaml` | Strategic DDD patterns for domains, bounded contexts, and context mappings. | Web application BFF demonstrating aggregation across bounded contexts and upstream dependencies. |
 | `ddd-part/tactical-ddd.schema.yaml` | `ddd-part/tactical-example.yaml` | Tactical DDD patterns covering aggregates, entities, value objects, services, and repositories. | Tactical view of Job Seeker domain with aggregates, entities, value objects, and service boundaries. |
 | `ddd-part/tactical-ddd.schema.yaml` | `ddd-part/application-service-example.yaml` | Tactical DDD patterns covering aggregates, entities, value objects, services, and repositories. | Application service example illustrating CQRS workflow for user management. |
+| `ddd-full/ddd-schema.yaml` | `ddd-full/platform-ddd.yaml` | Comprehensive DDD system architecture schema spanning strategic and tactical concepts. | End-to-end DDD platform example with multi-domain orchestration, integration patterns, and governance. |
 
 ## Quality Engineering
 
@@ -44,4 +47,3 @@ Curated catalog of the sample schemas and companion models included in `samples/
 | `ux/interaction-ux.schema.yaml` | `ux/interaction-example.yaml` | UX interaction schema for workflows, UI components, behaviors, and design system linkages. | E-commerce interaction design showing workflows, component library usage, and behavior rules. |
 | `ux/navigation-ux.schema.yaml` | `ux/navigation-example.yaml` | UX navigation schema for global/local navigation, page structures, and wayfinding aids. | E-commerce navigation model with breadcrumbs, mega-menus, and contextual navigation patterns. |
 | `ux/structure-ux.schema.yaml` | `ux/structure-example.yaml` | UX information architecture schema for content hierarchy, facets, and search structures. | E-commerce IA detailing product hierarchy, tagging facets, and search affordances. |
-

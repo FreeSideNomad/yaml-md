@@ -36,12 +36,86 @@
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="" href="#">Home</a>
           </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="sys-ml-feature-store" href="#sys-ml-feature-store">System: ML Feature Store Platform</a>
+          </li>
         </ul>
       </aside>
       <main class="Layout-main p-4" id="content">
         <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
           <h2>Top Level Types</h2>
-          <p>No top-level types discovered.</p>
+          <div class="home-index">
+            <a href="#sys-ml-feature-store">System: ML Feature Store Platform</a>
+          </div>
+        </section>
+        <section id="sys-ml-feature-store" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: ML Feature Store Platform", "href": "#sys-ml-feature-store"}]'>
+          <header><h2>System: ML Feature Store Platform</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>sys-ml-feature-store</dd>
+            <dt>Name</dt>
+            <dd>ML Feature Store Platform</dd>
+            <dt>Description</dt>
+            <dd>Centralized feature store for ML model training and serving with point-in-time correctness</dd>
+            <dt>X-vendor</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="sys-ml-feature-store-owners-tab" data-tab-target="sys-ml-feature-store-owners-tab">Owners</button>
+            <button role="tab" aria-selected="false" aria-controls="sys-ml-feature-store-domains-tab" data-tab-target="sys-ml-feature-store-domains-tab">Domains</button>
+            <button role="tab" aria-selected="false" aria-controls="sys-ml-feature-store-tags-tab" data-tab-target="sys-ml-feature-store-tags-tab">Tags</button>
+            </nav>
+          <div role="tabpanel" id="sys-ml-feature-store-owners-tab" class="TabPanel" data-tab-label="Owners">
+            <ul class="ActionList">
+              <li class="ActionList-item">Team: ml-platform Contact: ml-platform@mlcompany.com</li>
+            </ul>
+          </div>
+          <div role="tabpanel" id="sys-ml-feature-store-domains-tab" class="TabPanel hidden" data-tab-label="Domains">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Domains</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>dom-feature-ingestion</td>
+                  </tr>
+                  <tr>
+                    <td>dom-feature-materialization</td>
+                  </tr>
+                  <tr>
+                    <td>dom-feature-serving</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="sys-ml-feature-store-tags-tab" class="TabPanel hidden" data-tab-label="Tags">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ml</td>
+                  </tr>
+                  <tr>
+                    <td>feature-store</td>
+                  </tr>
+                  <tr>
+                    <td>point-in-time-correct</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
         </section>
       </main>
     </div>
@@ -172,7 +246,7 @@
           if (window.location.hash) {
             handleHashChange();
           } else {
-            showSection("home");
+            window.location.hash = "#sys-ml-feature-store";
           }
         })();
         

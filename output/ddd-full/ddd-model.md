@@ -116,14 +116,6 @@ Team Ownership: Core Matching Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-#### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 #### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -132,6 +124,14 @@ Team Ownership: Core Matching Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+#### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 #### Context Mappings
 
@@ -195,6 +195,14 @@ On Update:
 
 On Delete:
 
+##### Repositories
+
+| Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
+| ---------- | ------------------- | ------------- | -------------------- | -------------------- |
+| [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
+| [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
+| [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
+
 ##### Domain Events
 
 | Domain Event | Bounded Context Ref | Aggregate Ref | Description | Immutable | Timestamp Included |
@@ -203,14 +211,6 @@ On Delete:
 | [JobPosted](#evt_job_posted) | bc_job_catalog | agg_job_posting | New job was posted to catalog | true | true |
 | [HighMatchFound](#evt_high_match_found) | bc_matching | agg_job_match | A high-quality match (score >= 80) was found | true | true |
 | [ApplicationSubmitted](#evt_application_submitted) | bc_applications | agg_job_application | Candidate submitted job application | true | true |
-
-##### Repositories
-
-| Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
-| ---------- | ------------------- | ------------- | -------------------- | -------------------- |
-| [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
-| [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
-| [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
 
 <a id="ent_candidate"></a>
 ##### Entity: Candidate
@@ -391,14 +391,6 @@ Team Ownership: Aggregation Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -407,6 +399,14 @@ Team Ownership: Aggregation Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -491,14 +491,6 @@ Team Ownership: Aggregation Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -507,6 +499,14 @@ Team Ownership: Aggregation Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -605,14 +605,6 @@ Team Ownership: Core Matching Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -621,6 +613,14 @@ Team Ownership: Core Matching Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -679,6 +679,14 @@ On Update:
 
 On Delete:
 
+###### Repositories
+
+| Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
+| ---------- | ------------------- | ------------- | -------------------- | -------------------- |
+| [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
+| [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
+| [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
+
 ###### Domain Events
 
 | Domain Event | Bounded Context Ref | Aggregate Ref | Description | Immutable | Timestamp Included |
@@ -687,14 +695,6 @@ On Delete:
 | [JobPosted](#evt_job_posted) | bc_job_catalog | agg_job_posting | New job was posted to catalog | true | true |
 | [HighMatchFound](#evt_high_match_found) | bc_matching | agg_job_match | A high-quality match (score >= 80) was found | true | true |
 | [ApplicationSubmitted](#evt_application_submitted) | bc_applications | agg_job_application | Candidate submitted job application | true | true |
-
-###### Repositories
-
-| Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
-| ---------- | ------------------- | ------------- | -------------------- | -------------------- |
-| [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
-| [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
-| [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
 
 <a id="ent_job_match"></a>
 ###### Entity: Job Match
@@ -822,14 +822,6 @@ Team Ownership:
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -838,6 +830,14 @@ Team Ownership:
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -923,14 +923,6 @@ Team Ownership: Core Matching Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -939,6 +931,14 @@ Team Ownership: Core Matching Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -998,6 +998,14 @@ On Update:
 
 On Delete:
 
+###### Repositories
+
+| Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
+| ---------- | ------------------- | ------------- | -------------------- | -------------------- |
+| [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
+| [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
+| [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
+
 ###### Domain Events
 
 | Domain Event | Bounded Context Ref | Aggregate Ref | Description | Immutable | Timestamp Included |
@@ -1007,6 +1015,84 @@ On Delete:
 | [HighMatchFound](#evt_high_match_found) | bc_matching | agg_job_match | A high-quality match (score >= 80) was found | true | true |
 | [ApplicationSubmitted](#evt_application_submitted) | bc_applications | agg_job_application | Candidate submitted job application | true | true |
 
+<a id="repo_profile"></a>
+###### Repository: ProfileRepository
+
+Id: repo_profile
+Name: ProfileRepository
+Bounded Context Ref: [Profile Management](#bc_profile)
+Aggregate Ref: [Candidate Profile](#agg_candidate_profile)
+Persistence Strategy: PostgreSQL with JPA
+Implementation Notes: Uses Data Mapper pattern to separate domain model from persistence
+
+###### Interface Methods
+
+| Interface Method | Returns | Query Type |
+| ---------------- | ------- | ---------- |
+| save | void | custom |
+| findById | Optional<CandidateProfile> | by_id |
+| findByEmail | Optional<CandidateProfile> | by_criteria |
+| findIncompleteProfiles | List<CandidateProfile> | custom |
+
+<a id="repo_job_posting"></a>
+###### Repository: JobPostingRepository
+
+Id: repo_job_posting
+Name: JobPostingRepository
+Bounded Context Ref: [Job Catalog](#bc_job_catalog)
+Aggregate Ref: [Job Posting](#agg_job_posting)
+Persistence Strategy: PostgreSQL with pgvector for semantic search
+Implementation Notes: Job embeddings stored for similarity matching
+
+###### Interface Methods
+
+| Interface Method | Returns | Query Type |
+| ---------------- | ------- | ---------- |
+| save | void | custom |
+| findById | Optional<JobPosting> | by_id |
+| findActive | List<JobPosting> | custom |
+| findByLocation | List<JobPosting> | by_criteria |
+| findPostedAfter | List<JobPosting> | by_criteria |
+
+<a id="agg_job_posting"></a>
+###### Aggregate: Job Posting
+
+Id: agg_job_posting
+Name: Job Posting
+Bounded Context Ref: [Job Catalog](#bc_job_catalog)
+Root Ref: [Job Posting](#ent_job_posting)
+Lifecycle Hooks: 
+Size Estimate: small
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+
+###### Value Objects
+
+| Value Object | Bounded Context Ref | Description | Immutability |
+| ------------ | ------------------- | ----------- | ------------ |
+| [Job Id](#vo_job_id) |  |  |  |
+| [Job Title](#vo_job_title) |  |  |  |
+| [Company](#vo_company) |  |  |  |
+| [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+| [Salary Range](#vo_salary_range) |  |  |  |
+| [Requirements](#vo_requirements) |  |  |  |
+| [Description](#vo_description) |  |  |  |
+| [Source](#vo_source) |  |  |  |
+
+Consistency Rules: Job must have title, company, and source Job must not be duplicate (same title, company, location)
+
+Invariants: Posted date <= Current date Expiry date > Posted date
+
+On Create:
+
+On Update:
+
+On Delete:
+
 ###### Repositories
 
 | Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
@@ -1014,6 +1100,65 @@ On Delete:
 | [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
 | [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
 | [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
+
+###### Domain Events
+
+| Domain Event | Bounded Context Ref | Aggregate Ref | Description | Immutable | Timestamp Included |
+| ------------ | ------------------- | ------------- | ----------- | --------- | ------------------ |
+| [ProfileUpdated](#evt_profile_updated) | bc_profile | agg_candidate_profile | Candidate profile was updated | true | true |
+| [JobPosted](#evt_job_posted) | bc_job_catalog | agg_job_posting | New job was posted to catalog | true | true |
+| [HighMatchFound](#evt_high_match_found) | bc_matching | agg_job_match | A high-quality match (score >= 80) was found | true | true |
+| [ApplicationSubmitted](#evt_application_submitted) | bc_applications | agg_job_application | Candidate submitted job application | true | true |
+
+<a id="vo_location"></a>
+###### Value Object: Location
+
+Id: vo_location
+Name: Location
+Bounded Context Ref: [Profile Management](#bc_profile)
+Description: Canadian location (city, province)
+Immutability: true
+
+###### Attributes
+
+| Attribute | Type | Required | Validation |
+| --------- | ---- | -------- | ---------- |
+| city | string | true |  |
+| province | CanadianProvince | true |  |
+| country | string | true | Must be 'Canada' |
+
+Validation Rules: Province must be valid Canadian province code (ON, BC, QC, etc.) Country must be 'Canada'
+
+Equality Criteria: city province country
+
+Common Values:
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
+
+<a id="repo_job_match"></a>
+###### Repository: JobMatchRepository
+
+Id: repo_job_match
+Name: JobMatchRepository
+Bounded Context Ref: [Job Matching Engine](#bc_matching)
+Aggregate Ref: [Job Match](#agg_job_match)
+Persistence Strategy: PostgreSQL
+Implementation Notes: 
+
+###### Interface Methods
+
+| Interface Method | Returns | Query Type |
+| ---------------- | ------- | ---------- |
+| save | void | custom |
+| findByCandidate | List<JobMatch> | by_criteria |
+| findHighMatches | List<JobMatch> | custom |
+| findByJob | List<JobMatch> | by_criteria |
 
 <a id="evt_profile_updated"></a>
 ###### Domain Event: ProfileUpdated
@@ -1066,93 +1211,6 @@ Timestamp Included: true
 | Handler | Bounded Context | Handler | Action |
 | ------- | --------------- | ------- | ------ |
 | bc_matching CalculateMatchesForNewJob Calculate matches for all eligible candidates | bc_matching | CalculateMatchesForNewJob | Calculate matches for all eligible candidates |
-
-<a id="agg_job_posting"></a>
-###### Aggregate: Job Posting
-
-Id: agg_job_posting
-Name: Job Posting
-Bounded Context Ref: [Job Catalog](#bc_job_catalog)
-Root Ref: [Job Posting](#ent_job_posting)
-Lifecycle Hooks: 
-Size Estimate: small
-
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-
-###### Value Objects
-
-| Value Object | Bounded Context Ref | Description | Immutability |
-| ------------ | ------------------- | ----------- | ------------ |
-| [Job Id](#vo_job_id) |  |  |  |
-| [Job Title](#vo_job_title) |  |  |  |
-| [Company](#vo_company) |  |  |  |
-| [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
-| [Salary Range](#vo_salary_range) |  |  |  |
-| [Requirements](#vo_requirements) |  |  |  |
-| [Description](#vo_description) |  |  |  |
-| [Source](#vo_source) |  |  |  |
-
-Consistency Rules: Job must have title, company, and source Job must not be duplicate (same title, company, location)
-
-Invariants: Posted date <= Current date Expiry date > Posted date
-
-On Create:
-
-On Update:
-
-On Delete:
-
-###### Domain Events
-
-| Domain Event | Bounded Context Ref | Aggregate Ref | Description | Immutable | Timestamp Included |
-| ------------ | ------------------- | ------------- | ----------- | --------- | ------------------ |
-| [ProfileUpdated](#evt_profile_updated) | bc_profile | agg_candidate_profile | Candidate profile was updated | true | true |
-| [JobPosted](#evt_job_posted) | bc_job_catalog | agg_job_posting | New job was posted to catalog | true | true |
-| [HighMatchFound](#evt_high_match_found) | bc_matching | agg_job_match | A high-quality match (score >= 80) was found | true | true |
-| [ApplicationSubmitted](#evt_application_submitted) | bc_applications | agg_job_application | Candidate submitted job application | true | true |
-
-###### Repositories
-
-| Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
-| ---------- | ------------------- | ------------- | -------------------- | -------------------- |
-| [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
-| [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
-| [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
-
-<a id="vo_location"></a>
-###### Value Object: Location
-
-Id: vo_location
-Name: Location
-Bounded Context Ref: [Profile Management](#bc_profile)
-Description: Canadian location (city, province)
-Immutability: true
-
-###### Attributes
-
-| Attribute | Type | Required | Validation |
-| --------- | ---- | -------- | ---------- |
-| city | string | true |  |
-| province | CanadianProvince | true |  |
-| country | string | true | Must be 'Canada' |
-
-Validation Rules: Province must be valid Canadian province code (ON, BC, QC, etc.) Country must be 'Canada'
-
-Equality Criteria: city province country
-
-Common Values:
-
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 <a id="evt_high_match_found"></a>
 ###### Domain Event: HighMatchFound
@@ -1251,14 +1309,6 @@ Team Ownership: Application Tracking Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -1267,6 +1317,14 @@ Team Ownership: Application Tracking Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -1333,15 +1391,6 @@ On Update:
 
 On Delete:
 
-###### Domain Events
-
-| Domain Event | Bounded Context Ref | Aggregate Ref | Description | Immutable | Timestamp Included |
-| ------------ | ------------------- | ------------- | ----------- | --------- | ------------------ |
-| [ProfileUpdated](#evt_profile_updated) | bc_profile | agg_candidate_profile | Candidate profile was updated | true | true |
-| [JobPosted](#evt_job_posted) | bc_job_catalog | agg_job_posting | New job was posted to catalog | true | true |
-| [HighMatchFound](#evt_high_match_found) | bc_matching | agg_job_match | A high-quality match (score >= 80) was found | true | true |
-| [ApplicationSubmitted](#evt_application_submitted) | bc_applications | agg_job_application | Candidate submitted job application | true | true |
-
 ###### Repositories
 
 | Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
@@ -1350,63 +1399,14 @@ On Delete:
 | [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
 | [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
 
-<a id="repo_profile"></a>
-###### Repository: ProfileRepository
+###### Domain Events
 
-Id: repo_profile
-Name: ProfileRepository
-Bounded Context Ref: [Profile Management](#bc_profile)
-Aggregate Ref: [Candidate Profile](#agg_candidate_profile)
-Persistence Strategy: PostgreSQL with JPA
-Implementation Notes: Uses Data Mapper pattern to separate domain model from persistence
-
-###### Interface Methods
-
-| Interface Method | Returns | Query Type |
-| ---------------- | ------- | ---------- |
-| save | void | custom |
-| findById | Optional<CandidateProfile> | by_id |
-| findByEmail | Optional<CandidateProfile> | by_criteria |
-| findIncompleteProfiles | List<CandidateProfile> | custom |
-
-<a id="repo_job_posting"></a>
-###### Repository: JobPostingRepository
-
-Id: repo_job_posting
-Name: JobPostingRepository
-Bounded Context Ref: [Job Catalog](#bc_job_catalog)
-Aggregate Ref: [Job Posting](#agg_job_posting)
-Persistence Strategy: PostgreSQL with pgvector for semantic search
-Implementation Notes: Job embeddings stored for similarity matching
-
-###### Interface Methods
-
-| Interface Method | Returns | Query Type |
-| ---------------- | ------- | ---------- |
-| save | void | custom |
-| findById | Optional<JobPosting> | by_id |
-| findActive | List<JobPosting> | custom |
-| findByLocation | List<JobPosting> | by_criteria |
-| findPostedAfter | List<JobPosting> | by_criteria |
-
-<a id="repo_job_match"></a>
-###### Repository: JobMatchRepository
-
-Id: repo_job_match
-Name: JobMatchRepository
-Bounded Context Ref: [Job Matching Engine](#bc_matching)
-Aggregate Ref: [Job Match](#agg_job_match)
-Persistence Strategy: PostgreSQL
-Implementation Notes: 
-
-###### Interface Methods
-
-| Interface Method | Returns | Query Type |
-| ---------------- | ------- | ---------- |
-| save | void | custom |
-| findByCandidate | List<JobMatch> | by_criteria |
-| findHighMatches | List<JobMatch> | custom |
-| findByJob | List<JobMatch> | by_criteria |
+| Domain Event | Bounded Context Ref | Aggregate Ref | Description | Immutable | Timestamp Included |
+| ------------ | ------------------- | ------------- | ----------- | --------- | ------------------ |
+| [ProfileUpdated](#evt_profile_updated) | bc_profile | agg_candidate_profile | Candidate profile was updated | true | true |
+| [JobPosted](#evt_job_posted) | bc_job_catalog | agg_job_posting | New job was posted to catalog | true | true |
+| [HighMatchFound](#evt_high_match_found) | bc_matching | agg_job_match | A high-quality match (score >= 80) was found | true | true |
+| [ApplicationSubmitted](#evt_application_submitted) | bc_applications | agg_job_application | Candidate submitted job application | true | true |
 
 <a id="svc_app_submit_application"></a>
 ###### Application Service: SubmitApplicationService
@@ -1648,14 +1648,6 @@ Team Ownership: Career Development Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -1664,6 +1656,14 @@ Team Ownership: Career Development Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -1743,14 +1743,6 @@ Team Ownership: Career Development Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -1759,6 +1751,14 @@ Team Ownership: Career Development Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -1886,14 +1886,6 @@ Team Ownership: Infrastructure Team
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -1902,6 +1894,14 @@ Team Ownership: Infrastructure Team
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -2000,6 +2000,14 @@ On Update:
 
 On Delete:
 
+###### Repositories
+
+| Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
+| ---------- | ------------------- | ------------- | -------------------- | -------------------- |
+| [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
+| [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
+| [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
+
 ###### Domain Events
 
 | Domain Event | Bounded Context Ref | Aggregate Ref | Description | Immutable | Timestamp Included |
@@ -2008,14 +2016,6 @@ On Delete:
 | [JobPosted](#evt_job_posted) | bc_job_catalog | agg_job_posting | New job was posted to catalog | true | true |
 | [HighMatchFound](#evt_high_match_found) | bc_matching | agg_job_match | A high-quality match (score >= 80) was found | true | true |
 | [ApplicationSubmitted](#evt_application_submitted) | bc_applications | agg_job_application | Candidate submitted job application | true | true |
-
-###### Repositories
-
-| Repository | Bounded Context Ref | Aggregate Ref | Persistence Strategy | Implementation Notes |
-| ---------- | ------------------- | ------------- | -------------------- | -------------------- |
-| [ProfileRepository](#repo_profile) | bc_profile | agg_candidate_profile | PostgreSQL with JPA | Uses Data Mapper pattern to separate domain model from persistence |
-| [JobPostingRepository](#repo_job_posting) | bc_job_catalog | agg_job_posting | PostgreSQL with pgvector for semantic search | Job embeddings stored for similarity matching |
-| [JobMatchRepository](#repo_job_match) | bc_matching | agg_job_match | PostgreSQL |  |
 
 <a id="bc_skills_analysis"></a>
 ###### Specification: Skills Gap Analysis
@@ -2237,14 +2237,6 @@ Team Ownership:
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -2253,6 +2245,14 @@ Team Ownership:
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -2384,14 +2384,6 @@ Team Ownership:
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -2400,6 +2392,14 @@ Team Ownership:
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -2531,14 +2531,6 @@ Team Ownership:
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -2547,6 +2539,14 @@ Team Ownership:
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -2714,14 +2714,6 @@ Team Ownership:
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -2730,6 +2722,14 @@ Team Ownership:
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -2861,14 +2861,6 @@ Team Ownership:
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -2877,6 +2869,14 @@ Team Ownership:
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 
@@ -3008,14 +3008,6 @@ Team Ownership:
 | [CandidateProfileFactory](#factory_candidate_profile) | bc_profile | aggregate | agg_candidate_profile | domain_layer | true |
 | [JobMatchFactory](#factory_job_match) | bc_matching | aggregate | agg_job_match | domain_layer | false |
 
-###### Entities
-
-| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
-| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
-| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
-| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
-| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
-
 ###### Value Objects
 
 | Value Object | Bounded Context Ref | Description | Immutability |
@@ -3024,6 +3016,14 @@ Team Ownership:
 | [Skills](#vo_skills) | bc_profile | Collection of candidate skills with proficiency levels | true |
 | [MatchScore](#vo_match_score) | bc_matching | Calculated match score between 0 and 100 | true |
 | [Location](#vo_location) | bc_profile | Canadian location (city, province) | true |
+
+###### Entities
+
+| Entity | Bounded Context Ref | Aggregate Ref | Is Aggregate Root | Identity Field | Identity Generation |
+| ------ | ------------------- | ------------- | ----------------- | -------------- | ------------------- |
+| [Candidate](#ent_candidate) | bc_profile | agg_candidate_profile | true | candidate_id | auto_generated |
+| [Job Posting](#ent_job_posting) | bc_job_catalog | agg_job_posting | true | job_id | auto_generated |
+| [Job Match](#ent_job_match) | bc_matching | agg_job_match | true | match_id | auto_generated |
 
 ###### Context Mappings
 

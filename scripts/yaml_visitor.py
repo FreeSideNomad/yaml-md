@@ -1351,10 +1351,94 @@ class HtmlVisitor(NodeVisitor):
         return html_module.escape(value or "")
 
 def load_document(doc_file: str) -> dict:
-    """Load YAML document (model/instance)."""
+    """Load YAML document (model/instance), merging multiple YAML documents if necessary."""
     with open(doc_file, 'r') as f:
-        docs = list(yaml.safe_load_all(f))
-        return docs[0] if docs else {}
+        docs = [doc for doc in yaml.safe_load_all(f) if doc is not None]
+        if not docs:
+            return {}
+        if len(docs) == 1:
+            return docs[0]
+
+        def merge_values(base, new):
+            if base is None:
+                return new
+            if isinstance(base, dict) and isinstance(new, dict):
+                merged = dict(base)
+                for key, value in new.items():
+                    if key in merged:
+                        merged[key] = merge_values(merged[key], value)
+                    else:
+                        merged[key] = value
+                return merged
+            if isinstance(base, list) and isinstance(new, list):
+                return base + new
+            return new
+
+        merged_doc = docs[0]
+        for doc in docs[1:]:
+            merged_doc = merge_values(merged_doc, doc)
+        return merged_doc
+
+
+def pluralize_token(token: str) -> str:
+    if not token:
+        return token
+    lower = token.lower()
+    if lower.endswith('y') and len(lower) > 1 and lower[-2] not in 'aeiou':
+        plural = lower[:-1] + 'ies'
+    elif lower.endswith(('s', 'x', 'z', 'ch', 'sh')):
+        plural = lower + 'es'
+    else:
+        plural = lower + 's'
+
+    if token.isupper():
+        return plural.upper()
+    if token[0].isupper() and token[1:].islower():
+        return plural.capitalize()
+    return plural
+
+
+def pluralize_identifier(identifier: str) -> str:
+    if not identifier:
+        return identifier
+    if '_' in identifier:
+        parts = identifier.split('_')
+        parts[-1] = pluralize_token(parts[-1])
+        return '_'.join(parts)
+    return pluralize_token(identifier)
+
+
+def candidate_root_keys(type_name: str) -> list:
+    forms = {type_name}
+    plural_form = pluralize_identifier(type_name)
+    forms.add(plural_form)
+    lower = type_name.lower()
+    forms.add(lower)
+    forms.add(pluralize_identifier(lower))
+
+    hyphen_variants = set()
+    for form in list(forms):
+        if '_' in form:
+            hyphen_variants.add(form.replace('_', '-'))
+    forms.update(hyphen_variants)
+
+    return sorted(forms)
+
+
+def find_root_entry(schema_types: set, data: dict):
+    if not isinstance(data, dict):
+        return None
+
+    candidate_map = {
+        schema_type: set(candidate_root_keys(schema_type))
+        for schema_type in schema_types
+    }
+
+    for key in data.keys():
+        for schema_type, candidates in candidate_map.items():
+            if key in candidates:
+                return schema_type, key
+    return None
 
 
 def build_id_index(data: dict) -> dict:
@@ -1539,18 +1623,41 @@ def main(schema_file: str, document_file: str, output_file: str, trace: bool = F
 
     # Find root schema type in the document
     # Try common root names or use first schema type found in data
-    root_type = None
-    for schema_type in schema_types:
-        if schema_type in full_data:
-            root_type = schema_type
-            break
+    root_entry = find_root_entry(schema_types, full_data)
+    if not root_entry:
+        available_keys = list(full_data.keys())[:5] if isinstance(full_data, dict) else []
+        raise ValueError(
+            "No root schema type found in document. "
+            f"Schema types: {sorted(schema_types)}; Available keys: {available_keys}"
+        )
 
-    if root_type:
-        print(f"Starting visit from root type: {root_type}")
-        visit_tree(root_type, relationships, type_info, full_data[root_type],
+    schema_type, key = root_entry
+    value = full_data.get(key)
+    if value is None:
+        raise ValueError(f"Root key '{key}' not found in document after parsing.")
+
+    print(f"Starting visit from root type: {schema_type} (document key: {key})")
+    if isinstance(value, list):
+        for item in value:
+            if isinstance(item, dict):
+                visit_tree(schema_type, relationships, type_info, item,
+                           id_index, full_data, visitor, visited_global, [], schema_types, 0)
+            elif isinstance(item, str):
+                resolved = id_index.get(item)
+                if isinstance(resolved, dict):
+                    visit_tree(schema_type, relationships, type_info, resolved,
+                               id_index, full_data, visitor, visited_global, [], schema_types, 0)
+            else:
+                raise ValueError(
+                    f"Unsupported root list item for {key}: {type(item).__name__}. Expected dict or str."
+                )
+    elif isinstance(value, dict):
+        visit_tree(schema_type, relationships, type_info, value,
                    id_index, full_data, visitor, visited_global, [], schema_types, 0)
     else:
-        print(f"Warning: No root schema type found in document. Available keys: {list(full_data.keys())[:5]}")
+        raise ValueError(
+            f"Unsupported root value type for {key}: {type(value).__name__}. Expected dict or list."
+        )
 
     visitor.finish()
     output_lines = visitor.get_output_lines()

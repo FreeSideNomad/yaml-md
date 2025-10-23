@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>YAML Document • /Users/igor/code/yaml-md/samples/agile-full/platform-agile.yaml</title>
+    <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css">
+    <script src="https://unpkg.com/@primer/layout@1.0.4/dist/index.umd.js" defer></script>
+    <style>
+      body { background: var(--bgColor-default, #fff); color: var(--fgColor-default, #24292f); font-size: 17px; line-height: 1.6; }
+      .hidden { display: none !important; }
+      .Layout { min-height: 100vh; }
+      #app > aside { display: none; }
+      #app > main { width: 100%; }
+      a, a:visited { color: #0969da !important; }
+      .tabbed-tables { margin-top: 1rem; }
+      .TabNav { border-bottom: 1px solid var(--borderColor-default, #d0d7de); }
+      .TabNav button { background: none; border: none; padding: 0.5rem 1rem; cursor: pointer; }
+      .TabNav button[aria-selected="true"] { border-bottom: 2px solid var(--borderColor-accent-emphasis, #0969da); font-weight: 600; }
+      .TabPanel.hidden { display: none !important; }
+      .type-attributes { display: grid; grid-template-columns: minmax(0, 200px) 1fr; gap: 0.5rem 1rem; margin: 1rem 0; }
+      .type-attributes dt { font-weight: 600; }
+      .type-attributes dd { margin: 0; }
+      .home-index { display: grid; gap: 0.75rem; margin-top: 1rem; }
+      .home-index a { text-decoration: none; font-weight: 600; color: var(--fgColor-accent, #0969da); }
+      .ActionList-content.ActionList-item--active { background-color: var(--bgColor-muted, #eaeef2); border-radius: 6px; }
+      .Table th, .Table td { white-space: normal; word-break: break-word; padding: 0.5rem; }
+      .table-wrapper { overflow-x: auto; margin-top: 0.5rem; }
+      .table-wrapper .Table { min-width: 640px; }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="Layout Layout--flowRow-until-lg">
+      <aside class="Layout-sidebar p-3 border-right">
+        <h1 class="h3 mb-3">Schema Types</h1>
+        <ul class="ActionList" id="nav-list">
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="" href="#">Home</a>
+          </li>
+        </ul>
+      </aside>
+      <main class="Layout-main p-4" id="content">
+        <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
+          <h2>Top Level Types</h2>
+          <p>No top-level types discovered.</p>
+        </section>
+        <section id="vision" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Vision: A modern, scalable cash management platform that empowers commercial banking clients across Canada and the US\nto self-manage their banking services, users, and approval workflows through a unified digital experience.\nThe platform eliminates manual processes, reduces operational overhead, and provides clients with real-time\ncontrol over their banking relationships while maintaining robust security and compliance standards.\n Payedge is ready to launch a brand-new Receivables service\u2014something we've never offered before. A large commercial\nclient wants to bring 700 of their business partners (payors) onto the platform by June 2026. This isn't replacing\na manual process\u2014we're creating a new digital service from scratch. And we can't launch without the right platform.\n\nWe need three things to succeed: First, an employee portal where our bank staff can efficiently enroll Canadian online\nprofiles and monitor 700 indirect client relationships. Second, a self-service portal where those 700 payors can\nindependently manage their users, set their approval rules, and process invoices. Third, a generic approval workflow\nengine that supports flexible rules\u2014single approver for small invoices, dual approval for large amounts, configurable\nthresholds for each payor.\n\nToday, none of this exists. We're manually managing users from our legacy Express system. We have no portal for\nemployees or payors. We have no approval engine\u2014every service builds custom approval logic. We're at risk of losing\nthis client and missing the entire Receivables opportunity.\n\nWe're building the platform that makes this possible. Employee portal for efficient bank operations. Self-service\nportal for payor independence. Generic approval workflow engine supporting flexible, configurable rules. Near\nreal-time Express integration so users flow automatically. A three-tier model that turns our client into a platform\nfor their partners.\n\nThis is our moment. By June 2026, we launch a new service with one large client, 700 payors, and 700 approval\nworkflows. We prove the model works. Then we scale\u2014more clients, more services, corporate structure support, US\nexpansion. We're not just enabling Payedge. We're building the foundation for the next decade of commercial banking\ninnovation.\n 2025-10-15", "href": "#vision"}]'>
+          <header><h2>Vision: A modern, scalable cash management platform that empowers commercial banking clients across Canada and the US
+to self-manage their banking services, users, and approval workflows through a unified digital experience.
+The platform eliminates manual processes, reduces operational overhead, and provides clients with real-time
+control over their banking relationships while maintaining robust security and compliance standards.
+ Payedge is ready to launch a brand-new Receivables service—something we&#x27;ve never offered before. A large commercial
+client wants to bring 700 of their business partners (payors) onto the platform by June 2026. This isn&#x27;t replacing
+a manual process—we&#x27;re creating a new digital service from scratch. And we can&#x27;t launch without the right platform.
+
+We need three things to succeed: First, an employee portal where our bank staff can efficiently enroll Canadian online
+profiles and monitor 700 indirect client relationships. Second, a self-service portal where those 700 payors can
+independently manage their users, set their approval rules, and process invoices. Third, a generic approval workflow
+engine that supports flexible rules—single approver for small invoices, dual approval for large amounts, configurable
+thresholds for each payor.
+
+Today, none of this exists. We&#x27;re manually managing users from our legacy Express system. We have no portal for
+employees or payors. We have no approval engine—every service builds custom approval logic. We&#x27;re at risk of losing
+this client and missing the entire Receivables opportunity.
+
+We&#x27;re building the platform that makes this possible. Employee portal for efficient bank operations. Self-service
+portal for payor independence. Generic approval workflow engine supporting flexible, configurable rules. Near
+real-time Express integration so users flow automatically. A three-tier model that turns our client into a platform
+for their partners.
+
+This is our moment. By June 2026, we launch a new service with one large client, 700 payors, and 700 approval
+workflows. We prove the model works. Then we scale—more clients, more services, corporate structure support, US
+expansion. We&#x27;re not just enabling Payedge. We&#x27;re building the foundation for the next decade of commercial banking
+innovation.
+ 2025-10-15</h2></header>
+          <dl class="type-attributes">
+            <dt>Futurestatedescription</dt>
+            <dd>A modern, scalable cash management platform that empowers commercial banking clients across Canada and the US
+to self-manage their banking services, users, and approval workflows through a unified digital experience.
+The platform eliminates manual processes, reduces operational overhead, and provides clients with real-time
+control over their banking relationships while maintaining robust security and compliance standards.
+</dd>
+            <dt>Motivationalnarrative</dt>
+            <dd>Payedge is ready to launch a brand-new Receivables service—something we&#x27;ve never offered before. A large commercial
+client wants to bring 700 of their business partners (payors) onto the platform by June 2026. This isn&#x27;t replacing
+a manual process—we&#x27;re creating a new digital service from scratch. And we can&#x27;t launch without the right platform.
+
+We need three things to succeed: First, an employee portal where our bank staff can efficiently enroll Canadian online
+profiles and monitor 700 indirect client relationships. Second, a self-service portal where those 700 payors can
+independently manage their users, set their approval rules, and process invoices. Third, a generic approval workflow
+engine that supports flexible rules—single approver for small invoices, dual approval for large amounts, configurable
+thresholds for each payor.
+
+Today, none of this exists. We&#x27;re manually managing users from our legacy Express system. We have no portal for
+employees or payors. We have no approval engine—every service builds custom approval logic. We&#x27;re at risk of losing
+this client and missing the entire Receivables opportunity.
+
+We&#x27;re building the platform that makes this possible. Employee portal for efficient bank operations. Self-service
+portal for payor independence. Generic approval workflow engine supporting flexible, configurable rules. Near
+real-time Express integration so users flow automatically. A three-tier model that turns our client into a platform
+for their partners.
+
+This is our moment. By June 2026, we launch a new service with one large client, 700 payors, and 700 approval
+workflows. We prove the model works. Then we scale—more clients, more services, corporate structure support, US
+expansion. We&#x27;re not just enabling Payedge. We&#x27;re building the foundation for the next decade of commercial banking
+innovation.
+</dd>
+            <dt>Lastupdated</dt>
+            <dd>2025-10-15</dd>
+          </dl>
+          <div class="inline-objects">
+            <details class="my-3">
+              <summary>Customerneeds: Enable Payedge to launch new Receivables service by delivering a dual-portal platform: (1) employee portal
+for bank staff to manage client enrollment and monitor indirect client relationships; (2) self-service portal
+for indirect clients (payors) to independently manage their users, permissions, and approval rules. Generic
+approval workflow engine supports flexible invoice approval patterns (single/dual approver, thresholds).
+</summary>
+              <dl class="type-attributes">
+                <dt>Valueproposition</dt>
+                <dd>Enable Payedge to launch new Receivables service by delivering a dual-portal platform: (1) employee portal
+for bank staff to manage client enrollment and monitor indirect client relationships; (2) self-service portal
+for indirect clients (payors) to independently manage their users, permissions, and approval rules. Generic
+approval workflow engine supports flexible invoice approval patterns (single/dual approver, thresholds).
+</dd>
+              </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vision-customerneeds-targetcustomers-tab" data-tab-target="vision-customerneeds-targetcustomers-tab">Targetcustomers</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-customerneeds-problemsbeingsolved-tab" data-tab-target="vision-customerneeds-problemsbeingsolved-tab">Problemsbeingsolved</button>
+            </nav>
+          <div role="tabpanel" id="vision-customerneeds-targetcustomers-tab" class="TabPanel" data-tab-label="Targetcustomers">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Targetcustomers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Existing Canadian commercial clients (Payedge initiative) requiring online Receivables service enrollment</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect clients (payors) managed by direct commercial clients, requiring receivable-approval service access</td>
+                  </tr>
+                  <tr>
+                    <td>Mid-market and large commercial clients with complex organizational structures and approval hierarchies</td>
+                  </tr>
+                  <tr>
+                    <td>Small business clients needing basic receivables and payment management capabilities</td>
+                  </tr>
+                  <tr>
+                    <td>Future: US-based commercial clients requiring cross-border receivables capabilities</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-customerneeds-problemsbeingsolved-tab" class="TabPanel hidden" data-tab-label="Problemsbeingsolved">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Problemsbeingsolved</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Payedge Receivables initiative cannot launch without platform support for client onboarding and user management</td>
+                  </tr>
+                  <tr>
+                    <td>No existing receivables service to digitize - this is a new service offering requiring greenfield platform</td>
+                  </tr>
+                  <tr>
+                    <td>Legacy Express platform (big ball of mud) cannot be modified or extended for new receivables service</td>
+                  </tr>
+                  <tr>
+                    <td>Express manages users for direct clients but has no concept of indirect clients (payors)</td>
+                  </tr>
+                  <tr>
+                    <td>No capability to onboard and manage indirect clients (payors) who need to approve invoices</td>
+                  </tr>
+                  <tr>
+                    <td>Bank employees lack portal to manage online profile enrollment and view indirect client relationships</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect clients cannot self-manage their users, permissions, and approval rules for invoice processing</td>
+                  </tr>
+                  <tr>
+                    <td>No generic approval workflow engine - each service implements custom approval logic</td>
+                  </tr>
+                  <tr>
+                    <td>No configurable approval rules for receivables workflows (single, dual, threshold-based approvals)</td>
+                  </tr>
+                  <tr>
+                    <td>No unified view for bank employees to monitor three-tier relationship: Bank → Direct Client → Indirect Clients (payors)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            </details>
+            <details class="my-3">
+              <summary>Solutionintent: Build a domain-driven, API-first platform with clear bounded contexts for client management, service enrollment,
+user management, and permission/approval orchestration. Leverage event-driven architecture for cross-context
+communication and maintain loose coupling with external account systems through adapter patterns.
+ Modern microservices architecture with domain-driven design principles, event-driven integration patterns,
+and cloud-native deployment. API-first design with dual data integration strategies: near real-time event
+streaming (Express user events) and daily batch synchronization (SRF account data). Data engineering
+capabilities for managing data replication, transformation, and quality from external systems. Identity
+federation with dual providers: A-and-P (direct clients via Express) and Okta (indirect clients). Data
+residency and sovereignty considerations for multi-region deployment.
+</summary>
+              <dl class="type-attributes">
+                <dt>Approach</dt>
+                <dd>Build a domain-driven, API-first platform with clear bounded contexts for client management, service enrollment,
+user management, and permission/approval orchestration. Leverage event-driven architecture for cross-context
+communication and maintain loose coupling with external account systems through adapter patterns.
+</dd>
+                <dt>Technicaldirection</dt>
+                <dd>Modern microservices architecture with domain-driven design principles, event-driven integration patterns,
+and cloud-native deployment. API-first design with dual data integration strategies: near real-time event
+streaming (Express user events) and daily batch synchronization (SRF account data). Data engineering
+capabilities for managing data replication, transformation, and quality from external systems. Identity
+federation with dual providers: A-and-P (direct clients via Express) and Okta (indirect clients). Data
+residency and sovereignty considerations for multi-region deployment.
+</dd>
+              </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vision-solutionintent-keycapabilities-tab" data-tab-target="vision-solutionintent-keycapabilities-tab">Keycapabilities</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-solutionintent-differentiators-tab" data-tab-target="vision-solutionintent-differentiators-tab">Differentiators</button>
+            </nav>
+          <div role="tabpanel" id="vision-solutionintent-keycapabilities-tab" class="TabPanel" data-tab-label="Keycapabilities">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Keycapabilities</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Employee portal for bank staff to manage Canadian online profile enrollment (primary use case for MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>Employee portal provides unified view into direct clients and their indirect client (payor) relationships</td>
+                  </tr>
+                  <tr>
+                    <td>Online profile with single primary client (MVP); secondary client support deferred to post-MVP</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect client (payor) profile creation and management (~700 BUSINESS payors for MVP large client)</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect client types: BUSINESS ONLY (business name + related persons with roles) - NO individuals in MVP</td>
+                  </tr>
+                  <tr>
+                    <td>~1050 indirect client users across 700 business payors (average 1.5 users per business)</td>
+                  </tr>
+                  <tr>
+                    <td>Dual identity provider strategy: Okta for indirect clients (MVP), A-and-P for direct clients (via Express)</td>
+                  </tr>
+                  <tr>
+                    <td>Full user lifecycle management for indirect clients in Okta: create, update, activate, deactivate, lock, unlock</td>
+                  </tr>
+                  <tr>
+                    <td>Platform creates and manages indirect client users in Okta (platform owns identity lifecycle)</td>
+                  </tr>
+                  <tr>
+                    <td>Anti-corruption layer: consume Express user events (add, update) - Express WILL BE MODIFIED to publish events</td>
+                  </tr>
+                  <tr>
+                    <td>Near real-time user synchronization from Express via event streaming - unidirectional (Express → Platform) for direct client users</td>
+                  </tr>
+                  <tr>
+                    <td>Daily batch synchronization from SRF for client-owned accounts (account list, status, updates)</td>
+                  </tr>
+                  <tr>
+                    <td>Data engineering capabilities for managing data replication from Express and SRF</td>
+                  </tr>
+                  <tr>
+                    <td>Online profile with site-id linking to Express profile for user replication (direct client users only)</td>
+                  </tr>
+                  <tr>
+                    <td>Direct client users managed in Express with A-and-P authentication - platform replicates for permission/approval enforcement</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect client users fully managed in platform with Okta authentication - NEW capability</td>
+                  </tr>
+                  <tr>
+                    <td>Self-service portal for indirect clients to manage their own users (via platform → Okta integration), permissions, and approval rules</td>
+                  </tr>
+                  <tr>
+                    <td>Receivable-approval service for indirect clients with self-service invoice approval workflows</td>
+                  </tr>
+                  <tr>
+                    <td>Generic approval workflow engine: single approver OR multiple approvers (parallel only)</td>
+                  </tr>
+                  <tr>
+                    <td>Approval workflow lifecycle: submit → pending → approved/rejected/expired</td>
+                  </tr>
+                  <tr>
+                    <td>Approval rule configuration: approver count (1 or N), amount thresholds (parallel approval when multiple approvers required)</td>
+                  </tr>
+                  <tr>
+                    <td>Parallel approval: ALL required approvers must approve (no sequential approval in MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>Three-tier relationship management: Bank → Direct Client (large client) → Indirect Clients (700 business payors)</td>
+                  </tr>
+                  <tr>
+                    <td>Bank-managed permission and approval rules for large client (MVP); platform stores and enforces rules</td>
+                  </tr>
+                  <tr>
+                    <td>Account enrollment supporting Canadian DDA accounts for payor invoice payments</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-solutionintent-differentiators-tab" class="TabPanel hidden" data-tab-label="Differentiators">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Differentiators</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Dual-portal architecture: Employee portal for bank operations + self-service portal for indirect clients</td>
+                  </tr>
+                  <tr>
+                    <td>Dual identity provider strategy: A-and-P (direct clients via Express) + Okta (indirect clients via platform)</td>
+                  </tr>
+                  <tr>
+                    <td>Full user lifecycle management for indirect clients via Okta integration (platform-owned)</td>
+                  </tr>
+                  <tr>
+                    <td>Employee portal provides end-to-end visibility: direct client enrollment through indirect client monitoring</td>
+                  </tr>
+                  <tr>
+                    <td>Three-tier client hierarchy: Direct commercial clients can onboard and monitor their indirect clients (payors)</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect clients have full self-service capabilities: manage users (via Okta), permissions, approval rules independently</td>
+                  </tr>
+                  <tr>
+                    <td>Generic approval workflow engine with flexible rules: single/dual approver, sequential/parallel, amount thresholds</td>
+                  </tr>
+                  <tr>
+                    <td>Approval workflow supports receivable-approval service for indirect clients (invoice approval)</td>
+                  </tr>
+                  <tr>
+                    <td>Flexible client identification: SRF for direct clients, IND for indirect clients (person or business)</td>
+                  </tr>
+                  <tr>
+                    <td>Platform enables new business model: clients can offer receivables services to their business partners</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Corporate structure support via secondary client linking (post-MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Migrate direct client users to Okta when Express is decommissioned</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            </details>
+            <details class="my-3">
+              <summary>Boundaries</summary>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vision-boundaries-inscope-tab" data-tab-target="vision-boundaries-inscope-tab">Inscope</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-boundaries-outofscope-tab" data-tab-target="vision-boundaries-outofscope-tab">Outofscope</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-boundaries-constraints-tab" data-tab-target="vision-boundaries-constraints-tab">Constraints</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-boundaries-assumptions-tab" data-tab-target="vision-boundaries-assumptions-tab">Assumptions</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-boundaries-dependencies-tab" data-tab-target="vision-boundaries-dependencies-tab">Dependencies</button>
+            </nav>
+          <div role="tabpanel" id="vision-boundaries-inscope-tab" class="TabPanel" data-tab-label="Inscope">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Inscope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>MVP: Employee portal for bank staff to manage Canadian online profile enrollment</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Employee portal view into direct client + indirect client (payor) relationships and profiles</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Onboard ONE large Canadian commercial client to online Receivables service via employee portal</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Onboard ~700 indirect clients (payors - BUSINESS ONLY, no individual persons) for the large Receivables client</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: ~1050 indirect client users (average 1.5 users per indirect client business)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Online profile with single primary client (no secondary client support in MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Receivable-approval service for indirect clients with self-service invoice approval workflows</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Generic approval workflow engine for invoice approval by indirect clients</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Configurable approval rules: single approver, multiple approvers (parallel approval only)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Approval thresholds (amount-based) determine single vs multiple approver requirements</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Approval workflow states: pending, approved, rejected, expired</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Parallel approval only - all required approvers must approve (no sequential approval in MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Okta identity provider for indirect client user authentication (NOT A-and-P)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Full user lifecycle management for indirect clients: create, update, activate, deactivate, lock, unlock</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Platform creates and manages indirect client users in Okta (platform owns lifecycle)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Near real-time user replication from legacy Express platform (add/update user events) for DIRECT client users</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Express platform will be modified to publish user events (add, update)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Daily batch synchronization from SRF for accounts owned by client (account list, status)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Online profile with site-id link to Express profile for user synchronization (direct clients only)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Bank-managed permission and approval rules for the large client (not client self-service)</td>
+                  </tr>
+                  <tr>
+                    <td>Client profile management (online profiles for direct clients, indirect profiles for payors)</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect client profile creation (BUSINESS ONLY with related persons: signing-officer, administrator, director)</td>
+                  </tr>
+                  <tr>
+                    <td>User lifecycle management for both direct and indirect client users (~1050 indirect users)</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Individual person indirect clients (deferred to post-MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>Self-service capabilities for indirect clients: manage their own users, permissions, and approval rules</td>
+                  </tr>
+                  <tr>
+                    <td>Self-service portal for indirect clients (payors) separate from employee portal</td>
+                  </tr>
+                  <tr>
+                    <td>Account enrollment supporting Canadian DDA accounts (for payor invoice payments)</td>
+                  </tr>
+                  <tr>
+                    <td>Integration with Okta for indirect client user authentication and lifecycle management (MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>Integration with A-and-P identity provider for direct client users (via Express - existing)</td>
+                  </tr>
+                  <tr>
+                    <td>Integration with legacy Express platform for near real-time user event synchronization (direct client users only)</td>
+                  </tr>
+                  <tr>
+                    <td>Integration with SRF for direct client data (primary client only in MVP), support for IND for indirect clients</td>
+                  </tr>
+                  <tr>
+                    <td>Geographic coverage: Canada (MVP), with architecture supporting future US and UK expansion</td>
+                  </tr>
+                  <tr>
+                    <td>Note: No existing receivables service to migrate - this is new service launch</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Secondary client linking for complex corporate structures (head office/subsidiary, holding/child)</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Account enrollment from multiple clients (primary + secondary)</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Self-service enrollment for direct clients (post-MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Migrate direct client users from A-and-P to Okta (post-MVP, when Express is decommissioned)</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Additional cash management services (BTR, Interac Send, other online services)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-boundaries-outofscope-tab" class="TabPanel hidden" data-tab-label="Outofscope">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Outofscope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Core banking functionality (account opening, transaction processing)</td>
+                  </tr>
+                  <tr>
+                    <td>Payment processing and execution (platform manages enrollment only)</td>
+                  </tr>
+                  <tr>
+                    <td>Credit decisioning and underwriting</td>
+                  </tr>
+                  <tr>
+                    <td>Fraud detection and anti-money laundering (AML) processing</td>
+                  </tr>
+                  <tr>
+                    <td>Customer Relationship Management (CRM) functionality</td>
+                  </tr>
+                  <tr>
+                    <td>Product catalog management (services are externally defined)</td>
+                  </tr>
+                  <tr>
+                    <td>Billing and invoicing for banking services</td>
+                  </tr>
+                  <tr>
+                    <td>Document management and archival</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-boundaries-constraints-tab" class="TabPanel hidden" data-tab-label="Constraints">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Constraints</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Express platform (legacy) will require modification to publish user events (add, update)</td>
+                  </tr>
+                  <tr>
+                    <td>Express already has self-serve user management - cannot change or replace this functionality (only add event publishing)</td>
+                  </tr>
+                  <tr>
+                    <td>Must replicate users from Express to platform via event streaming (add/update user events only)</td>
+                  </tr>
+                  <tr>
+                    <td>SRF integration limited to daily batch synchronization for account data (no real-time API available)</td>
+                  </tr>
+                  <tr>
+                    <td>Must integrate with existing Canadian banking platform (SRF) and Capital Markets platform (GID)</td>
+                  </tr>
+                  <tr>
+                    <td>Must support existing identity provider (A-and-P) before migrating to Okta</td>
+                  </tr>
+                  <tr>
+                    <td>Data sovereignty requirements for client data in Canada vs. US</td>
+                  </tr>
+                  <tr>
+                    <td>Regulatory compliance requirements differ by jurisdiction (Canada vs. US states)</td>
+                  </tr>
+                  <tr>
+                    <td>Must coexist with legacy cash management systems during transition period</td>
+                  </tr>
+                  <tr>
+                    <td>Limited control over account system APIs and data quality</td>
+                  </tr>
+                  <tr>
+                    <td>Account data updates via daily batch feeds (low velocity), not real-time</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-boundaries-assumptions-tab" class="TabPanel hidden" data-tab-label="Assumptions">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Assumptions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>MVP: Bank employee portal sufficient for onboarding one large client (no client self-service required)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: 700 business payors (NO individuals) with ~1050 users can be onboarded within MVP timeline (June 2026)</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: All indirect clients are businesses - individual person indirect clients deferred to post-MVP</td>
+                  </tr>
+                  <tr>
+                    <td>MVP: Parallel approval sufficient - sequential approval not required</td>
+                  </tr>
+                  <tr>
+                    <td>Okta is available and approved for use in MVP (indirect client authentication)</td>
+                  </tr>
+                  <tr>
+                    <td>Platform can integrate with Okta APIs for full user lifecycle management</td>
+                  </tr>
+                  <tr>
+                    <td>Okta supports required MFA and security policies for commercial banking</td>
+                  </tr>
+                  <tr>
+                    <td>Express platform can be modified to publish user events (add, update) without disrupting existing functionality</td>
+                  </tr>
+                  <tr>
+                    <td>Express continues to handle user management for direct clients via existing self-serve capabilities</td>
+                  </tr>
+                  <tr>
+                    <td>Express uses A-and-P for direct client user authentication (existing integration)</td>
+                  </tr>
+                  <tr>
+                    <td>Platform replicates Express users via near real-time event streaming (add, update events) for direct clients</td>
+                  </tr>
+                  <tr>
+                    <td>Express site-id is stable and can be used as linking key for user synchronization (direct clients)</td>
+                  </tr>
+                  <tr>
+                    <td>Platform does NOT manage direct client users - this remains in Express with A-and-P (anti-corruption layer pattern)</td>
+                  </tr>
+                  <tr>
+                    <td>Platform DOES fully manage indirect client users in Okta - new functionality not in Express</td>
+                  </tr>
+                  <tr>
+                    <td>Dual identity provider approach is acceptable: A-and-P (direct clients via Express) + Okta (indirect clients via platform)</td>
+                  </tr>
+                  <tr>
+                    <td>Daily batch feeds from SRF for client-owned accounts are sufficient for account enrollment management</td>
+                  </tr>
+                  <tr>
+                    <td>SRF provides complete list of accounts owned by client (daily batch, no real-time API)</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect clients (business payors) have technical capability for self-service portal with Okta authentication</td>
+                  </tr>
+                  <tr>
+                    <td>Permission and approval models are consistent enough across services to use generic engine</td>
+                  </tr>
+                  <tr>
+                    <td>Bank-managed permission/approval rules acceptable for MVP; client self-service in future releases</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-boundaries-dependencies-tab" class="TabPanel hidden" data-tab-label="Dependencies">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Dependencies</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Legacy Express platform - WILL BE MODIFIED to publish user events (add, update) via event streaming</td>
+                  </tr>
+                  <tr>
+                    <td>Express continues to own user management for direct clients via existing self-serve UI</td>
+                  </tr>
+                  <tr>
+                    <td>Platform consumes Express user events (add, update) via event streaming - unidirectional (Express → Platform)</td>
+                  </tr>
+                  <tr>
+                    <td>A-and-P identity provider for direct client user authentication (via Express integration)</td>
+                  </tr>
+                  <tr>
+                    <td>Okta identity provider for indirect client user authentication and lifecycle management (MVP)</td>
+                  </tr>
+                  <tr>
+                    <td>Platform must integrate with Okta APIs for user lifecycle operations (create, update, activate, deactivate, lock, unlock)</td>
+                  </tr>
+                  <tr>
+                    <td>SRF system for Canadian client demographics and daily batch account synchronization (client-owned accounts)</td>
+                  </tr>
+                  <tr>
+                    <td>SRF provides daily batch feed of accounts owned by client (account list, status, updates)</td>
+                  </tr>
+                  <tr>
+                    <td>DDA systems (Canadian) for deposit account information (payor payment accounts)</td>
+                  </tr>
+                  <tr>
+                    <td>ACH/GSAN systems for payment account information (receivables)</td>
+                  </tr>
+                  <tr>
+                    <td>GID system for Capital Markets client identification (future)</td>
+                  </tr>
+                  <tr>
+                    <td>Future: Additional account systems (OLB, MTG, RIBS, TSYS) for expanded services</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            </details>
+            <details class="my-3">
+              <summary>Strategicalignment</summary>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vision-strategicalignment-businessobjectives-tab" data-tab-target="vision-strategicalignment-businessobjectives-tab">Businessobjectives</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-strategicalignment-strategicthemes-tab" data-tab-target="vision-strategicalignment-strategicthemes-tab">Strategicthemes</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-strategicalignment-successmetrics-tab" data-tab-target="vision-strategicalignment-successmetrics-tab">Successmetrics</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-strategicalignment-outcomes-tab" data-tab-target="vision-strategicalignment-outcomes-tab">Outcomes</button>
+            </nav>
+          <div role="tabpanel" id="vision-strategicalignment-businessobjectives-tab" class="TabPanel" data-tab-label="Businessobjectives">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Businessobjectives</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Enable Payedge to launch new Receivables service (not replacing existing service - this is greenfield)</td>
+                  </tr>
+                  <tr>
+                    <td>Provide employee portal for bank staff to efficiently manage online profile enrollment and monitor relationships</td>
+                  </tr>
+                  <tr>
+                    <td>Unlock new business model: allow commercial clients to extend receivables services to their business partners (payors)</td>
+                  </tr>
+                  <tr>
+                    <td>Empower indirect clients with self-service portal for user lifecycle, permission, and approval workflow management</td>
+                  </tr>
+                  <tr>
+                    <td>Adopt Okta for indirect client authentication and lifecycle management (modern identity platform)</td>
+                  </tr>
+                  <tr>
+                    <td>Provide generic approval workflow engine supporting flexible rules (single/dual approver, thresholds)</td>
+                  </tr>
+                  <tr>
+                    <td>Reduce operational costs for receivables onboarding through employee portal efficiency and payor self-service</td>
+                  </tr>
+                  <tr>
+                    <td>Create reusable platform components (dual portals, Okta integration, approval engine, three-tier model) for future services</td>
+                  </tr>
+                  <tr>
+                    <td>Reduce risk through standardized permission and approval controls for receivables workflows</td>
+                  </tr>
+                  <tr>
+                    <td>Establish modern identity foundation (Okta) for future migration of direct client users from A-and-P</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-strategicalignment-strategicthemes-tab" class="TabPanel hidden" data-tab-label="Strategicthemes">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Strategicthemes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Enable Payedge Receivables initiative (MVP priority)</td>
+                  </tr>
+                  <tr>
+                    <td>Three-tier client relationship management (Bank → Client → Payors)</td>
+                  </tr>
+                  <tr>
+                    <td>Self-service empowerment for indirect clients</td>
+                  </tr>
+                  <tr>
+                    <td>Digital transformation of commercial banking</td>
+                  </tr>
+                  <tr>
+                    <td>Platform thinking for service innovation and reuse</td>
+                  </tr>
+                  <tr>
+                    <td>Operational efficiency and cost reduction</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-strategicalignment-successmetrics-tab" class="TabPanel hidden" data-tab-label="Successmetrics">
+            <ul class="ActionList">
+              <li class="ActionList-item">Name: MVP launch date Description: Platform ready to support one large Receivables client with 700 payors Target: 20260630 Unit: date</li>
+              <li class="ActionList-item">Name: Direct client onboarding Description: Large Receivables client onboarded via employee portal (bank-managed, not self-service) Target: 1 Current: 0 Unit: clients</li>
+              <li class="ActionList-item">Name: Indirect client (payor) onboarding Description: Number of business payors onboarded for the large Receivables client (NO individuals) Target: 700 Current: 0 Unit: payors</li>
+              <li class="ActionList-item">Name: Okta user creation Description: Number of indirect client users created and managed in Okta by platform Target: 1050 Current: 0 Unit: users</li>
+              <li class="ActionList-item">Name: Approval workflow configuration Description: Number of approval rules configured for indirect clients (single/dual approver, thresholds) Target: 700 Current: 0 Unit: rules</li>
+              <li class="ActionList-item">Name: Invoice approval processing Description: Average time for indirect client to approve invoice via receivable-approval workflow Target: 24 Unit: hours</li>
+              <li class="ActionList-item">Name: Express user sync latency Description: Time from user add/update event in Express to replication in platform (direct clients) Target: 5 Unit: minutes</li>
+              <li class="ActionList-item">Name: Okta user lifecycle latency Description: Time from platform user create/update to Okta provisioning (indirect clients) Target: 2 Unit: seconds</li>
+              <li class="ActionList-item">Name: Platform uptime Description: System availability for client-facing services Target: 99.95 Current: 0 Unit: percent</li>
+              <li class="ActionList-item">Name: Indirect client self-service adoption Description: Percentage of indirect clients managing their own users (via Okta) and approval rules Target: 75 Current: 0 Unit: percent</li>
+            </ul>
+          </div>
+          <div role="tabpanel" id="vision-strategicalignment-outcomes-tab" class="TabPanel hidden" data-tab-label="Outcomes">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Outcomes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Payedge successfully launches NEW Receivables service by June 2026 with one large client and 700 business payors</td>
+                  </tr>
+                  <tr>
+                    <td>Bank employees can efficiently manage online profile enrollment via employee portal</td>
+                  </tr>
+                  <tr>
+                    <td>Bank employees have unified view into direct clients and their indirect client relationships</td>
+                  </tr>
+                  <tr>
+                    <td>700 indirect clients (BUSINESS payors only) successfully onboarded and using self-service portal with Okta authentication</td>
+                  </tr>
+                  <tr>
+                    <td>1050 indirect client users created and managed in Okta via platform lifecycle operations (avg 1.5 users per business)</td>
+                  </tr>
+                  <tr>
+                    <td>700 approval rules configured (single/dual approver, threshold-based) for receivables workflows</td>
+                  </tr>
+                  <tr>
+                    <td>Generic approval workflow engine processes invoice approvals with configurable rules</td>
+                  </tr>
+                  <tr>
+                    <td>Okta integration provides modern, secure identity foundation for indirect clients</td>
+                  </tr>
+                  <tr>
+                    <td>Near real-time user synchronization from Express platform eliminates manual user management for direct clients</td>
+                  </tr>
+                  <tr>
+                    <td>Indirect clients independently manage users (via platform → Okta), permissions, and approve invoices</td>
+                  </tr>
+                  <tr>
+                    <td>Dual identity provider strategy successfully implemented: A-and-P (direct via Express) + Okta (indirect via platform)</td>
+                  </tr>
+                  <tr>
+                    <td>Platform handles bank-managed permission and approval rules for large client</td>
+                  </tr>
+                  <tr>
+                    <td>Platform components (dual portals, Okta integration, approval engine, three-tier model) reusable for future services</td>
+                  </tr>
+                  <tr>
+                    <td>Foundation established for migrating direct client users to Okta (post-MVP), secondary client support, and US expansion</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            </details>
+            <details class="my-3">
+              <summary>Decisionframework</summary>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="vision-decisionframework-guidingprinciples-tab" data-tab-target="vision-decisionframework-guidingprinciples-tab">Guidingprinciples</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-decisionframework-tradeoffcriteria-tab" data-tab-target="vision-decisionframework-tradeoffcriteria-tab">Tradeoffcriteria</button>
+            <button role="tab" aria-selected="false" aria-controls="vision-decisionframework-alignmentmechanisms-tab" data-tab-target="vision-decisionframework-alignmentmechanisms-tab">Alignmentmechanisms</button>
+            </nav>
+          <div role="tabpanel" id="vision-decisionframework-guidingprinciples-tab" class="TabPanel" data-tab-label="Guidingprinciples">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Guidingprinciples</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Client empowerment first - enable self-service wherever possible</td>
+                  </tr>
+                  <tr>
+                    <td>Build for reuse - every component should serve multiple services</td>
+                  </tr>
+                  <tr>
+                    <td>Domain-driven design - clear boundaries, ubiquitous language, loose coupling</td>
+                  </tr>
+                  <tr>
+                    <td>API-first - all capabilities exposed through well-defined APIs</td>
+                  </tr>
+                  <tr>
+                    <td>Security and compliance are non-negotiable - build controls into the platform</td>
+                  </tr>
+                  <tr>
+                    <td>Design for multi-region from day one - not a future retrofit</td>
+                  </tr>
+                  <tr>
+                    <td>Eventual consistency is acceptable where real-time is not required</td>
+                  </tr>
+                  <tr>
+                    <td>Anti-corruption layer is mandatory for legacy system integration - protect domain from Express big ball of mud</td>
+                  </tr>
+                  <tr>
+                    <td>Do not modify legacy systems (Express) - consume via events, translate into domain model</td>
+                  </tr>
+                  <tr>
+                    <td>Separate concerns: Express owns direct client users, platform owns indirect client users</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-decisionframework-tradeoffcriteria-tab" class="TabPanel hidden" data-tab-label="Tradeoffcriteria">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Tradeoffcriteria</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Speed to market vs. perfect architecture - favor iterative delivery with solid foundations</td>
+                  </tr>
+                  <tr>
+                    <td>Feature richness vs. platform stability - stability wins, add features incrementally</td>
+                  </tr>
+                  <tr>
+                    <td>Custom solutions vs. generic patterns - always prefer generic, reusable patterns</td>
+                  </tr>
+                  <tr>
+                    <td>Real-time integration vs. batch - use batch where latency is acceptable to reduce coupling</td>
+                  </tr>
+                  <tr>
+                    <td>Build vs. buy - buy for identity, build for domain-specific capabilities</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="vision-decisionframework-alignmentmechanisms-tab" class="TabPanel hidden" data-tab-label="Alignmentmechanisms">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Alignmentmechanisms</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Bi-weekly product review with stakeholders to validate priorities</td>
+                  </tr>
+                  <tr>
+                    <td>Architecture review board for technical decisions impacting multiple teams</td>
+                  </tr>
+                  <tr>
+                    <td>Quarterly roadmap review aligned with business objectives</td>
+                  </tr>
+                  <tr>
+                    <td>Regular user feedback sessions with commercial banking clients</td>
+                  </tr>
+                  <tr>
+                    <td>Cross-functional working groups for domain modeling and API design</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            </details>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script>
+
+        (function() {
+          const sections = Array.from(document.querySelectorAll('.type-view'));
+          const navLinks = Array.from(document.querySelectorAll('#nav-list a'));
+          const breadcrumb = document.querySelector('#breadcrumb .Breadcrumbs-list');
+
+          const sectionMap = new Map();
+          sections.forEach(section => {
+            sectionMap.set(section.id, section);
+          });
+
+          function setActiveNav(targetId) {
+            navLinks.forEach(link => {
+              const isActive = link.dataset.target === targetId || (targetId === '' && !link.dataset.target);
+              link.classList.toggle('ActionList-item--active', isActive);
+            });
+          }
+
+          function showSection(targetId, tabId) {
+            if (!targetId || !sectionMap.has(targetId)) {
+              targetId = 'home';
+            }
+
+            sections.forEach(section => {
+              if (!section.id) return;
+              if (section.id === targetId) {
+                section.classList.remove('hidden');
+              } else {
+                section.classList.add('hidden');
+              }
+            });
+
+            const activeSection = sectionMap.get(targetId);
+            if (activeSection) {
+              if (breadcrumb) {
+                const breadcrumbData = activeSection.dataset.breadcrumb ? JSON.parse(activeSection.dataset.breadcrumb) : [];
+                breadcrumb.innerHTML = '';
+                breadcrumbData.forEach(item => {
+                  const li = document.createElement('li');
+                  li.className = 'Breadcrumbs-item';
+                  const a = document.createElement('a');
+                  a.className = 'Breadcrumbs-link';
+                  a.href = item.href || '#';
+                  a.textContent = item.label;
+                  li.appendChild(a);
+                  breadcrumb.appendChild(li);
+                });
+              }
+
+              if (tabId) {
+                activateTab(tabId);
+              } else {
+                const defaultTab = activeSection.querySelector('[role="tab"][aria-selected="true"]');
+                if (defaultTab) {
+                  activateTab(defaultTab.dataset.tabTarget);
+                }
+              }
+            }
+
+            setActiveNav(targetId === 'home' ? '' : targetId);
+          }
+
+          function activateTab(tabId) {
+            if (!tabId) return;
+            const panel = document.getElementById(tabId);
+            if (!panel) return;
+            const root = panel.closest('[data-tab-root]');
+            if (!root) return;
+            const tabs = Array.from(root.querySelectorAll('[role="tab"]'));
+            const panels = Array.from(root.querySelectorAll('[role="tabpanel"]'));
+            tabs.forEach(tab => {
+              const isActive = tab.dataset.tabTarget === tabId;
+              tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            panels.forEach(p => {
+              if (p.id === tabId) {
+                p.classList.remove('hidden');
+              } else {
+                p.classList.add('hidden');
+              }
+            });
+          }
+
+          navLinks.forEach(link => {
+            link.addEventListener('click', event => {
+              const target = link.dataset.target || '';
+              event.preventDefault();
+              if (target) {
+                window.location.hash = target;
+              } else {
+                window.location.hash = '';
+                showSection('home');
+              }
+            });
+          });
+
+          sections.forEach(section => {
+            section.addEventListener('click', event => {
+              const tabButton = event.target.closest('[role="tab"]');
+              if (tabButton) {
+                const tabId = tabButton.dataset.tabTarget;
+                activateTab(tabId);
+              }
+            });
+          });
+
+          function handleHashChange() {
+            let hash = window.location.hash.slice(1);
+            let tabId = null;
+            if (hash.includes('|')) {
+              const parts = hash.split('|');
+              hash = parts[0];
+              tabId = parts[1];
+            }
+            if (!hash) {
+              showSection('home');
+            } else {
+              showSection(hash, tabId);
+            }
+          }
+
+          window.addEventListener('hashchange', handleHashChange);
+
+          if (window.location.hash) {
+            handleHashChange();
+          } else {
+            showSection("home");
+          }
+        })();
+        
+    </script>
+  </body>
+</html>

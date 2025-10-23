@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>YAML Document • /Users/igor/code/yaml-md/samples/qe/qe-schema-example.yaml</title>
+    <title>YAML Document • /Users/igor/code/yaml-md/samples/data-eng/platform-data-eng.yaml</title>
     <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css">
     <script src="https://unpkg.com/@primer/layout@1.0.4/dist/index.umd.js" defer></script>
     <style>
@@ -37,7 +37,7 @@
             <a class="ActionList-content" data-target="" href="#">Home</a>
           </li>
           <li class="ActionList-item">
-            <a class="ActionList-content" data-target="ts_job_seeker_main" href="#ts_job_seeker_main">Test Strategy: Job Seeker Application Test Strategy</a>
+            <a class="ActionList-content" data-target="sys-cash-mgmt-platform" href="#sys-cash-mgmt-platform">System: Commercial Banking Cash Management Platform - Data Engineering</a>
           </li>
         </ul>
       </aside>
@@ -45,11 +45,69 @@
         <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
           <h2>Top Level Types</h2>
           <div class="home-index">
-            <a href="#ts_job_seeker_main">Test Strategy: Job Seeker Application Test Strategy</a>
+            <a href="#sys-cash-mgmt-platform">System: Commercial Banking Cash Management Platform - Data Engineering</a>
           </div>
         </section>
-        <section id="ts_job_seeker_main" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Test Strategy: Job Seeker Application Test Strategy", "href": "#ts_job_seeker_main"}]'>
-          <header><h2>Test Strategy: Job Seeker Application Test Strategy</h2></header>
+        <section id="sys-cash-mgmt-platform" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "System: Commercial Banking Cash Management Platform - Data Engineering", "href": "#sys-cash-mgmt-platform"}]'>
+          <header><h2>System: Commercial Banking Cash Management Platform - Data Engineering</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>sys-cash-mgmt-platform</dd>
+            <dt>Name</dt>
+            <dd>Commercial Banking Cash Management Platform - Data Engineering</dd>
+            <dt>Description</dt>
+            <dd>Data engineering model for cash management platform focusing on gold copy creation and serving layer for Service Profile domain</dd>
+            <dt>X-vendor</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="sys-cash-mgmt-platform-owners-tab" data-tab-target="sys-cash-mgmt-platform-owners-tab">Owners</button>
+            <button role="tab" aria-selected="false" aria-controls="sys-cash-mgmt-platform-domains-tab" data-tab-target="sys-cash-mgmt-platform-domains-tab">Domains</button>
+            <button role="tab" aria-selected="false" aria-controls="sys-cash-mgmt-platform-tags-tab" data-tab-target="sys-cash-mgmt-platform-tags-tab">Tags</button>
+            </nav>
+          <div role="tabpanel" id="sys-cash-mgmt-platform-owners-tab" class="TabPanel" data-tab-label="Owners">
+            <ul class="ActionList">
+              <li class="ActionList-item"><em>None</em></li>
+            </ul>
+          </div>
+          <div role="tabpanel" id="sys-cash-mgmt-platform-domains-tab" class="TabPanel hidden" data-tab-label="Domains">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Domains</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>dom-account-data</td>
+                  </tr>
+                  <tr>
+                    <td>dom-express-site-data</td>
+                  </tr>
+                  <tr>
+                    <td>dom-reference-data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="sys-cash-mgmt-platform-tags-tab" class="TabPanel hidden" data-tab-label="Tags">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
         </section>
       </main>
     </div>
@@ -180,7 +238,7 @@
           if (window.location.hash) {
             handleHashChange();
           } else {
-            window.location.hash = "#ts_job_seeker_main";
+            window.location.hash = "#sys-cash-mgmt-platform";
           }
         })();
         

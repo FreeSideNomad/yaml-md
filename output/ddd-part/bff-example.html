@@ -36,12 +36,357 @@
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="" href="#">Home</a>
           </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="bff_web" href="#bff_web">Bff Scope: WebAppBFF</a>
+          </li>
         </ul>
       </aside>
       <main class="Layout-main p-4" id="content">
         <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
           <h2>Top Level Types</h2>
-          <p>No top-level types discovered.</p>
+          <div class="home-index">
+            <a href="#bff_web">Bff Scope: WebAppBFF</a>
+          </div>
+        </section>
+        <section id="bff_web" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Bff Scope: WebAppBFF", "href": "#bff_web"}]'>
+          <header><h2>Bff Scope: WebAppBFF</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>bff_web</dd>
+            <dt>Name</dt>
+            <dd>WebAppBFF</dd>
+            <dt>Client Type</dt>
+            <dd>web</dd>
+            <dt>Serves Interface</dt>
+            <dd>Web application SPA (Single Page Application) for desktop and tablet browsers</dd>
+            <dt>Owned By Team</dt>
+            <dd>Web Frontend Team</dd>
+            <dt>Team Type</dt>
+            <dd>frontend</dd>
+            <dt>Architecture Layer</dt>
+            <dd>integration</dd>
+            <dt>Pattern Type</dt>
+            <dd>bff</dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="bff-web-aggregates-from-contexts-tab" data-tab-target="bff-web-aggregates-from-contexts-tab">Aggregates From Contexts</button>
+            <button role="tab" aria-selected="false" aria-controls="bff-web-upstream-dependencies-tab" data-tab-target="bff-web-upstream-dependencies-tab">Upstream Dependencies</button>
+            <button role="tab" aria-selected="false" aria-controls="bff-web-calls-tab" data-tab-target="bff-web-calls-tab">Calls</button>
+            </nav>
+          <div role="tabpanel" id="bff-web-aggregates-from-contexts-tab" class="TabPanel" data-tab-label="Aggregates From Contexts">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Aggregates From Contexts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>bc_user_management</td>
+                  </tr>
+                  <tr>
+                    <td>bc_order_management</td>
+                  </tr>
+                  <tr>
+                    <td>bc_product_catalog</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bff-web-upstream-dependencies-tab" class="TabPanel hidden" data-tab-label="Upstream Dependencies">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Upstream Dependencies</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>api_gateway</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bff-web-calls-tab" class="TabPanel hidden" data-tab-label="Calls">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Calls</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>application_service</td>
+                  </tr>
+                  <tr>
+                    <td>bounded_context_api</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+          <div class="inline-objects">
+            <details class="my-3">
+              <summary>Provides</summary>
+              <dl class="type-attributes">
+                <dt>Path</dt>
+                <dd>/api/web/users/dashboard</dd>
+                <dt>Method</dt>
+                <dd>GET</dd>
+                <dt>Description</dt>
+                <dd>Aggregates user profile + recent orders for dashboard view</dd>
+                <dt>Path</dt>
+                <dd>/api/web/products/detail/{productId}</dd>
+                <dt>Method</dt>
+                <dd>GET</dd>
+                <dt>Description</dt>
+                <dd>Product details + user&#x27;s purchase history for this product</dd>
+                <dt>Path</dt>
+                <dd>/api/web/checkout/summary</dd>
+                <dt>Method</dt>
+                <dd>GET</dd>
+                <dt>Description</dt>
+                <dd>Complete checkout summary with user, cart items, and pricing</dd>
+                <dt>From Context</dt>
+                <dd>bc_user_management</dd>
+                <dt>Transformation Type</dt>
+                <dd>format_conversion</dd>
+                <dt>Description</dt>
+                <dd>Convert UserId value object to string, Status enum to human-readable label</dd>
+                <dt>From Context</dt>
+                <dd>bc_order_management</dd>
+                <dt>Transformation Type</dt>
+                <dd>data_enrichment</dd>
+                <dt>Description</dt>
+                <dd>Enrich order summary with user display name from user context</dd>
+                <dt>From Context</dt>
+                <dd>bc_product_catalog</dd>
+                <dt>Transformation Type</dt>
+                <dd>denormalization</dd>
+                <dt>Description</dt>
+                <dd>Flatten product hierarchy for simplified web display</dd>
+              </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="bff-web-provides-endpoints-tab" data-tab-target="bff-web-provides-endpoints-tab">Endpoints</button>
+            <button role="tab" aria-selected="false" aria-controls="bff-web-provides-aggregates-from-tab" data-tab-target="bff-web-provides-aggregates-from-tab">Aggregates From</button>
+            <button role="tab" aria-selected="false" aria-controls="bff-web-provides-aggregates-from-tab-1" data-tab-target="bff-web-provides-aggregates-from-tab-1">Aggregates From</button>
+            <button role="tab" aria-selected="false" aria-controls="bff-web-provides-aggregates-from-tab-2" data-tab-target="bff-web-provides-aggregates-from-tab-2">Aggregates From</button>
+            <button role="tab" aria-selected="false" aria-controls="bff-web-provides-transformations-tab" data-tab-target="bff-web-provides-transformations-tab">Transformations</button>
+            <button role="tab" aria-selected="false" aria-controls="bff-web-provides-client-optimizations-tab" data-tab-target="bff-web-provides-client-optimizations-tab">Client Optimizations</button>
+            </nav>
+          <div role="tabpanel" id="bff-web-provides-endpoints-tab" class="TabPanel" data-tab-label="Endpoints">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Endpoint</th>
+                    <th>Path</th>
+                    <th>Method</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Aggregates user profile + recent orders for dashboard view</td>
+                    <td>/api/web/users/dashboard</td>
+                    <td>GET</td>
+                    <td>Aggregates user profile + recent orders for dashboard view</td>
+                  </tr>
+                  <tr>
+                    <td>Product details + user&#x27;s purchase history for this product</td>
+                    <td>/api/web/products/detail/{productId}</td>
+                    <td>GET</td>
+                    <td>Product details + user&#x27;s purchase history for this product</td>
+                  </tr>
+                  <tr>
+                    <td>Complete checkout summary with user, cart items, and pricing</td>
+                    <td>/api/web/checkout/summary</td>
+                    <td>GET</td>
+                    <td>Complete checkout summary with user, cart items, and pricing</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bff-web-provides-aggregates-from-tab" class="TabPanel hidden" data-tab-label="Aggregates From">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Aggregates From</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>bc_user_management</td>
+                  </tr>
+                  <tr>
+                    <td>bc_order_management</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bff-web-provides-aggregates-from-tab-1" class="TabPanel hidden" data-tab-label="Aggregates From">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Aggregates From</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>bc_product_catalog</td>
+                  </tr>
+                  <tr>
+                    <td>bc_order_management</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bff-web-provides-aggregates-from-tab-2" class="TabPanel hidden" data-tab-label="Aggregates From">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Aggregates From</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>bc_order_management</td>
+                  </tr>
+                  <tr>
+                    <td>bc_user_management</td>
+                  </tr>
+                  <tr>
+                    <td>bc_product_catalog</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bff-web-provides-transformations-tab" class="TabPanel hidden" data-tab-label="Transformations">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Transformation</th>
+                    <th>From Context</th>
+                    <th>Transformation Type</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Convert UserId value object to string, Status enum to human-readable label</td>
+                    <td>User Management</td>
+                    <td>Format Conversion</td>
+                    <td>Convert UserId value object to string, Status enum to human-readable label</td>
+                  </tr>
+                  <tr>
+                    <td>Enrich order summary with user display name from user context</td>
+                    <td>Order Management</td>
+                    <td>Data Enrichment</td>
+                    <td>Enrich order summary with user display name from user context</td>
+                  </tr>
+                  <tr>
+                    <td>Flatten product hierarchy for simplified web display</td>
+                    <td>Product Catalog</td>
+                    <td>denormalization</td>
+                    <td>Flatten product hierarchy for simplified web display</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="bff-web-provides-client-optimizations-tab" class="TabPanel hidden" data-tab-label="Client Optimizations">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Client Optimizations</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Field selection: Only include fields needed by web UI</td>
+                  </tr>
+                  <tr>
+                    <td>Image size reduction: Return web-optimized image URLs</td>
+                  </tr>
+                  <tr>
+                    <td>Pagination: Default 20 items per page for desktop list views</td>
+                  </tr>
+                  <tr>
+                    <td>Caching headers: Set appropriate cache TTLs for static data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            <details class="my-3">
+              <summary>Data Aggregation: parallel Dashboard endpoint makes parallel calls to:
+1. UserQueries.getUserSummary(userId) → User profile
+2. OrderQueries.listRecentOrders(userId) → Recent orders
+Then combines results into single DashboardDTO response
+</summary>
+              <dl class="type-attributes">
+                <dt>Strategy</dt>
+                <dd>parallel</dd>
+                <dt>Example</dt>
+                <dd>Dashboard endpoint makes parallel calls to:
+1. UserQueries.getUserSummary(userId) → User profile
+2. OrderQueries.listRecentOrders(userId) → Recent orders
+Then combines results into single DashboardDTO response
+</dd>
+              </dl>
+            </details>
+            </details>
+            <details class="my-3">
+              <summary>Responsibilities: true true true</summary>
+              <dl class="type-attributes">
+                <dt>Data Aggregation</dt>
+                <dd>true</dd>
+                <dt>Client Specific Orchestration</dt>
+                <dd>true</dd>
+                <dt>Presentation Logic</dt>
+                <dd>true</dd>
+                <dt>Format Translation</dt>
+                <dd>true</dd>
+                <dt>Business Logic</dt>
+                <dd>false</dd>
+                <dt>Transaction Management</dt>
+                <dd>false</dd>
+                <dt>Direct Persistence</dt>
+                <dd>false</dd>
+              </dl>
+            </details>
+            <details class="my-3">
+              <summary>Anti Patterns: false false false</summary>
+              <dl class="type-attributes">
+                <dt>Shared Business Logic</dt>
+                <dd>false</dd>
+                <dt>Generic Cross Cutting Concerns</dt>
+                <dd>false</dd>
+                <dt>Direct Database Access</dt>
+                <dd>false</dd>
+                <dt>Serving Multiple Client Types</dt>
+                <dd>false</dd>
+              </dl>
+            </details>
+          </div>
         </section>
       </main>
     </div>
@@ -172,7 +517,7 @@
           if (window.location.hash) {
             handleHashChange();
           } else {
-            showSection("home");
+            window.location.hash = "#bff_web";
           }
         })();
         

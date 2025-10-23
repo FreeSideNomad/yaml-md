@@ -36,44 +36,831 @@
           <li class="ActionList-item">
             <a class="ActionList-content" data-target="" href="#">Home</a>
           </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="wf_add_to_cart" href="#wf_add_to_cart">Workflow: Add Product to Cart</a>
+          </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="wf_user_activation" href="#wf_user_activation">Workflow: User Account Activation</a>
+          </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="wf_checkout" href="#wf_checkout">Workflow: Checkout Process</a>
+          </li>
         </ul>
       </aside>
       <main class="Layout-main p-4" id="content">
         <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
           <h2>Top Level Types</h2>
-          <p>No top-level types discovered.</p>
+          <div class="home-index">
+            <a href="#wf_add_to_cart">Workflow: Add Product to Cart</a>
+            <a href="#wf_user_activation">Workflow: User Account Activation</a>
+            <a href="#wf_checkout">Workflow: Checkout Process</a>
+          </div>
         </section>
-        <section id="design-tokens" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Design Tokens", "href": "#design-tokens"}]'>
-          <header><h2>Design Tokens</h2></header>
+        <section id="wf_add_to_cart" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Workflow: Add Product to Cart", "href": "#wf_add_to_cart"}]'>
+          <header><h2>Workflow: Add Product to Cart</h2></header>
           <dl class="type-attributes">
-            <dt>Breakpoints</dt>
+            <dt>Workflow Id</dt>
             <dd></dd>
-            <dt>Mobile</dt>
+            <dt>Name</dt>
+            <dd>Add Product to Cart</dd>
+            <dt>Type</dt>
+            <dd>flexible</dd>
+            <dt>Application Service</dt>
             <dd></dd>
-            <dt>Tablet</dt>
+            <dt>Step Number</dt>
             <dd></dd>
-            <dt>Desktop</dt>
+            <dt>Label</dt>
+            <dd></dd>
+            <dt>Page Ref</dt>
+            <dd>page_product_detail</dd>
+            <dt>Validates</dt>
+            <dd></dd>
+            <dt>Timing</dt>
+            <dd></dd>
+            <dt>Can Skip</dt>
+            <dd></dd>
+            <dt>Next Enabled When</dt>
+            <dd></dd>
+            <dt>On Complete</dt>
+            <dd></dd>
+            <dt>Update Aggregate</dt>
+            <dd></dd>
+            <dt>Publish Event</dt>
+            <dd></dd>
+            <dt>Navigate To</dt>
+            <dd></dd>
+            <dt>Step Number</dt>
+            <dd></dd>
+            <dt>Label</dt>
+            <dd></dd>
+            <dt>Page Ref</dt>
+            <dd>page_product_detail</dd>
+            <dt>Validates</dt>
+            <dd></dd>
+            <dt>Timing</dt>
+            <dd></dd>
+            <dt>Can Skip</dt>
+            <dd></dd>
+            <dt>Next Enabled When</dt>
+            <dd></dd>
+            <dt>On Complete</dt>
+            <dd></dd>
+            <dt>Update Aggregate</dt>
+            <dd></dd>
+            <dt>Publish Event</dt>
+            <dd></dd>
+            <dt>Navigate To</dt>
+            <dd></dd>
+            <dt>Step Number</dt>
+            <dd></dd>
+            <dt>Label</dt>
+            <dd></dd>
+            <dt>Page Ref</dt>
+            <dd>page_product_detail</dd>
+            <dt>Validates</dt>
+            <dd></dd>
+            <dt>Timing</dt>
+            <dd></dd>
+            <dt>Can Skip</dt>
+            <dd></dd>
+            <dt>Next Enabled When</dt>
+            <dd></dd>
+            <dt>State Persistence</dt>
+            <dd></dd>
+            <dt>Strategy</dt>
+            <dd></dd>
+            <dt>Interval</dt>
+            <dd></dd>
+            <dt>Progress Indicator</dt>
+            <dd></dd>
+            <dt>Type</dt>
+            <dd>flexible</dd>
+            <dt>Position</dt>
             <dd></dd>
           </dl>
-          <div class="table-wrapper mt-3">
-            <table class="Table">
-              <thead>
-                <tr>
-                  <th>Breakpoints</th>
-                  <th>Mobile</th>
-                  <th>Tablet</th>
-                  <th>Desktop</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="wf-add-to-cart-bounded-contexts-tab" data-tab-target="wf-add-to-cart-bounded-contexts-tab">Bounded Contexts</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-add-to-cart-aggregate-refs-tab" data-tab-target="wf-add-to-cart-aggregate-refs-tab">Aggregate Refs</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-add-to-cart-steps-tab" data-tab-target="wf-add-to-cart-steps-tab">Steps</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-add-to-cart-collects-tab" data-tab-target="wf-add-to-cart-collects-tab">Collects</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-add-to-cart-rules-tab" data-tab-target="wf-add-to-cart-rules-tab">Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-add-to-cart-collects-tab-1" data-tab-target="wf-add-to-cart-collects-tab-1">Collects</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-add-to-cart-rules-tab-1" data-tab-target="wf-add-to-cart-rules-tab-1">Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-add-to-cart-collects-tab-2" data-tab-target="wf-add-to-cart-collects-tab-2">Collects</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-add-to-cart-rules-tab-2" data-tab-target="wf-add-to-cart-rules-tab-2">Rules</button>
+            </nav>
+          <div role="tabpanel" id="wf-add-to-cart-bounded-contexts-tab" class="TabPanel" data-tab-label="Bounded Contexts">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Bounded Contexts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>bc_product_catalog</td>
+                  </tr>
+                  <tr>
+                    <td>bc_shopping_cart</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-add-to-cart-aggregate-refs-tab" class="TabPanel hidden" data-tab-label="Aggregate Refs">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Aggregate Refs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>agg_product</td>
+                  </tr>
+                  <tr>
+                    <td>agg_shopping_cart</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-add-to-cart-steps-tab" class="TabPanel hidden" data-tab-label="Steps">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Step Id</th>
+                    <th>Page Ref</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>View Product Details</td>
+                    <td>Select Product</td>
+                    <td>Page Product Detail</td>
+                  </tr>
+                  <tr>
+                    <td>Configure Options</td>
+                    <td>Configure Product</td>
+                    <td>Page Product Detail</td>
+                  </tr>
+                  <tr>
+                    <td>Add to Cart</td>
+                    <td>Add To Cart</td>
+                    <td>Page Product Detail</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-add-to-cart-collects-tab" class="TabPanel hidden" data-tab-label="Collects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Collects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-add-to-cart-rules-tab" class="TabPanel hidden" data-tab-label="Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-add-to-cart-collects-tab-1" class="TabPanel hidden" data-tab-label="Collects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Collects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-add-to-cart-rules-tab-1" class="TabPanel hidden" data-tab-label="Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-add-to-cart-collects-tab-2" class="TabPanel hidden" data-tab-label="Collects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Collects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-add-to-cart-rules-tab-2" class="TabPanel hidden" data-tab-label="Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+          <div class="inline-objects">
+            <details class="my-3">
+              <summary>On Complete: agg_shopping_cart evt_product_added_to_cart page_cart</summary>
+              <dl class="type-attributes">
+                <dt>Update Aggregate</dt>
+                <dd>agg_shopping_cart</dd>
+                <dt>Publish Event</dt>
+                <dd>evt_product_added_to_cart</dd>
+                <dt>Navigate To</dt>
+                <dd>page_cart</dd>
+              </dl>
+            </details>
+            <details class="my-3">
+              <summary>Completion: EMPTY → CONTAINS_ITEMS evt_cart_updated toast</summary>
+              <dl class="type-attributes">
+                <dt>Aggregate Transition</dt>
+                <dd>EMPTY → CONTAINS_ITEMS</dd>
+                <dt>Publishes Event</dt>
+                <dd>evt_cart_updated</dd>
+                <dt>Navigate To</dt>
+                <dd></dd>
+                <dt>Feedback</dt>
+                <dd>toast</dd>
+              </dl>
+            </details>
+          </div>
+        </section>
+        <section id="wf_user_activation" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Workflow: User Account Activation", "href": "#wf_user_activation"}]'>
+          <header><h2>Workflow: User Account Activation</h2></header>
+          <dl class="type-attributes">
+            <dt>Workflow Id</dt>
+            <dd></dd>
+            <dt>Name</dt>
+            <dd>User Account Activation</dd>
+            <dt>Type</dt>
+            <dd>flexible</dd>
+            <dt>Application Service</dt>
+            <dd>svc_app_user_management</dd>
+            <dt>Step Number</dt>
+            <dd>1</dd>
+            <dt>Label</dt>
+            <dd>View Pending User</dd>
+            <dt>Page Ref</dt>
+            <dd>page_user_management</dd>
+            <dt>Can Skip</dt>
+            <dd>false</dd>
+            <dt>Next Enabled When</dt>
+            <dd>user_exists_and_pending</dd>
+            <dt>On Complete</dt>
+            <dd></dd>
+            <dt>Update Aggregate</dt>
+            <dd></dd>
+            <dt>Publish Event</dt>
+            <dd></dd>
+            <dt>Navigate To</dt>
+            <dd></dd>
+            <dt>Step Number</dt>
+            <dd>2</dd>
+            <dt>Label</dt>
+            <dd>Confirm Activation</dd>
+            <dt>Page Ref</dt>
+            <dd>page_user_management</dd>
+            <dt>Can Skip</dt>
+            <dd>false</dd>
+            <dt>Next Enabled When</dt>
+            <dd>validation_passed</dd>
+            <dt>State Persistence</dt>
+            <dd></dd>
+            <dt>Strategy</dt>
+            <dd></dd>
+            <dt>Interval</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="wf-user-activation-bounded-contexts-tab" data-tab-target="wf-user-activation-bounded-contexts-tab">Bounded Contexts</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-user-activation-aggregate-refs-tab" data-tab-target="wf-user-activation-aggregate-refs-tab">Aggregate Refs</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-user-activation-steps-tab" data-tab-target="wf-user-activation-steps-tab">Steps</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-user-activation-collects-tab" data-tab-target="wf-user-activation-collects-tab">Collects</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-user-activation-collects-tab-1" data-tab-target="wf-user-activation-collects-tab-1">Collects</button>
+            </nav>
+          <div role="tabpanel" id="wf-user-activation-bounded-contexts-tab" class="TabPanel" data-tab-label="Bounded Contexts">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Bounded Contexts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>bc_user_management</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-user-activation-aggregate-refs-tab" class="TabPanel hidden" data-tab-label="Aggregate Refs">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Aggregate Refs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>agg_user</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-user-activation-steps-tab" class="TabPanel hidden" data-tab-label="Steps">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Step Number</th>
+                    <th>Label</th>
+                    <th>Page Ref</th>
+                    <th>Can Skip</th>
+                    <th>Next Enabled When</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1 View Pending User page_user_management</td>
+                    <td>1</td>
+                    <td>View Pending User</td>
+                    <td>Page User Management</td>
+                    <td>false</td>
+                    <td>User Exists And Pending</td>
+                  </tr>
+                  <tr>
+                    <td>2 Confirm Activation page_user_management</td>
+                    <td>2</td>
+                    <td>Confirm Activation</td>
+                    <td>Page User Management</td>
+                    <td>false</td>
+                    <td>Validation Passed</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-user-activation-collects-tab" class="TabPanel hidden" data-tab-label="Collects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Collects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>vo_user_id</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-user-activation-collects-tab-1" class="TabPanel hidden" data-tab-label="Collects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Collects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+          <div class="inline-objects">
+            <details class="my-3">
+              <summary>Validates: on_blur</summary>
+              <dl class="type-attributes">
+                <dt>Timing</dt>
+                <dd>on_blur</dd>
+              </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="wf-user-activation-validates-rules-tab" data-tab-target="wf-user-activation-validates-rules-tab">Rules</button>
+            </nav>
+          <div role="tabpanel" id="wf-user-activation-validates-rules-tab" class="TabPanel" data-tab-label="Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>User must exist</td>
+                  </tr>
+                  <tr>
+                    <td>User must be in PENDING status</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            </details>
+            <details class="my-3">
+              <summary>Validates: on_submit</summary>
+              <dl class="type-attributes">
+                <dt>Timing</dt>
+                <dd>on_submit</dd>
+              </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="wf-user-activation-validates-1-rules-tab" data-tab-target="wf-user-activation-validates-1-rules-tab">Rules</button>
+            </nav>
+          <div role="tabpanel" id="wf-user-activation-validates-1-rules-tab" class="TabPanel" data-tab-label="Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>User not locked</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            </details>
+            <details class="my-3">
+              <summary>On Complete: agg_user evt_user_activated page_user_management</summary>
+              <dl class="type-attributes">
+                <dt>Update Aggregate</dt>
+                <dd>agg_user</dd>
+                <dt>Publish Event</dt>
+                <dd>evt_user_activated</dd>
+                <dt>Navigate To</dt>
+                <dd>page_user_management</dd>
+              </dl>
+            </details>
+            <details class="my-3">
+              <summary>Progress Indicator: steps top</summary>
+              <dl class="type-attributes">
+                <dt>Type</dt>
+                <dd>steps</dd>
+                <dt>Position</dt>
+                <dd>top</dd>
+              </dl>
+            </details>
+            <details class="my-3">
+              <summary>Completion: PENDING → ACTIVE evt_user_activated page_user_management</summary>
+              <dl class="type-attributes">
+                <dt>Aggregate Transition</dt>
+                <dd>PENDING → ACTIVE</dd>
+                <dt>Publishes Event</dt>
+                <dd>evt_user_activated</dd>
+                <dt>Navigate To</dt>
+                <dd>page_user_management</dd>
+                <dt>Feedback</dt>
+                <dd>toast</dd>
+              </dl>
+            </details>
+          </div>
+        </section>
+        <section id="wf_checkout" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Workflow: Checkout Process", "href": "#wf_checkout"}]'>
+          <header><h2>Workflow: Checkout Process</h2></header>
+          <dl class="type-attributes">
+            <dt>Workflow Id</dt>
+            <dd></dd>
+            <dt>Name</dt>
+            <dd>Checkout Process</dd>
+            <dt>Type</dt>
+            <dd>linear</dd>
+            <dt>Application Service</dt>
+            <dd></dd>
+            <dt>Step Number</dt>
+            <dd></dd>
+            <dt>Label</dt>
+            <dd></dd>
+            <dt>Page Ref</dt>
+            <dd>page_cart</dd>
+            <dt>Validates</dt>
+            <dd></dd>
+            <dt>Timing</dt>
+            <dd></dd>
+            <dt>Can Skip</dt>
+            <dd></dd>
+            <dt>Next Enabled When</dt>
+            <dd>cart_not_empty</dd>
+            <dt>On Complete</dt>
+            <dd></dd>
+            <dt>Update Aggregate</dt>
+            <dd></dd>
+            <dt>Publish Event</dt>
+            <dd></dd>
+            <dt>Navigate To</dt>
+            <dd></dd>
+            <dt>Step Number</dt>
+            <dd></dd>
+            <dt>Label</dt>
+            <dd></dd>
+            <dt>Page Ref</dt>
+            <dd>page_checkout_shipping</dd>
+            <dt>Validates</dt>
+            <dd></dd>
+            <dt>Timing</dt>
+            <dd></dd>
+            <dt>Can Skip</dt>
+            <dd></dd>
+            <dt>Next Enabled When</dt>
+            <dd>all_required_fields_valid</dd>
+            <dt>On Complete</dt>
+            <dd></dd>
+            <dt>Update Aggregate</dt>
+            <dd></dd>
+            <dt>Publish Event</dt>
+            <dd></dd>
+            <dt>Navigate To</dt>
+            <dd></dd>
+            <dt>Step Number</dt>
+            <dd></dd>
+            <dt>Label</dt>
+            <dd></dd>
+            <dt>Page Ref</dt>
+            <dd>page_checkout_payment</dd>
+            <dt>Validates</dt>
+            <dd></dd>
+            <dt>Timing</dt>
+            <dd></dd>
+            <dt>Can Skip</dt>
+            <dd></dd>
+            <dt>Next Enabled When</dt>
+            <dd>payment_valid</dd>
+            <dt>State Persistence</dt>
+            <dd></dd>
+            <dt>Strategy</dt>
+            <dd></dd>
+            <dt>Interval</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="wf-checkout-bounded-contexts-tab" data-tab-target="wf-checkout-bounded-contexts-tab">Bounded Contexts</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-checkout-aggregate-refs-tab" data-tab-target="wf-checkout-aggregate-refs-tab">Aggregate Refs</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-checkout-steps-tab" data-tab-target="wf-checkout-steps-tab">Steps</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-checkout-collects-tab" data-tab-target="wf-checkout-collects-tab">Collects</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-checkout-rules-tab" data-tab-target="wf-checkout-rules-tab">Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-checkout-collects-tab-1" data-tab-target="wf-checkout-collects-tab-1">Collects</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-checkout-rules-tab-1" data-tab-target="wf-checkout-rules-tab-1">Rules</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-checkout-collects-tab-2" data-tab-target="wf-checkout-collects-tab-2">Collects</button>
+            <button role="tab" aria-selected="false" aria-controls="wf-checkout-rules-tab-2" data-tab-target="wf-checkout-rules-tab-2">Rules</button>
+            </nav>
+          <div role="tabpanel" id="wf-checkout-bounded-contexts-tab" class="TabPanel" data-tab-label="Bounded Contexts">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Bounded Contexts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>bc_shopping_cart</td>
+                  </tr>
+                  <tr>
+                    <td>bc_order_management</td>
+                  </tr>
+                  <tr>
+                    <td>bc_payment</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-checkout-aggregate-refs-tab" class="TabPanel hidden" data-tab-label="Aggregate Refs">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Aggregate Refs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>agg_shopping_cart</td>
+                  </tr>
+                  <tr>
+                    <td>agg_order</td>
+                  </tr>
+                  <tr>
+                    <td>agg_payment</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-checkout-steps-tab" class="TabPanel hidden" data-tab-label="Steps">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Step Id</th>
+                    <th>Page Ref</th>
+                    <th>Next Enabled When</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Review Cart</td>
+                    <td>Review Cart</td>
+                    <td>Page Cart</td>
+                    <td>Cart Not Empty</td>
+                  </tr>
+                  <tr>
+                    <td>Shipping Information</td>
+                    <td>Shipping Info</td>
+                    <td>Page Checkout Shipping</td>
+                    <td>All Required Fields Valid</td>
+                  </tr>
+                  <tr>
+                    <td>Payment Information</td>
+                    <td>Payment Info</td>
+                    <td>Page Checkout Payment</td>
+                    <td>Payment Valid</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-checkout-collects-tab" class="TabPanel hidden" data-tab-label="Collects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Collects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-checkout-rules-tab" class="TabPanel hidden" data-tab-label="Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-checkout-collects-tab-1" class="TabPanel hidden" data-tab-label="Collects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Collects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-checkout-rules-tab-1" class="TabPanel hidden" data-tab-label="Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-checkout-collects-tab-2" class="TabPanel hidden" data-tab-label="Collects">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Collects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="wf-checkout-rules-tab-2" class="TabPanel hidden" data-tab-label="Rules">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Rules</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+          <div class="inline-objects">
+            <details class="my-3">
+              <summary>On Complete: agg_order evt_order_placed</summary>
+              <dl class="type-attributes">
+                <dt>Update Aggregate</dt>
+                <dd>agg_order</dd>
+                <dt>Publish Event</dt>
+                <dd>evt_order_placed</dd>
+                <dt>Navigate To</dt>
+                <dd></dd>
+              </dl>
+            </details>
+            <details class="my-3">
+              <summary>Progress Indicator: steps top</summary>
+              <dl class="type-attributes">
+                <dt>Type</dt>
+                <dd>steps</dd>
+                <dt>Position</dt>
+                <dd>top</dd>
+              </dl>
+            </details>
+            <details class="my-3">
+              <summary>Completion: PENDING → CONFIRMED evt_order_confirmed page_order_confirmation</summary>
+              <dl class="type-attributes">
+                <dt>Aggregate Transition</dt>
+                <dd>PENDING → CONFIRMED</dd>
+                <dt>Publishes Event</dt>
+                <dd>evt_order_confirmed</dd>
+                <dt>Navigate To</dt>
+                <dd>page_order_confirmation</dd>
+                <dt>Feedback</dt>
+                <dd>modal</dd>
+              </dl>
+            </details>
           </div>
         </section>
       </main>
