@@ -1,0 +1,351 @@
+# UX Structure Example: E-Commerce Product Catalog
+# Demonstrates information architecture, hierarchy, facets, and search
+
+information_architecture:
+  ia_ecommerce_products:
+    organization_scheme: hybrid
+    hierarchy:
+      root: "Products"
+      levels:
+        - level: 1
+          node_refs:
+            - hn_electronics
+            - hn_clothing
+            - hn_home
+            - hn_sports
+        - level: 2
+          node_refs:
+            - hn_laptops
+            - hn_phones
+            - hn_tablets
+            - hn_mens_clothing
+            - hn_womens_clothing
+            - hn_furniture
+            - hn_decor
+    facets:
+      - facet_brand
+      - facet_price_range
+      - facet_rating
+      - facet_color
+      - facet_availability
+    navigation_systems:
+      global_navigation: true
+      local_navigation: true
+      contextual_navigation: true
+      search: true
+      breadcrumbs: true
+    search_system_ref: search_products
+    labeling_system:
+      terminology_source: "Product Catalog bounded context glossary"
+      label_types:
+        - navigation_labels
+        - headings
+        - contextual_links
+        - tags
+
+hierarchy_nodes:
+  # Level 1 - Top categories
+  - id: hn_electronics
+    label: "Electronics"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/electronics"
+    page_ref: page_category_list
+    children_refs:
+      - hn_laptops
+      - hn_phones
+      - hn_tablets
+    metadata:
+      depth: 1
+      order: 1
+
+  - id: hn_clothing
+    label: "Clothing & Apparel"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/clothing"
+    page_ref: page_category_list
+    children_refs:
+      - hn_mens_clothing
+      - hn_womens_clothing
+    metadata:
+      depth: 1
+      order: 2
+
+  - id: hn_home
+    label: "Home & Garden"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/home"
+    page_ref: page_category_list
+    children_refs:
+      - hn_furniture
+      - hn_decor
+    metadata:
+      depth: 1
+      order: 3
+
+  - id: hn_sports
+    label: "Sports & Outdoors"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/sports"
+    page_ref: page_category_list
+    metadata:
+      depth: 1
+      order: 4
+
+  # Level 2 - Subcategories
+  - id: hn_laptops
+    label: "Laptops"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/electronics/laptops"
+    page_ref: page_product_list
+    parent_ref: hn_electronics
+    metadata:
+      depth: 2
+      order: 1
+
+  - id: hn_phones
+    label: "Smartphones"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/electronics/phones"
+    page_ref: page_product_list
+    parent_ref: hn_electronics
+    metadata:
+      depth: 2
+      order: 2
+
+  - id: hn_tablets
+    label: "Tablets"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/electronics/tablets"
+    page_ref: page_product_list
+    parent_ref: hn_electronics
+    metadata:
+      depth: 2
+      order: 3
+
+  - id: hn_mens_clothing
+    label: "Men's Clothing"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/clothing/mens"
+    page_ref: page_product_list
+    parent_ref: hn_clothing
+    metadata:
+      depth: 2
+      order: 1
+
+  - id: hn_womens_clothing
+    label: "Women's Clothing"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/clothing/womens"
+    page_ref: page_product_list
+    parent_ref: hn_clothing
+    metadata:
+      depth: 2
+      order: 2
+
+  - id: hn_furniture
+    label: "Furniture"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/home/furniture"
+    page_ref: page_product_list
+    parent_ref: hn_home
+    metadata:
+      depth: 2
+      order: 1
+
+  - id: hn_decor
+    label: "Home Decor"
+    bounded_context_ref: bc_product_catalog
+    url: "/products/home/decor"
+    page_ref: page_product_list
+    parent_ref: hn_home
+    metadata:
+      depth: 2
+      order: 2
+
+facets:
+  - id: facet_brand
+    label: "Brand"
+    type: multi_select
+    ddd_mapping: "vo_product.brand"
+    values:
+      - fv_apple
+      - fv_samsung
+      - fv_dell
+      - fv_hp
+      - fv_sony
+    display:
+      position: sidebar
+      collapsible: true
+      default_expanded: true
+
+  - id: facet_price_range
+    label: "Price"
+    type: range
+    ddd_mapping: "vo_product.price.amount"
+    range:
+      min: 0
+      max: 5000
+      step: 50
+      unit: "$"
+    display:
+      position: sidebar
+      collapsible: true
+      default_expanded: true
+
+  - id: facet_rating
+    label: "Customer Rating"
+    type: single_select
+    ddd_mapping: "vo_product.rating"
+    values:
+      - fv_rating_4_plus
+      - fv_rating_3_plus
+      - fv_rating_2_plus
+    display:
+      position: sidebar
+      collapsible: true
+      default_expanded: false
+
+  - id: facet_color
+    label: "Color"
+    type: multi_select
+    ddd_mapping: "vo_product.color"
+    values:
+      - fv_black
+      - fv_white
+      - fv_silver
+      - fv_blue
+      - fv_red
+    display:
+      position: sidebar
+      collapsible: true
+      default_expanded: false
+
+  - id: facet_availability
+    label: "Availability"
+    type: single_select
+    ddd_mapping: "vo_product.stock_status"
+    values:
+      - fv_in_stock
+      - fv_out_of_stock
+      - fv_pre_order
+    display:
+      position: top
+      collapsible: false
+      default_expanded: true
+
+facet_values:
+  # Brand values
+  - id: fv_apple
+    value: "apple"
+    label: "Apple"
+    count: 245
+
+  - id: fv_samsung
+    value: "samsung"
+    label: "Samsung"
+    count: 198
+
+  - id: fv_dell
+    value: "dell"
+    label: "Dell"
+    count: 152
+
+  - id: fv_hp
+    value: "hp"
+    label: "HP"
+    count: 134
+
+  - id: fv_sony
+    value: "sony"
+    label: "Sony"
+    count: 89
+
+  # Rating values
+  - id: fv_rating_4_plus
+    value: "4_and_up"
+    label: "4 Stars & Up"
+    count: 1234
+
+  - id: fv_rating_3_plus
+    value: "3_and_up"
+    label: "3 Stars & Up"
+    count: 2456
+
+  - id: fv_rating_2_plus
+    value: "2_and_up"
+    label: "2 Stars & Up"
+    count: 3012
+
+  # Color values
+  - id: fv_black
+    value: "black"
+    label: "Black"
+    count: 567
+
+  - id: fv_white
+    value: "white"
+    label: "White"
+    count: 432
+
+  - id: fv_silver
+    value: "silver"
+    label: "Silver"
+    count: 398
+
+  - id: fv_blue
+    value: "blue"
+    label: "Blue"
+    count: 245
+
+  - id: fv_red
+    value: "red"
+    label: "Red"
+    count: 178
+
+  # Availability values
+  - id: fv_in_stock
+    value: "in_stock"
+    label: "In Stock"
+    count: 2845
+
+  - id: fv_out_of_stock
+    value: "out_of_stock"
+    label: "Out of Stock"
+    count: 234
+
+  - id: fv_pre_order
+    value: "pre_order"
+    label: "Pre-Order"
+    count: 45
+
+search_systems:
+  - id: search_products
+    type: faceted
+    scope: global
+    features:
+      - autocomplete
+      - suggestions
+      - filters
+      - recent_searches
+    indexed_fields:
+      - "product_name"
+      - "brand"
+      - "category"
+      - "description"
+      - "sku"
+      - "tags"
+    ranking:
+      algorithm: hybrid
+      weights:
+        product_name: 2.0
+        brand: 1.5
+        category: 1.0
+        description: 0.5
+        tags: 0.8
+    filters:
+      - facet_brand
+      - facet_price_range
+      - facet_rating
+      - facet_color
+      - facet_availability
+    bounded_context_ref: bc_product_catalog

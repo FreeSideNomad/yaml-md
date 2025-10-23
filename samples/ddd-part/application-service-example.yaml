@@ -1,0 +1,666 @@
+# Application Service Example: User Management
+# Demonstrates complete CQRS implementation following Knight codebase patterns
+# Schema version: tactical-ddd.schema.yaml v1.1.0
+
+# ==============================================================================
+# BOUNDED CONTEXT DEFINITION
+# ==============================================================================
+
+bounded_context:
+  id: bc_user_management
+  name: User Management
+  domain_ref: dom_identity_access
+  description: Manages user accounts, lifecycle, and authentication
+  ubiquitous_language:
+    glossary:
+      - term: User
+        definition: A person with an identity in the system who can access the platform
+        examples:
+          - "Direct user authenticated via Okta"
+          - "Indirect user created by a parent client"
+      - term: Activation
+        definition: Transition from PENDING to ACTIVE status, enabling system access
+        examples:
+          - "User activates their account after email verification"
+      - term: Deactivation
+        definition: Transition to DEACTIVATED status, disabling system access without deletion
+        examples:
+          - "Admin deactivates user for policy violation"
+      - term: Lock
+        definition: Temporary suspension of account access due to security concerns
+        examples:
+          - "User locked after 5 failed login attempts"
+  team_ownership: Identity and Access Team
+
+# ==============================================================================
+# VALUE OBJECTS (SharedKernel)
+# ==============================================================================
+
+value_objects:
+  - id: vo_user_id
+    name: UserId
+    bounded_context_ref: bc_user_management
+    description: Unique identifier for a user (UUID-based)
+    attributes:
+      - name: id
+        type: String
+        required: true
+        validation: "UUID format"
+    validation_rules:
+      - "Cannot be null or blank"
+      - "Must be valid UUID string"
+    equality_criteria:
+      - id
+    immutability: true
+
+  - id: vo_client_id
+    name: ClientId
+    bounded_context_ref: bc_user_management
+    description: URN-based identifier for clients (srf, gid, ind)
+    attributes:
+      - name: urn
+        type: String
+        required: true
+        validation: "^(srf|gid|ind):[A-Za-z0-9_-]+$"
+    validation_rules:
+      - "Must match pattern {system}:{clientNumber}"
+      - "System must be srf, gid, or ind"
+    equality_criteria:
+      - urn
+    immutability: true
+
+# ==============================================================================
+# AGGREGATE: User
+# ==============================================================================
+
+aggregates:
+  - id: agg_user
+    name: User
+    bounded_context_ref: bc_user_management
+    root_ref: ent_user
+    entities:
+      - ent_user
+    value_objects:
+      - vo_user_id
+      - vo_client_id
+    consistency_rules:
+      - "User email must be unique within the system"
+      - "Locked users cannot be activated without unlocking first"
+      - "User status transitions must follow state machine rules"
+    invariants:
+      - "UserId cannot be null"
+      - "Email must be valid format and contain @"
+      - "UserType and IdentityProvider must be set"
+      - "Lock reason required when status is LOCKED"
+      - "Deactivation reason required when status is DEACTIVATED"
+    size_estimate: small
+
+entities:
+  - id: ent_user
+    name: User
+    bounded_context_ref: bc_user_management
+    aggregate_ref: agg_user
+    is_aggregate_root: true
+    identity_field: userId
+    identity_generation: auto_generated
+    attributes:
+      - name: userId
+        type: UserId
+        value_object_ref: vo_user_id
+        required: true
+        description: Unique user identifier
+      - name: email
+        type: String
+        required: true
+        description: User email address
+      - name: status
+        type: UserStatus
+        required: true
+        description: "Current user status (PENDING, ACTIVE, LOCKED, DEACTIVATED)"
+      - name: userType
+        type: UserType
+        required: true
+        description: "Direct or Indirect user"
+      - name: identityProvider
+        type: IdentityProvider
+        required: true
+        description: "Authentication provider (OKTA, A_AND_P)"
+      - name: clientId
+        type: ClientId
+        value_object_ref: vo_client_id
+        required: true
+        description: Parent client identifier
+      - name: createdAt
+        type: Instant
+        required: true
+        description: Creation timestamp
+      - name: updatedAt
+        type: Instant
+        required: true
+        description: Last update timestamp
+      - name: lockReason
+        type: String
+        required: false
+        description: Reason for lock (required when locked)
+      - name: deactivationReason
+        type: String
+        required: false
+        description: Reason for deactivation (required when deactivated)
+    business_methods:
+      - name: create
+        description: "Static factory method to create new user in PENDING status"
+        parameters:
+          - userId
+          - email
+          - userType
+          - identityProvider
+          - clientId
+        returns: User
+      - name: activate
+        description: "Transition to ACTIVE status, enabling system access"
+        parameters: []
+        returns: void
+      - name: deactivate
+        description: "Transition to DEACTIVATED status with reason"
+        parameters:
+          - reason
+        returns: void
+      - name: lock
+        description: "Transition to LOCKED status with reason"
+        parameters:
+          - reason
+        returns: void
+      - name: unlock
+        description: "Remove lock and restore previous status"
+        parameters: []
+        returns: void
+    invariants:
+      - "Cannot activate locked user without unlocking first"
+      - "Cannot lock already locked user (idempotent)"
+      - "Cannot activate already active user (idempotent)"
+      - "Lock reason required when locking"
+      - "Deactivation reason required when deactivating"
+
+# ==============================================================================
+# DOMAIN EVENTS
+# ==============================================================================
+
+domain_events:
+  - id: evt_user_created
+    name: UserCreated
+    bounded_context_ref: bc_user_management
+    aggregate_ref: agg_user
+    description: Published when a new user is created in PENDING status
+    data_carried:
+      - name: userId
+        type: String
+        description: User ID serialized to string
+      - name: email
+        type: String
+        description: User email address
+      - name: userType
+        type: String
+        description: User type (DIRECT, INDIRECT)
+      - name: identityProvider
+        type: String
+        description: Identity provider (OKTA, A_AND_P)
+      - name: createdAt
+        type: Instant
+        description: Event timestamp
+    immutable: true
+
+  - id: evt_user_activated
+    name: UserActivated
+    bounded_context_ref: bc_user_management
+    aggregate_ref: agg_user
+    description: Published when user transitions to ACTIVE status
+    data_carried:
+      - name: userId
+        type: String
+        description: User ID serialized to string
+      - name: activatedAt
+        type: Instant
+        description: Activation timestamp
+    immutable: true
+
+  - id: evt_user_deactivated
+    name: UserDeactivated
+    bounded_context_ref: bc_user_management
+    aggregate_ref: agg_user
+    description: Published when user is deactivated
+    data_carried:
+      - name: userId
+        type: String
+        description: User ID serialized to string
+      - name: reason
+        type: String
+        description: Deactivation reason
+      - name: deactivatedAt
+        type: Instant
+        description: Deactivation timestamp
+    immutable: true
+
+  - id: evt_user_locked
+    name: UserLocked
+    bounded_context_ref: bc_user_management
+    aggregate_ref: agg_user
+    description: Published when user account is locked
+    data_carried:
+      - name: userId
+        type: String
+        description: User ID serialized to string
+      - name: reason
+        type: String
+        description: Lock reason
+      - name: lockedAt
+        type: Instant
+        description: Lock timestamp
+    immutable: true
+
+# ==============================================================================
+# REPOSITORY
+# ==============================================================================
+
+repositories:
+  - id: repo_user
+    name: UserRepository
+    bounded_context_ref: bc_user_management
+    aggregate_ref: agg_user
+    interface_methods:
+      - name: save
+        description: Persist user aggregate
+        parameters:
+          - name: user
+            type: User
+        returns: void
+        query_type: custom
+      - name: findById
+        description: Retrieve user by ID
+        parameters:
+          - name: userId
+            type: UserId
+        returns: Optional<User>
+        query_type: by_id
+      - name: findByEmail
+        description: Retrieve user by email address
+        parameters:
+          - name: email
+            type: String
+        returns: Optional<User>
+        query_type: by_criteria
+    persistence_strategy: JPA (Hibernate)
+
+# ==============================================================================
+# COMMAND INTERFACE
+# ==============================================================================
+
+command_interfaces:
+  - id: cmd_user_commands
+    name: UserCommands
+    bounded_context_ref: bc_user_management
+    aggregate_ref: agg_user
+    description: Command interface for user lifecycle operations
+    command_records:
+      - record_name: CreateUserCmd
+        intent: createUser
+        description: Create a new user in PENDING status
+        parameters:
+          - name: email
+            type: String
+            required: true
+            description: User email address
+          - name: userType
+            type: String
+            required: true
+            description: "User type enum as string (DIRECT, INDIRECT)"
+          - name: identityProvider
+            type: String
+            required: true
+            description: "Identity provider enum as string (OKTA, A_AND_P)"
+          - name: clientId
+            type: ClientId
+            value_object_ref: vo_client_id
+            required: true
+            description: Parent client identifier
+        returns: domain_id
+        return_type_ref: vo_user_id
+        modifies_aggregate: agg_user
+        publishes_events:
+          - evt_user_created
+
+      - record_name: ActivateUserCmd
+        intent: activateUser
+        description: Activate user account, enabling system access
+        parameters:
+          - name: userId
+            type: UserId
+            value_object_ref: vo_user_id
+            required: true
+            description: User to activate
+        returns: void
+        modifies_aggregate: agg_user
+        publishes_events:
+          - evt_user_activated
+
+      - record_name: DeactivateUserCmd
+        intent: deactivateUser
+        description: Deactivate user account with reason
+        parameters:
+          - name: userId
+            type: UserId
+            value_object_ref: vo_user_id
+            required: true
+            description: User to deactivate
+          - name: reason
+            type: String
+            required: true
+            description: Reason for deactivation
+        returns: void
+        modifies_aggregate: agg_user
+        publishes_events:
+          - evt_user_deactivated
+        audit_fields:
+          - reason
+
+      - record_name: LockUserCmd
+        intent: lockUser
+        description: Lock user account due to security concerns
+        parameters:
+          - name: userId
+            type: UserId
+            value_object_ref: vo_user_id
+            required: true
+            description: User to lock
+          - name: reason
+            type: String
+            required: true
+            description: Reason for lock (e.g., failed login attempts)
+        returns: void
+        modifies_aggregate: agg_user
+        publishes_events:
+          - evt_user_locked
+        audit_fields:
+          - reason
+
+      - record_name: UnlockUserCmd
+        intent: unlockUser
+        description: Remove lock from user account
+        parameters:
+          - name: userId
+            type: UserId
+            value_object_ref: vo_user_id
+            required: true
+            description: User to unlock
+        returns: void
+        modifies_aggregate: agg_user
+    immutability: true
+    layer: api
+
+# ==============================================================================
+# QUERY INTERFACE
+# ==============================================================================
+
+query_interfaces:
+  - id: qry_user_queries
+    name: UserQueries
+    bounded_context_ref: bc_user_management
+    aggregate_ref: agg_user
+    description: Query interface for user information retrieval
+    query_methods:
+      - method_name: getUserSummary
+        description: Retrieve user summary information
+        parameters:
+          - name: userId
+            type: UserId
+            value_object_ref: vo_user_id
+            required: true
+            description: User ID to query
+        result_record_name: UserSummary
+        result_structure:
+          fields:
+            - name: userId
+              type: String
+              serialization: "UserId serialized to String via userId.id()"
+              description: User identifier
+            - name: email
+              type: String
+              description: User email address
+            - name: status
+              type: String
+              serialization: "Status enum serialized to String via status.name()"
+              description: Current user status
+            - name: userType
+              type: String
+              serialization: "UserType enum serialized to String via userType.name()"
+              description: User type
+            - name: identityProvider
+              type: String
+              serialization: "IdentityProvider enum serialized to String"
+              description: Authentication provider
+        bypasses_domain_model: false
+        optimizations:
+          denormalized: false
+          cached: false
+          indexed: true
+    result_characteristics:
+      immutable: true
+      flat_structure: true
+      string_serialization: true
+    layer: api
+    no_side_effects: true
+
+# ==============================================================================
+# APPLICATION SERVICE (implements both Commands and Queries)
+# ==============================================================================
+
+application_services:
+  - id: svc_app_user_management
+    name: UserApplicationService
+    bounded_context_ref: bc_user_management
+    description: |
+      Orchestrates user lifecycle use cases by coordinating User aggregate, UserRepository,
+      and event publishing. Implements both UserCommands and UserQueries interfaces.
+      Contains NO business logic - only coordination logic.
+    implements_commands:
+      - cmd_user_commands
+    implements_queries:
+      - qry_user_queries
+    operations:
+      # COMMAND OPERATIONS
+      - name: createUser
+        type: command
+        description: Create new user and publish UserCreated event
+        parameters:
+          - name: cmd
+            type: CreateUserCmd
+            required: true
+        returns: UserId
+        transaction_boundary:
+          is_transactional: true
+          modifies_aggregates:
+            - agg_user
+          consistency_type: transactional
+        workflow:
+          validates_input: true
+          loads_aggregates: []
+          invokes_domain_operations:
+            - "User.create() - factory method"
+          invokes_domain_services: []
+          persists_aggregates: true
+          publishes_events:
+            - evt_user_created
+          returns_dto: null
+
+      - name: activateUser
+        type: command
+        description: Activate user account
+        parameters:
+          - name: cmd
+            type: ActivateUserCmd
+            required: true
+        returns: void
+        transaction_boundary:
+          is_transactional: true
+          modifies_aggregates:
+            - agg_user
+          consistency_type: transactional
+        workflow:
+          validates_input: true
+          loads_aggregates:
+            - agg_user
+          invokes_domain_operations:
+            - "user.activate() - business method"
+          invokes_domain_services: []
+          persists_aggregates: true
+          publishes_events:
+            - evt_user_activated
+          returns_dto: null
+
+      - name: deactivateUser
+        type: command
+        description: Deactivate user with reason
+        parameters:
+          - name: cmd
+            type: DeactivateUserCmd
+            required: true
+        returns: void
+        transaction_boundary:
+          is_transactional: true
+          modifies_aggregates:
+            - agg_user
+          consistency_type: transactional
+        workflow:
+          validates_input: true
+          loads_aggregates:
+            - agg_user
+          invokes_domain_operations:
+            - "user.deactivate(reason) - business method"
+          invokes_domain_services: []
+          persists_aggregates: true
+          publishes_events:
+            - evt_user_deactivated
+          returns_dto: null
+
+      - name: lockUser
+        type: command
+        description: Lock user account with reason
+        parameters:
+          - name: cmd
+            type: LockUserCmd
+            required: true
+        returns: void
+        transaction_boundary:
+          is_transactional: true
+          modifies_aggregates:
+            - agg_user
+          consistency_type: transactional
+        workflow:
+          validates_input: true
+          loads_aggregates:
+            - agg_user
+          invokes_domain_operations:
+            - "user.lock(reason) - business method"
+          invokes_domain_services: []
+          persists_aggregates: true
+          publishes_events:
+            - evt_user_locked
+          returns_dto: null
+
+      - name: unlockUser
+        type: command
+        description: Remove lock from user account
+        parameters:
+          - name: cmd
+            type: UnlockUserCmd
+            required: true
+        returns: void
+        transaction_boundary:
+          is_transactional: true
+          modifies_aggregates:
+            - agg_user
+          consistency_type: transactional
+        workflow:
+          validates_input: true
+          loads_aggregates:
+            - agg_user
+          invokes_domain_operations:
+            - "user.unlock() - business method"
+          invokes_domain_services: []
+          persists_aggregates: true
+          publishes_events: []
+          returns_dto: null
+
+      # QUERY OPERATIONS
+      - name: getUserSummary
+        type: query
+        description: Retrieve user summary DTO
+        parameters:
+          - name: userId
+            type: UserId
+            required: true
+        returns: UserSummary
+        transaction_boundary:
+          is_transactional: false
+          modifies_aggregates: []
+          consistency_type: transactional
+        workflow:
+          validates_input: true
+          loads_aggregates:
+            - agg_user
+          invokes_domain_operations: []
+          invokes_domain_services: []
+          persists_aggregates: false
+          publishes_events: []
+          returns_dto: UserSummary
+
+    dependencies:
+      repositories:
+        - repo_user
+      domain_services: []
+      event_publishers:
+        - type: in_memory_bus
+          description: Micronaut ApplicationEventPublisher for in-memory event distribution
+
+    characteristics:
+      stateless: true
+      contains_business_logic: false
+      manages_transactions: true
+      coordinates_aggregates: true
+      publishes_events: true
+      performs_authorization: true
+
+    layer: application
+
+    implementation_notes: |
+      - ID generation: Application service generates UserId using UUID.randomUUID()
+      - Enum parsing: Converts string parameters to domain enums (UserType, IdentityProvider)
+      - Error handling: Throws IllegalArgumentException for not found (handled by framework)
+      - Event timing: Events published AFTER persistence in same transaction
+      - Repository pattern: Repository interface defined as inner interface, implemented in infra layer
+
+# ==============================================================================
+# WORKFLOW EXAMPLE: Complete User Creation Flow
+# ==============================================================================
+
+# This demonstrates the complete flow from BFF → ApplicationService → Aggregate → Repository → Events
+#
+# 1. BFF Controller receives HTTP POST /api/web/users/create
+#    - Request DTO: { email, userType, identityProvider, clientUrn }
+#    - Converts clientUrn string to ClientId value object
+#
+# 2. BFF delegates to UserApplicationService.createUser(CreateUserCmd)
+#    - CreateUserCmd(email, userType, identityProvider, clientId)
+#
+# 3. UserApplicationService orchestrates:
+#    a. Generate new UserId = UserId.of(UUID.randomUUID().toString())
+#    b. Parse enum strings to domain types
+#    c. Call User.create(userId, email, userType, identityProvider, clientId)
+#    d. Aggregate validates invariants and creates User in PENDING status
+#    e. Save user via repository.save(user)
+#    f. Publish UserCreated event via eventPublisher.publishEvent()
+#    g. Return UserId to BFF
+#
+# 4. BFF converts UserId to string and returns to client
+#    - Response DTO: { userId: "123e4567-e89b-12d3-a456-426614174000" }
+#
+# 5. UserCreated event consumed by downstream contexts (notifications, analytics, etc.)

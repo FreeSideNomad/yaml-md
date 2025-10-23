@@ -1,0 +1,477 @@
+---
+version: 0.2.0
+status: draft
+last_updated: 2025-10-09
+---
+
+# Retail Order Processing - Medallion Architecture Example
+# Demonstrates: CDC ingestion, bronze/silver/gold layers, SCD Type 2, data contracts, checks
+
+system:
+  id: sys-retail-order-processing
+  name: Retail Order Processing System
+  description: E-commerce order data pipeline using medallion architecture
+  owners:
+    - team: data-platform
+      contact: data-platform@retailco.com
+  domains:
+    - dom-orders
+
+domains:
+  - id: dom-orders
+    name: Orders Domain
+    description: Manages order lifecycle data from creation to fulfillment
+    owners:
+      - team: data-engineering
+        contact: de-team@retailco.com
+    pipelines:
+      - pip-ingest-orders
+
+pipelines:
+  - id: pip-ingest-orders
+    name: Ingest Orders Pipeline
+    description: CDC-based ingestion from PostgreSQL through bronze/silver/gold layers
+    mode: streaming
+    schedule:
+      id: sch-continuous
+      type: continuous
+      triggers:
+        - type: cdc-event
+          source: postgresql-orders-db
+    stages:
+      - id: stg-cdc-capture
+        name: CDC Capture
+        description: Capture order changes from PostgreSQL via Debezium
+        uses_patterns:
+          - pat-cdc-log-based
+          - pat-idempotent
+        inputs: []
+        outputs:
+          - ds-orders-raw
+        transforms:
+          - id: trf-cdc-extract
+            type: cdc-extract
+            description: Extract changes from PostgreSQL binlog
+            config:
+              connector: debezium
+              database: orders_db
+              table: orders
+
+      - id: stg-bronze-landing
+        name: Bronze Landing
+        description: Land raw CDC events in bronze layer
+        uses_patterns:
+          - pat-medallion-lakehouse
+        inputs:
+          - ds-orders-raw
+        outputs:
+          - ds-orders-bronze
+        transforms:
+          - id: trf-append-bronze
+            type: append
+            description: Append raw events to bronze Delta table
+            config:
+              format: delta
+              mode: append
+              add_metadata: true
+
+      - id: stg-silver-clean
+        name: Silver Cleaning & Deduplication
+        description: Deduplicate and validate orders in silver layer
+        uses_patterns:
+          - pat-medallion-lakehouse
+          - pat-deduplication
+          - pat-merge-upsert
+        inputs:
+          - ds-orders-bronze
+        outputs:
+          - ds-orders-silver
+        transforms:
+          - id: trf-dedupe-orders
+            type: deduplication
+            description: Deduplicate on order_id and event_time
+            config:
+              dedup_key: [order_id, event_time]
+              keep: last
+
+          - id: trf-validate-schema
+            type: custom
+            description: Validate schema and drop invalid records
+            config:
+              drop_nulls: [order_id, customer_id, order_date]
+              validate_types: true
+
+          - id: trf-merge-silver
+            type: upsert
+            description: Upsert into silver table on order_id
+            config:
+              merge_key: order_id
+              update_columns: [status, updated_at, total_amount]
+
+      - id: stg-gold-dimensions
+        name: Gold Dimensional Modeling
+        description: Create dimensional models for BI consumption
+        uses_patterns:
+          - pat-medallion-lakehouse
+          - pat-dimensional-modeling
+          - pat-scd-type2
+        inputs:
+          - ds-orders-silver
+        outputs:
+          - ds-dim-customers
+          - ds-fact-orders
+        transforms:
+          - id: trf-dim-customers-scd2
+            type: scd-type2
+            description: Track customer dimension changes over time
+            config:
+              scd_key: customer_id
+              version_columns: [effective_from, effective_to, is_current]
+              track_columns: [customer_name, customer_tier, customer_address]
+
+          - id: trf-fact-orders
+            type: aggregate
+            description: Build order fact table with metrics
+            config:
+              group_by: [order_id, customer_key, order_date]
+              aggregations:
+                total_amount: sum
+                item_count: count
+                discount_amount: sum
+
+datasets:
+  - id: ds-orders-raw
+    name: Orders Raw Stream
+    description: Raw CDC events from PostgreSQL
+    type: stream
+    format: json
+    location: kafka://orders-cdc
+    classification: internal
+    contains_pii: false
+    tags: [bronze, cdc, raw]
+
+  - id: ds-orders-bronze
+    name: Orders Bronze
+    description: Unprocessed order events in Delta Lake
+    type: table
+    format: delta
+    location: s3://datalake/bronze/orders/
+    schema:
+      fields:
+        - name: order_id
+          type: string
+          nullable: false
+        - name: customer_id
+          type: string
+          nullable: false
+        - name: order_date
+          type: timestamp
+          nullable: false
+        - name: status
+          type: string
+          nullable: true
+        - name: total_amount
+          type: decimal
+          nullable: true
+        - name: _ingested_at
+          type: timestamp
+          nullable: false
+          description: Metadata added at ingestion
+    partitioning:
+      columns: [order_date]
+      strategy: daily
+    classification: internal
+    contains_pii: false
+    tags: [bronze, raw]
+
+  - id: ds-orders-silver
+    name: Orders Silver
+    description: Cleaned and deduplicated orders
+    type: table
+    format: delta
+    location: s3://datalake/silver/orders/
+    schema:
+      fields:
+        - name: order_id
+          type: string
+          nullable: false
+        - name: customer_id
+          type: string
+          nullable: false
+        - name: order_date
+          type: timestamp
+          nullable: false
+        - name: status
+          type: string
+          nullable: false
+        - name: total_amount
+          type: decimal
+          nullable: false
+        - name: customer_email
+          type: string
+          nullable: true
+          pii: true
+        - name: shipping_address
+          type: string
+          nullable: true
+          pii: true
+        - name: updated_at
+          type: timestamp
+          nullable: false
+    partitioning:
+      columns: [order_date]
+      strategy: daily
+    classification: internal
+    contains_pii: true
+    pii_fields: [customer_email, shipping_address]
+    tags: [silver, clean]
+
+  - id: ds-dim-customers
+    name: Customer Dimension (SCD Type 2)
+    description: Customer dimension with full history
+    type: table
+    format: delta
+    location: s3://datalake/gold/dim_customers/
+    schema:
+      fields:
+        - name: customer_key
+          type: bigint
+          nullable: false
+          description: Surrogate key
+        - name: customer_id
+          type: string
+          nullable: false
+          description: Natural key
+        - name: customer_name
+          type: string
+          nullable: false
+        - name: customer_tier
+          type: string
+          nullable: false
+        - name: customer_address
+          type: string
+          nullable: true
+          pii: true
+        - name: effective_from
+          type: date
+          nullable: false
+        - name: effective_to
+          type: date
+          nullable: true
+        - name: is_current
+          type: boolean
+          nullable: false
+    classification: internal
+    contains_pii: true
+    pii_fields: [customer_address]
+    tags: [gold, dimension, scd2]
+
+  - id: ds-fact-orders
+    name: Order Fact Table
+    description: Aggregated order metrics for BI
+    type: table
+    format: delta
+    location: s3://datalake/gold/fact_orders/
+    schema:
+      fields:
+        - name: order_id
+          type: string
+          nullable: false
+        - name: customer_key
+          type: bigint
+          nullable: false
+        - name: order_date
+          type: date
+          nullable: false
+        - name: total_amount
+          type: decimal
+          nullable: false
+        - name: item_count
+          type: integer
+          nullable: false
+        - name: discount_amount
+          type: decimal
+          nullable: false
+    partitioning:
+      columns: [order_date]
+      strategy: daily
+    classification: internal
+    contains_pii: false
+    tags: [gold, fact]
+
+contracts:
+  - id: ctr-orders-silver-v1
+    name: Orders Silver Contract
+    dataset: ds-orders-silver
+    version: 1.0.0
+    schema:
+      $ref: schemas/orders-silver-v1.json
+    sla:
+      freshness_minutes: 10
+      completeness_percent: 99.9
+      availability_percent: 99.5
+    evolution_policy: backward-compatible
+    owners:
+      - team: data-engineering
+        contact: de-team@retailco.com
+    consumers:
+      - team: analytics
+        use_case: BI dashboards and reporting
+      - team: ml-platform
+        use_case: Customer churn prediction
+
+checks:
+  - id: chk-freshness-orders-silver
+    name: Freshness Check - Orders Silver
+    type: freshness
+    dataset: ds-orders-silver
+    threshold:
+      max_age_minutes: 10
+    severity: critical
+    alert:
+      channel: pagerduty
+      escalation: data-platform-oncall
+
+  - id: chk-completeness-orders-silver
+    name: Completeness Check - Orders Silver
+    type: completeness
+    dataset: ds-orders-silver
+    assertions:
+      - field: order_id
+        not_null: true
+      - field: customer_id
+        not_null: true
+      - field: total_amount
+        not_null: true
+    severity: high
+    alert:
+      channel: slack
+      escalation: data-engineering-team
+
+  - id: chk-uniqueness-orders-silver
+    name: Uniqueness Check - Orders Silver
+    type: uniqueness
+    dataset: ds-orders-silver
+    assertions:
+      - field: order_id
+        unique: true
+    severity: critical
+    alert:
+      channel: pagerduty
+      escalation: data-platform-oncall
+
+  - id: chk-drift-orders-silver
+    name: Drift Detection - Orders Silver
+    type: drift
+    dataset: ds-orders-silver
+    threshold:
+      max_schema_changes: 0
+      max_distribution_change_percent: 20
+    severity: medium
+    alert:
+      channel: slack
+      escalation: data-engineering-team
+
+lineage:
+  - id: lin-raw-to-bronze
+    upstream: ds-orders-raw
+    downstream: ds-orders-bronze
+    transform: trf-append-bronze
+    relationship: one-to-one
+
+  - id: lin-bronze-to-silver
+    upstream: ds-orders-bronze
+    downstream: ds-orders-silver
+    transform: trf-merge-silver
+    relationship: many-to-one
+
+  - id: lin-silver-to-dim-customers
+    upstream: ds-orders-silver
+    downstream: ds-dim-customers
+    transform: trf-dim-customers-scd2
+    relationship: one-to-many
+
+  - id: lin-silver-to-fact-orders
+    upstream: ds-orders-silver
+    downstream: ds-fact-orders
+    transform: trf-fact-orders
+    relationship: one-to-one
+
+governance:
+  retention:
+    - dataset: ds-orders-bronze
+      policy: delete-after-days
+      days: 90
+
+    - dataset: ds-orders-silver
+      policy: archive-after-years
+      years: 7
+
+    - dataset: ds-dim-customers
+      policy: retain-indefinitely
+
+    - dataset: ds-fact-orders
+      policy: retain-indefinitely
+
+  access:
+    - dataset: ds-orders-silver
+      tier: restricted
+      roles: [data-engineer, data-analyst-senior]
+
+    - dataset: ds-dim-customers
+      tier: general
+      roles: [data-analyst, business-user]
+
+    - dataset: ds-fact-orders
+      tier: general
+      roles: [data-analyst, business-user]
+
+  pii_handling:
+    - dataset: ds-orders-silver
+      masking: [customer_email, shipping_address]
+      masking_method: hash
+
+    - dataset: ds-dim-customers
+      masking: [customer_address]
+      masking_method: hash
+
+observability:
+  metrics:
+    - name: orders_ingested_count
+      dataset: ds-orders-raw
+      type: counter
+      description: Total orders ingested from CDC
+
+    - name: orders_dedupe_rate
+      dataset: ds-orders-silver
+      type: gauge
+      description: Percentage of duplicate records dropped
+
+    - name: dim_customers_scd_changes
+      dataset: ds-dim-customers
+      type: counter
+      description: Number of SCD Type 2 changes applied
+
+  slos:
+    - name: orders-freshness-slo
+      target: 99.9
+      unit: percent
+      window: 30d
+      linked_check: chk-freshness-orders-silver
+
+    - name: orders-completeness-slo
+      target: 99.5
+      unit: percent
+      window: 30d
+      linked_check: chk-completeness-orders-silver
+
+  alerts:
+    - name: orders-stale-alert
+      condition: "freshness > 10 minutes"
+      severity: critical
+      channel: pagerduty
+
+    - name: orders-quality-alert
+      condition: "completeness < 99%"
+      severity: high
+      channel: slack

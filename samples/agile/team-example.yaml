@@ -1,0 +1,293 @@
+# Team-level Example: iOS Development Team
+# Demonstrates teams, sprints, ceremonies, velocity structure
+
+teams:
+  - id: "tm_ios"
+    name: "iOS Development Team"
+    program_ref: "prg_mobile_platform"
+    teamType: "feature"
+    member_refs:
+      - "mbr_john_doe"
+      - "mbr_jane_smith"
+      - "mbr_alex_chen"
+      - "mbr_sarah_jones"
+      - "mbr_mike_wilson"
+    roles:
+      - role: "Scrum Master"
+        member_ref: "mbr_sarah_jones"
+      - role: "Product Owner"
+        member_ref: "mbr_mike_wilson"
+      - role: "Tech Lead"
+        member_ref: "mbr_john_doe"
+    sprint_refs:
+      - "sp_2025_01"
+      - "sp_2025_02"
+      - "sp_2025_03"
+    capacity:
+      sprintLengthWeeks: 2
+      totalCapacityHours: 320
+      availableCapacityHours: 280
+
+  - id: "tm_android"
+    name: "Android Development Team"
+    program_ref: "prg_mobile_platform"
+    teamType: "feature"
+    member_refs:
+      - "mbr_bob_taylor"
+      - "mbr_lisa_garcia"
+    capacity:
+      sprintLengthWeeks: 2
+      totalCapacityHours: 160
+      availableCapacityHours: 140
+
+team_members:
+  - id: "mbr_john_doe"
+    name: "John Doe"
+    email: "john.doe@ecommerce.com"
+    role: "iOS Developer"
+    team_ref: "tm_ios"
+    capacityHours: 80
+    skills:
+      - "Swift"
+      - "SwiftUI"
+      - "UIKit"
+
+  - id: "mbr_jane_smith"
+    name: "Jane Smith"
+    email: "jane.smith@ecommerce.com"
+    role: "iOS Developer"
+    team_ref: "tm_ios"
+    capacityHours: 80
+    skills:
+      - "Swift"
+      - "Combine"
+      - "Core Data"
+
+  - id: "mbr_alex_chen"
+    name: "Alex Chen"
+    email: "alex.chen@ecommerce.com"
+    role: "iOS Developer"
+    team_ref: "tm_ios"
+    capacityHours: 80
+    skills:
+      - "Swift"
+      - "SwiftUI"
+      - "Networking"
+
+  - id: "mbr_sarah_jones"
+    name: "Sarah Jones"
+    email: "sarah.jones@ecommerce.com"
+    role: "Scrum Master"
+    team_ref: "tm_ios"
+    capacityHours: 40
+    skills:
+      - "Agile Coaching"
+      - "Facilitation"
+
+  - id: "mbr_mike_wilson"
+    name: "Mike Wilson"
+    email: "mike.wilson@ecommerce.com"
+    role: "Product Owner"
+    team_ref: "tm_ios"
+    capacityHours: 40
+    skills:
+      - "Product Management"
+      - "User Research"
+
+  - id: "mbr_bob_taylor"
+    name: "Bob Taylor"
+    email: "bob.taylor@ecommerce.com"
+    role: "Android Developer"
+    team_ref: "tm_android"
+    capacityHours: 80
+    skills:
+      - "Kotlin"
+      - "Jetpack Compose"
+
+  - id: "mbr_lisa_garcia"
+    name: "Lisa Garcia"
+    email: "lisa.garcia@ecommerce.com"
+    role: "Android Developer"
+    team_ref: "tm_android"
+    capacityHours: 80
+    skills:
+      - "Kotlin"
+      - "Android SDK"
+
+sprints:
+  - id: "sp_2025_01"
+    name: "Sprint 2025-01"
+    number: 1
+    team_ref: "tm_ios"
+    startDate: "2025-01-06"
+    endDate: "2025-01-19"
+    iteration_ref: "it_2025_q1_1"
+    goal: "Complete user authentication flow and home screen layout"
+    user_story_refs:
+      - "us_login_screen"
+      - "us_signup_screen"
+      - "us_home_screen"
+    status: "in_progress"
+    velocity:
+      plannedPoints: 21
+      completedPoints: 18
+      carryoverPoints: 3
+
+  - id: "sp_2025_02"
+    name: "Sprint 2025-02"
+    number: 2
+    team_ref: "tm_ios"
+    startDate: "2025-01-20"
+    endDate: "2025-02-02"
+    iteration_ref: "it_2025_q1_2"
+    goal: "Implement product catalog browsing"
+
+    user_story_refs:
+      - "us_product_list"
+      - "us_product_detail"
+      - "us_search"
+    status: "planned"
+    velocity:
+      plannedPoints: 26
+
+  - id: "sp_2025_03"
+    name: "Sprint 2025-03"
+    number: 3
+    team_ref: "tm_ios"
+    startDate: "2025-02-03"
+    endDate: "2025-02-16"
+    iteration_ref: "it_2025_q1_3"
+    goal: "Implement shopping cart functionality"
+    user_story_refs:
+      - "us_add_to_cart"
+      - "us_cart_view"
+      - "us_cart_update"
+    status: "planned"
+    velocity:
+      plannedPoints: 24
+
+ceremonies:
+  - id: "cer_daily_standup"
+    name: "Daily Standup"
+    type: "daily_standup"
+    team_ref: "tm_ios"
+    frequency: "daily"
+    durationMinutes: 15
+    timeOfDay: "09:00"
+    participants:
+      - "mbr_john_doe"
+      - "mbr_jane_smith"
+      - "mbr_alex_chen"
+      - "mbr_sarah_jones"
+      - "mbr_mike_wilson"
+
+  - id: "cer_sprint_planning"
+    name: "Sprint Planning"
+    type: "sprint_planning"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_01"
+    date: "2025-01-06"
+    durationMinutes: 240
+    participants:
+      - "mbr_john_doe"
+      - "mbr_jane_smith"
+      - "mbr_alex_chen"
+      - "mbr_sarah_jones"
+      - "mbr_mike_wilson"
+    outcomes:
+      - "Sprint goal agreed"
+      - "21 story points committed"
+      - "All stories estimated"
+
+  - id: "cer_sprint_review"
+    name: "Sprint Review"
+    type: "sprint_review"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_01"
+    date: "2025-01-19"
+    durationMinutes: 120
+    participants:
+      - "mbr_john_doe"
+      - "mbr_jane_smith"
+      - "mbr_alex_chen"
+      - "mbr_sarah_jones"
+      - "mbr_mike_wilson"
+    stakeholders:
+      - "sh_cto"
+      - "sh_cmo"
+
+  - id: "cer_sprint_retro"
+    name: "Sprint Retrospective"
+    type: "retrospective"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_01"
+    date: "2025-01-19"
+    durationMinutes: 90
+    participants:
+      - "mbr_john_doe"
+      - "mbr_jane_smith"
+      - "mbr_alex_chen"
+      - "mbr_sarah_jones"
+    actionItems:
+      - action: "Improve code review turnaround time"
+        owner_ref: "mbr_john_doe"
+        status: "open"
+      - action: "Setup automated UI testing"
+        owner_ref: "mbr_alex_chen"
+        status: "open"
+
+  - id: "cer_backlog_refinement"
+    name: "Backlog Refinement"
+    type: "backlog_refinement"
+    team_ref: "tm_ios"
+    frequency: "weekly"
+    durationMinutes: 60
+    participants:
+      - "mbr_john_doe"
+      - "mbr_jane_smith"
+      - "mbr_mike_wilson"
+
+iterations:
+  - id: "it_2025_q1_1"
+    name: "Iteration 2025 Q1-1"
+    number: 1
+    program_increment_ref: "pi_2025_q1"
+    startDate: "2025-01-06"
+    endDate: "2025-01-19"
+    sprint_refs:
+      - "sp_2025_01"
+
+  - id: "it_2025_q1_2"
+    name: "Iteration 2025 Q1-2"
+    number: 2
+    program_increment_ref: "pi_2025_q1"
+    startDate: "2025-01-20"
+    endDate: "2025-02-02"
+    sprint_refs:
+      - "sp_2025_02"
+
+  - id: "it_2025_q1_3"
+    name: "Iteration 2025 Q1-3"
+    number: 3
+    program_increment_ref: "pi_2025_q1"
+    startDate: "2025-02-03"
+    endDate: "2025-02-16"
+    sprint_refs:
+      - "sp_2025_03"
+
+velocities:
+  - id: "vel_tm_ios_2025"
+    team_ref: "tm_ios"
+    period: "2025-Q1"
+    averageVelocity: 23
+    historicalVelocities:
+      - sprint: 1
+        plannedPoints: 21
+        completedPoints: 18
+      - sprint: 2
+        plannedPoints: 26
+        completedPoints: 24
+      - sprint: 3
+        plannedPoints: 24
+        completedPoints: 26
+    trend: "stable"

@@ -1,0 +1,609 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/ux/interaction/v1
+title: UX Interaction Schema
+description: User workflows, UI components, behaviors, and interaction patterns
+
+metadata:
+  author: "Igor Music"
+  created: "2025-10-17"
+  updated: "2025-10-18"
+  license: "MIT"
+  version: "2.1.0"
+  partition: "interaction"
+  references:
+    - "Brad Frost - Atomic Design (2016)"
+    - "Dan Saffer - Microinteractions (2013)"
+    - "WCAG 2.1 - Web Content Accessibility Guidelines"
+
+naming_conventions:
+  workflow_id: "wf_<name>"
+  component_id: "cmp_<name>"
+  behavior_id: "beh_<name>"
+  animation_id: "anim_<name>"
+  validation_config_id: "val_<name>"
+  responsive_config_id: "resp_<name>"
+  design_tokens_id: "dt_<name>"
+  accessibility_spec_id: "acc_<name>"
+  pagination_config_id: "pag_<name>"
+  caching_config_id: "cache_<name>"
+
+$defs:
+  workflow:
+    type: object
+    description: "Multi-step user workflows"
+    required: [workflow_id, name, type, steps]
+    properties:
+      workflow_id:
+        type: string
+        pattern: "^wf_[a-z0-9_]+$"
+        example: "wf_profile_setup"
+
+      name:
+        type: string
+        description: "Workflow name"
+
+      type:
+        type: string
+        enum: [linear, flexible, guided, batch, conditional, long_running]
+        description: "Workflow pattern type"
+
+      bounded_contexts:
+        type: array
+        items:
+          type: string
+          pattern: "^bc_[a-z0-9_]+$"
+        description: "Bounded contexts involved in workflow (cross-partition reference to DDD domain)"
+
+      application_service:
+        type: string
+        pattern: "^svc_app_[a-z0-9_]+$"
+        description: "DDD application service implementing workflow"
+
+      aggregate_refs:
+        type: array
+        items:
+          type: string
+          pattern: "^agg_[a-z0-9_]+$"
+        description: "Aggregates affected by workflow (cross-partition reference to DDD domain)"
+
+      steps:
+        type: array
+        items:
+          type: object
+          required: [step_number, label]
+          properties:
+            step_number:
+              type: integer
+              description: "Step sequence (1-based)"
+
+            label:
+              type: string
+              description: "Step display label"
+
+            page_ref:
+              type: string
+              description: "Page displayed for this step (cross-partition reference to navigation partition)"
+              pattern: "^page_[a-z0-9_]+$"
+
+            collects:
+              type: array
+              items:
+                type: string
+              description: "Data collected (DDD value objects/entities)"
+              example: ["vo_email", "vo_name", "vo_location"]
+
+            validates:
+              type: object
+              properties:
+                timing:
+                  type: string
+                  enum: [on_blur, on_change, on_submit, on_next]
+                rules:
+                  type: array
+                  items:
+                    type: string
+                  description: "Validation rules (reference VO rules)"
+
+            can_skip:
+              type: boolean
+              description: "Whether step is optional"
+
+            next_enabled_when:
+              type: string
+              description: "Condition for enabling Next button"
+              example: "all_required_fields_valid"
+
+            on_complete:
+              type: object
+              description: "Actions on step completion"
+              properties:
+                update_aggregate:
+                  type: string
+                  description: "Aggregate state update"
+                publish_event:
+                  type: string
+                  pattern: "^evt_[a-z0-9_]+$"
+                  description: "Domain event published"
+                navigate_to:
+                  type: string
+                  description: "Next step or page"
+
+      state_persistence:
+        type: object
+        description: "How workflow state is saved"
+        properties:
+          strategy:
+            type: string
+            enum: [auto_save, manual_save, on_step_complete, local_storage]
+          interval:
+            type: integer
+            description: "Auto-save interval (milliseconds)"
+
+      progress_indicator:
+        type: object
+        description: "Visual progress tracking"
+        properties:
+          type:
+            type: string
+            enum: [steps, progress_bar, percentage, checklist]
+          position:
+            type: string
+            enum: [top, left, right, inline]
+
+      completion:
+        type: object
+        description: "Workflow completion actions"
+        properties:
+          aggregate_transition:
+            type: string
+            description: "Aggregate state transition"
+            example: "DRAFT → ACTIVE"
+          publishes_event:
+            type: string
+            pattern: "^evt_[a-z0-9_]+$"
+          navigate_to:
+            type: string
+            description: "Post-completion navigation"
+          feedback:
+            type: string
+            enum: [toast, modal, redirect, inline]
+
+  component:
+    type: object
+    description: "Reusable UI component"
+    required: [component_id, name, atomic_level]
+    properties:
+      component_id:
+        type: string
+        pattern: "^comp_[a-z0-9_]+$"
+        example: "comp_button"
+
+      name:
+        type: string
+        description: "Component name"
+
+      atomic_level:
+        type: string
+        enum: [atom, molecule, organism, template]
+        description: "Atomic design classification"
+
+      category:
+        type: string
+        enum: [input, display, navigation, feedback, layout, domain_specific]
+
+      description:
+        type: string
+
+      page_refs:
+        type: array
+        items:
+          type: string
+          pattern: "^page_[a-z0-9_]+$"
+        description: "Pages where this component is used (cross-partition reference to navigation partition)"
+
+      api_endpoints:
+        type: array
+        description: BFF interface endpoints this component invokes
+        items:
+          type: string
+          pattern: "^bff_if_[a-z0-9_]+$"
+
+      props:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+              enum: [string, number, boolean, array, object, function, node]
+            required:
+              type: boolean
+            default:
+              description: "Default value"
+            validation:
+              type: string
+              description: "Validation rule (reference DDD VO rules)"
+            ddd_mapping:
+              type: string
+              description: "Maps to DDD value object or property"
+
+      variants:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+
+      states:
+        type: array
+        items:
+          type: string
+          enum: [default, hover, focus, active, disabled, loading, error, success]
+
+      composed_of:
+        type: array
+        items:
+          type: string
+          pattern: "^comp_[a-z0-9_]+$"
+        description: "Child component IDs (for molecules/organisms)"
+
+      behaviors:
+        type: array
+        items:
+          $ref: "#/$defs/behavior"
+
+      accessibility:
+        $ref: "#/$defs/accessibility_spec"
+
+      examples:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            code:
+              type: string
+            description:
+              type: string
+
+  behavior:
+    type: object
+    description: "Interactive behavior specification"
+    required: [behavior_id, type]
+    properties:
+      behavior_id:
+        type: string
+        pattern: "^bhv_[a-z0-9_]+$"
+
+      type:
+        type: string
+        enum: [interaction, validation, async_operation, animation, event_response, state_transition]
+
+      trigger:
+        type: string
+        description: "What triggers this behavior"
+        enum: [click, hover, focus, blur, change, submit, scroll, keypress, domain_event, timer]
+
+      trigger_source:
+        type: string
+        description: "Specific trigger (e.g., event name for domain_event)"
+
+      action:
+        type: string
+        description: "What action occurs"
+
+      feedback:
+        type: object
+        description: "User feedback provided"
+        properties:
+          type:
+            type: string
+            enum: [visual, auditory, haptic, toast, modal, inline, redirect]
+          message:
+            type: string
+          duration:
+            type: integer
+            description: "Milliseconds (for temporary feedback)"
+
+      validation:
+        $ref: "#/$defs/validation_config"
+
+      async_operation:
+        type: object
+        description: "Asynchronous operation behavior"
+        properties:
+          operation:
+            type: string
+            description: "Operation description"
+          loading_state:
+            type: object
+            properties:
+              indicator:
+                type: string
+                enum: [spinner, progress_bar, skeleton, overlay]
+              message:
+                type: string
+          success_state:
+            type: object
+            properties:
+              feedback:
+                type: string
+              navigate_to:
+                type: string
+              publish_event:
+                type: string
+          error_state:
+            type: object
+            properties:
+              feedback:
+                type: string
+              retry:
+                type: boolean
+              fallback:
+                type: string
+
+      animation:
+        $ref: "#/$defs/animation"
+
+      domain_event_response:
+        type: object
+        description: "Response to domain event"
+        properties:
+          event:
+            type: string
+            pattern: "^evt_[a-z0-9_]+$"
+          action:
+            type: string
+            description: "What UI does in response"
+          feedback:
+            type: string
+            enum: [toast, modal, highlight, badge_update, navigation]
+
+      state_transition:
+        type: object
+        description: "Aggregate state visualization"
+        properties:
+          aggregate:
+            type: string
+            pattern: "^agg_[a-z0-9_]+$"
+          from_state:
+            type: string
+          to_state:
+            type: string
+          visual_feedback:
+            type: string
+            description: "How transition is shown"
+
+  animation:
+    type: object
+    description: "Animation specification"
+    properties:
+      type:
+        type: string
+        enum: [fade, slide, scale, rotate, morph, custom]
+      duration:
+        type: integer
+        description: "Milliseconds"
+      easing:
+        type: string
+        enum: [linear, ease_in, ease_out, ease_in_out, spring]
+      trigger:
+        type: string
+
+  validation_config:
+    type: object
+    description: "Validation behavior configuration"
+    properties:
+      timing:
+        type: string
+        enum: [on_blur, on_change, on_submit, real_time, debounced]
+      debounce_ms:
+        type: integer
+        description: "Debounce delay (milliseconds)"
+      rules:
+        type: array
+        items:
+          type: object
+          properties:
+            rule:
+              type: string
+              description: "Validation rule (reference VO rules)"
+            error_message:
+              type: string
+
+  responsive_config:
+    type: object
+    description: "Responsive behavior configuration across device breakpoints"
+    properties:
+      mobile:
+        type: string
+        enum: [show, hide, collapse, reorder, single_column, stack]
+        description: "Mobile layout pattern"
+      tablet:
+        type: string
+        enum: [show, hide, collapse, reorder, single_column, two_column, stack]
+        description: "Tablet layout pattern"
+      desktop:
+        type: string
+        enum: [show, hide, collapse, reorder, single_column, two_column, three_column, grid]
+        description: "Desktop layout pattern"
+
+  design_tokens:
+    type: object
+    description: "Design system tokens"
+    properties:
+      colors:
+        type: object
+        description: "Color palette"
+      typography:
+        type: object
+        description: "Typography scale"
+      spacing:
+        type: object
+        description: "Spacing scale"
+      breakpoints:
+        type: object
+        description: "Responsive breakpoints"
+        properties:
+          mobile:
+            type: integer
+            example: 768
+          tablet:
+            type: integer
+            example: 1024
+          desktop:
+            type: integer
+            example: 1440
+
+  accessibility_spec:
+    type: object
+    description: "Accessibility specifications"
+    properties:
+      wcag_level:
+        type: string
+        enum: [A, AA, AAA]
+        description: "Target WCAG conformance level"
+
+      aria:
+        type: object
+        description: "ARIA attributes and patterns"
+        properties:
+          role:
+            type: string
+            description: "ARIA role"
+          labels:
+            type: object
+            properties:
+              aria_label:
+                type: string
+              aria_labelledby:
+                type: string
+              aria_describedby:
+                type: string
+          states:
+            type: object
+            description: "ARIA state attributes"
+            properties:
+              aria_expanded:
+                type: boolean
+              aria_selected:
+                type: boolean
+              aria_current:
+                type: string
+              aria_invalid:
+                type: boolean
+          properties:
+            type: object
+            description: "ARIA properties"
+
+      keyboard:
+        type: object
+        description: "Keyboard navigation support"
+        properties:
+          focusable:
+            type: boolean
+          tab_order:
+            type: integer
+            description: "Tab index (-1, 0, or positive)"
+          shortcuts:
+            type: array
+            items:
+              type: object
+              properties:
+                key:
+                  type: string
+                  description: "Key combination"
+                action:
+                  type: string
+                  description: "Action performed"
+
+      screen_reader:
+        type: object
+        description: "Screen reader support"
+        properties:
+          announcements:
+            type: array
+            items:
+              type: object
+              properties:
+                event:
+                  type: string
+                  description: "When to announce"
+                message:
+                  type: string
+                  description: "What to announce"
+                priority:
+                  type: string
+                  enum: [polite, assertive]
+
+      color_contrast:
+        type: object
+        description: "Color contrast requirements"
+        properties:
+          minimum_ratio:
+            type: number
+            description: "Minimum contrast ratio"
+            example: 4.5
+          large_text_ratio:
+            type: number
+            example: 3.0
+
+      touch_targets:
+        type: object
+        description: "Touch target specifications"
+        properties:
+          minimum_size:
+            type: string
+            description: "Minimum touch target size"
+            example: "44x44px"
+
+  pagination_config:
+    type: object
+    description: "Pagination configuration"
+    properties:
+      type:
+        type: string
+        enum: [numbered, cursor_based, infinite_scroll, load_more, virtual_scroll]
+      page_size:
+        type: integer
+        description: "Items per page"
+      page_size_options:
+        type: array
+        items:
+          type: integer
+        description: "User-selectable page sizes"
+      show_total:
+        type: boolean
+        description: "Display total item count"
+      repository_method:
+        type: string
+        description: "DDD repository pagination method"
+        example: "repo_job_posting.findPaginated"
+
+  caching_config:
+    type: object
+    description: "Client-side caching strategy"
+    properties:
+      strategy:
+        type: string
+        enum: [no_cache, memory, local_storage, session_storage, indexed_db, service_worker]
+      ttl:
+        type: integer
+        description: "Time to live (seconds)"
+      invalidation:
+        type: object
+        properties:
+          on_events:
+            type: array
+            items:
+              type: string
+            description: "Domain events that invalidate cache"
+          on_mutation:
+            type: boolean
+            description: "Invalidate on aggregate mutation"

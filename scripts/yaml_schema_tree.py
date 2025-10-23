@@ -188,14 +188,6 @@ def find_root_types(type_defs: dict, relationships: dict) -> list:
         child_types.update([c for c in children if c in all_types])
 
     roots = all_types - child_types
-
-    # Prefer 'system' first if it exists, then add other roots
-    if 'system' in roots:
-        result = ['system']
-        other_roots = sorted(roots - {'system'})
-        result.extend(other_roots)
-        return result
-
     return sorted(list(roots))
 
 

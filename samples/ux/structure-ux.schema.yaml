@@ -1,0 +1,200 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/ux/structure/v1
+title: UX Information Architecture Schema
+description: Information architecture, organization schemes, and content structure patterns
+
+metadata:
+  author: "Igor Music"
+  created: "2025-10-17"
+  updated: "2025-10-17"
+  license: "MIT"
+  version: "1.0.0"
+  partition: "structure"
+  references:
+    - "Louis Rosenfeld & Peter Morville - Information Architecture (4th ed, 2015)"
+    - "Donna Spencer - A Practical Guide to Information Architecture (2014)"
+
+naming_conventions:
+  information_architecture_id: "ia_<name>"
+  hierarchy_node_id: "hn_<name>"
+  facet_id: "facet_<name>"
+  facet_value_id: "fv_<name>"
+  search_system_id: "search_<name>"
+
+$defs:
+  information_architecture:
+    type: object
+    description: "Defines how information is organized, labeled, and accessed"
+    required: [organization_scheme, navigation_systems]
+    properties:
+      organization_scheme:
+        type: string
+        enum: [hierarchical, sequential, faceted, matrix, hybrid]
+        description: "Primary organization pattern"
+
+      hierarchy:
+        type: object
+        description: "Hierarchical structure (if applicable)"
+        properties:
+          root:
+            type: string
+            description: "Root node label"
+          levels:
+            type: array
+            items:
+              type: object
+              properties:
+                level:
+                  type: integer
+                  description: "Hierarchy depth (1 = top level)"
+                nodes:
+                  type: array
+                  items:
+                    $ref: "#/$defs/hierarchy_node"
+
+      facets:
+        type: array
+        description: "Faceted classification dimensions"
+        items:
+          $ref: "#/$defs/facet"
+
+      navigation_systems:
+        type: object
+        description: "Types of navigation available"
+        properties:
+          global_navigation:
+            type: boolean
+          local_navigation:
+            type: boolean
+          contextual_navigation:
+            type: boolean
+          search:
+            type: boolean
+          breadcrumbs:
+            type: boolean
+
+      search_system:
+        $ref: "#/$defs/search_system"
+
+      labeling_system:
+        type: object
+        description: "Labeling standards"
+        properties:
+          terminology_source:
+            type: string
+            description: "Source of terminology (ubiquitous language)"
+            example: "DDD bounded context glossaries"
+          label_types:
+            type: array
+            items:
+              type: string
+              enum: [contextual_links, headings, navigation_labels, index_terms, tags]
+
+  hierarchy_node:
+    type: object
+    description: "Node in a hierarchical information architecture"
+    properties:
+      id:
+        type: string
+        pattern: "^hn_[a-z0-9_]+$"
+        description: "Unique identifier for hierarchy node"
+      label:
+        type: string
+        description: "Display label (use ubiquitous language)"
+      bounded_context_ref:
+        type: string
+        description: "Associated DDD bounded context (cross-domain reference)"
+        pattern: "^bc_[a-z0-9_]+$"
+      url:
+        type: string
+        description: "URL path"
+      children:
+        type: array
+        items:
+          type: string
+          pattern: "^hn_[a-z0-9_]+$"
+        description: "Child node IDs"
+      parent_ref:
+        type: string
+        pattern: "^hn_[a-z0-9_]+$"
+        description: "Parent node ID (for non-root nodes)"
+
+  facet:
+    type: object
+    description: "Faceted classification dimension for filtering and navigation"
+    required: [facet_id, label, type]
+    properties:
+      facet_id:
+        type: string
+        pattern: "^facet_[a-z0-9_]+$"
+      label:
+        type: string
+        description: "Display label"
+      type:
+        type: string
+        enum: [single_select, multi_select, range, hierarchy, autocomplete]
+      ddd_mapping:
+        type: string
+        description: "Maps to DDD value object or property"
+        example: "vo_location.work_mode"
+      values:
+        type: array
+        description: "Available facet values (for select types)"
+        items:
+          $ref: "#/$defs/facet_value"
+      range:
+        type: object
+        description: "For range facets"
+        properties:
+          min:
+            type: number
+          max:
+            type: number
+          step:
+            type: number
+
+  facet_value:
+    type: object
+    description: "Value within a faceted classification dimension"
+    properties:
+      value:
+        type: string
+      label:
+        type: string
+      count:
+        type: integer
+        description: "Number of items with this value (dynamic)"
+
+  search_system:
+    type: object
+    description: "Search configuration"
+    properties:
+      search_system_id:
+        type: string
+        pattern: "^search_[a-z0-9_]+$"
+        description: "Unique identifier for search system"
+      type:
+        type: string
+        enum: [simple, advanced, faceted]
+        description: "Search system type"
+      scope:
+        type: string
+        enum: [global, contextual, bounded_context]
+        description: "Search scope"
+      features:
+        type: array
+        items:
+          type: string
+          enum: [autocomplete, suggestions, filters, saved_searches, recent_searches]
+        description: "Search features enabled"
+      indexed_fields:
+        type: array
+        items:
+          type: string
+        description: "Fields included in search index"
+      facets:
+        type: array
+        items:
+          type: string
+          pattern: "^facet_[a-z0-9_]+$"
+        description: "Facets available in search (references to facet IDs)"

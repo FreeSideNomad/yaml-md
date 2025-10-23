@@ -1,0 +1,586 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/agile/program/v1
+title: Agile Program Patterns Schema
+description: Program-level patterns for agile at scale - programs, PIs, releases, architectural runway
+
+metadata:
+  author: "Igor Music"
+  created: "2025-10-17"
+  updated: "2025-10-17"
+  license: "MIT"
+  version: "1.0.0"
+  partition: "program"
+  references:
+    - "SAFe 6.0 - Program Level"
+    - "Program Increment Planning"
+
+naming_conventions:
+  program_id: "prg_<name>"
+  program_increment_id: "pi_<number>"
+  architectural_runway_id: "ar_<name>"
+  enabler_id: "enb_<name>"
+  release_id: "rel_<name>"
+  release_vision_id: "rv_<name>"
+  technical_debt_id: "td_<number>"
+
+$defs:
+  Program:
+    type: object
+    description: Program or Agile Release Train coordinating multiple teams
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: Unique program identifier
+      name:
+        type: string
+        description: Program name
+      portfolio_ref:
+        type: string
+        pattern: "^pf_[a-z0-9_]+$"
+        description: "Portfolio this program belongs to (ID reference)"
+      team_refs:
+        type: array
+        description: "Teams in this program (ID references)"
+        items:
+          type: string
+          pattern: "^tm_[a-z0-9_]+$"
+      value_stream_ref:
+        type: string
+        pattern: "^vs_[a-z0-9_]+$"
+        description: "Value stream this program supports (ID reference)"
+      program_increment_refs:
+        type: array
+        description: "Program increments (ID references)"
+        items:
+          type: string
+          pattern: "^pi_[a-z0-9_]+$"
+
+  program_increment:
+    type: object
+    description: Time-boxed planning increment in SAFe (8-12 weeks)
+    required:
+      - id
+      - name
+      - startDate
+      - endDate
+      - program_ref
+    properties:
+      id:
+        type: string
+        pattern: "^pi_[a-z0-9_]+$"
+        description: Unique PI identifier
+      name:
+        type: string
+        description: PI name (e.g., 'PI 2025 Q1')
+      number:
+        type: integer
+        minimum: 1
+        description: PI number
+      startDate:
+        type: string
+        format: date
+        description: PI start date
+      endDate:
+        type: string
+        format: date
+        description: PI end date
+      program_ref:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: "Program running this PI (ID reference)"
+      iteration_refs:
+        type: array
+        description: "Iterations in this PI (typically 5 + 1 IP) (ID references)"
+        items:
+          type: string
+          pattern: "^it_[a-z0-9_]+$"
+        minItems: 4
+        maxItems: 6
+      objectives:
+        type: array
+        description: PI Objectives by team
+        items:
+          type: object
+          required:
+            - team_ref
+            - objectives
+          properties:
+            team_ref:
+              type: string
+              pattern: "^tm_[a-z0-9_]+$"
+              description: "Team ID reference"
+            objectives:
+              type: array
+              items:
+                type: object
+                required:
+                  - description
+                  - businessValue
+                properties:
+                  description:
+                    type: string
+                    description: Objective description
+                  businessValue:
+                    type: integer
+                    minimum: 1
+                    maximum: 10
+                    description: Business value score
+                  committed:
+                    type: boolean
+                    description: Committed vs uncommitted objective
+                  status:
+                    type: string
+                    enum:
+                      - not-started
+                      - in-progress
+                      - completed
+                      - not-achieved
+      feature_refs:
+        type: array
+        description: "Features planned for this PI (ID references)"
+        items:
+          type: string
+          pattern: "^feat_[a-z0-9_]+$"
+      planning:
+        type: object
+        description: PI Planning event details
+        properties:
+          date:
+            type: string
+            format: date
+            description: Planning event date
+          location:
+            type: string
+            description: Planning location
+          attendees:
+            type: array
+            description: Planning attendees
+            items:
+              type: string
+          confidenceVote:
+            type: number
+            minimum: 1
+            maximum: 5
+            description: Average confidence vote (1-5)
+      risk_refs:
+        type: array
+        description: "Program risks identified (ID references)"
+        items:
+          type: string
+          pattern: "^risk_[a-z0-9_]+$"
+      predictability:
+        type: number
+        description: Predictability measure (planned objectives achieved / total planned)
+        minimum: 0
+        maximum: 1
+      status:
+        type: string
+        enum:
+          - planning
+          - executing
+          - completed
+        description: PI status
+
+  architectural_runway:
+    type: object
+    description: Technical foundation enabling future business functionality
+    required:
+      - id
+      - description
+      - enabler_refs
+    properties:
+      id:
+        type: string
+        pattern: "^ar_[a-z0-9_]+$"
+        description: Unique architectural runway identifier
+      description:
+        type: string
+        description: Description of architectural runway
+        minLength: 10
+      program_ref:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: "Program this runway belongs to (ID reference)"
+      enabler_refs:
+        type: array
+        description: "Enabler work items that build runway (ID references)"
+        items:
+          type: string
+          pattern: "^enb_[a-z0-9_]+$"
+        minItems: 1
+      technical_debt_refs:
+        type: array
+        description: "Technical debt items addressed by this runway (ID references)"
+        items:
+          type: string
+          pattern: "^td_[a-z0-9_]+$"
+      runwayScore:
+        type: number
+        description: Assessment of runway adequacy (0-10)
+        minimum: 0
+        maximum: 10
+
+  enabler:
+    type: object
+    description: Work item that extends architectural runway
+    required:
+      - id
+      - type
+      - description
+    properties:
+      id:
+        type: string
+        pattern: "^enb_[a-z0-9_]+$"
+        description: Unique enabler identifier
+      type:
+        type: string
+        enum:
+          - architectural
+          - infrastructure
+          - exploration
+          - compliance
+        description: Type of enabler work
+      description:
+        type: string
+        description: Description of what the enabler provides
+        minLength: 10
+      feature_refs:
+        type: array
+        description: "Features that depend on this enabler (ID references)"
+        items:
+          type: string
+          pattern: "^feat_[a-z0-9_]+$"
+      bounded_context_ref:
+        type: string
+        pattern: "^ddd:BoundedContext:[a-z0-9_-]+$"
+        description: "DDD bounded context this enabler supports (cross-domain reference)"
+      program_ref:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: "Program this enabler belongs to (ID reference)"
+
+  release:
+    type: object
+    description: Time-boxed delivery of value spanning one or more Program increments
+    required:
+      - id
+      - name
+      - vision_ref
+      - startDate
+      - endDate
+    properties:
+      id:
+        type: string
+        pattern: "^rel_[a-z0-9_]+$"
+        description: Unique release identifier
+      name:
+        type: string
+        description: Release name (e.g., 'Spring 2025 Release', 'Version 2.0')
+      version:
+        type: string
+        pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        description: Semantic version number
+      vision_ref:
+        type: string
+        pattern: "^rv_[a-z0-9_]+$"
+        description: "Release vision reference (ID reference)"
+      startDate:
+        type: string
+        format: date
+        description: Release start date
+      endDate:
+        type: string
+        format: date
+        description: Release end date
+      product_ref:
+        type: string
+        pattern: "^prod_[a-z0-9_]+$"
+        description: "Parent product (ID reference)"
+      program_ref:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: "Program delivering this release (ID reference)"
+      program_increment_refs:
+        type: array
+        description: "PIs included in this release (ID references)"
+        items:
+          type: string
+          pattern: "^pi_[a-z0-9_]+$"
+        minItems: 1
+        maxItems: 3
+      feature_refs:
+        type: array
+        description: "Features planned for this release (ID references)"
+        items:
+          type: string
+          pattern: "^feat_[a-z0-9_]+$"
+      roadmap_ref:
+        type: string
+        pattern: "^rm_[a-z0-9_]+$"
+        description: "Release-level roadmap showing PI-by-PI plan (ID reference)"
+      releaseObjectives:
+        type: array
+        description: High-level objectives for this release
+        items:
+          type: object
+          required:
+            - description
+            - businessValue
+          properties:
+            description:
+              type: string
+              description: Objective description
+            businessValue:
+              type: integer
+              minimum: 1
+              maximum: 10
+              description: Business value score
+            target_pi_ref:
+              type: string
+              pattern: "^pi_[a-z0-9_]+$"
+              description: "Which PI this objective targets (ID reference)"
+      milestones:
+        type: array
+        description: Key milestones for this release
+        items:
+          type: object
+          required:
+            - name
+            - date
+          properties:
+            name:
+              type: string
+              description: Milestone name
+            date:
+              type: string
+              format: date
+              description: Milestone date
+            type:
+              type: string
+              enum:
+                - planning
+                - development
+                - testing
+                - deployment
+                - marketing
+              description: Milestone type
+            status:
+              type: string
+              enum:
+                - upcoming
+                - in-progress
+                - completed
+                - at-risk
+              description: Milestone status
+      stakeholder_refs:
+        type: array
+        description: "Release stakeholders (ID references)"
+        items:
+          type: string
+          pattern: "^sh_[a-z0-9_]+$"
+      metric_refs:
+        type: array
+        description: "Release success metrics (ID references)"
+        items:
+          type: string
+          pattern: "^met_[a-z0-9_]+$"
+      status:
+        type: string
+        enum:
+          - planning
+          - development
+          - hardening
+          - deployed
+          - closed
+        description: Release status
+      releaseType:
+        type: string
+        enum:
+          - major
+          - minor
+          - patch
+          - hotfix
+        description: Type of release following semantic versioning
+      deploymentStrategy:
+        type: string
+        enum:
+          - big-bang
+          - phased
+          - canary
+          - blue-green
+          - feature-flags
+        description: How this release will be deployed
+
+  release_vision:
+    type: object
+    description: Focused vision for a specific release, derived from product vision
+    required:
+      - id
+      - releaseGoal
+      - targetCustomers
+      - keyCapabilities
+    properties:
+      id:
+        type: string
+        pattern: "^rv_[a-z0-9_]+$"
+        description: Unique release vision identifier
+      releaseGoal:
+        type: string
+        description: Clear statement of what this release aims to achieve
+        minLength: 50
+      targetCustomers:
+        type: array
+        description: Customer segments targeted by this release
+        items:
+          type: string
+        minItems: 1
+      keyCapabilities:
+        type: array
+        description: Top 3-5 capabilities being delivered in this release
+        items:
+          type: string
+        minItems: 1
+        maxItems: 10
+      customerValue:
+        type: string
+        description: Clear articulation of value to customers
+        minLength: 50
+      businessValue:
+        type: string
+        description: Business value expected from this release
+      themes:
+        type: array
+        description: Strategic themes this release addresses
+        items:
+          type: string
+      differentiators:
+        type: array
+        description: What makes this release special or different
+        items:
+          type: string
+      boundaries:
+        type: object
+        description: What's in and out of scope for this release
+        properties:
+          inScope:
+            type: array
+            items:
+              type: string
+          outOfScope:
+            type: array
+            items:
+              type: string
+          deferredToFuture:
+            type: array
+            description: Features deferred to future releases
+            items:
+              type: string
+      successCriteria:
+        type: array
+        description: How we'll know this release is successful
+        items:
+          type: string
+          pattern: "^met_[a-z0-9_]+$"
+          description: "Metric ID reference"
+        minItems: 1
+      risk_refs:
+        type: array
+        description: "Key risks for this release (ID references)"
+        items:
+          type: string
+          pattern: "^risk_[a-z0-9_]+$"
+      alignmentToProductVision:
+        type: string
+        description: How this release advances the overall product vision
+        minLength: 50
+      motivationalNarrative:
+        type: string
+        description: Inspiring story about this release
+        minLength: 100
+      lastUpdated:
+        type: string
+        format: date
+        description: When vision was last updated
+
+  technical_debt:
+    type: object
+    description: Technical debt requiring remediation
+    required:
+      - id
+      - description
+      - impact
+      - priority
+    properties:
+      id:
+        type: string
+        pattern: "^td_[a-z0-9_]+$"
+        description: Unique technical debt identifier
+      description:
+        type: string
+        description: Description of the technical debt
+        minLength: 10
+      impact:
+        type: string
+        enum:
+          - high
+          - medium
+          - low
+        description: Impact on system quality
+      priority:
+        type: integer
+        description: Priority for addressing debt (1=highest)
+        minimum: 1
+      bounded_context_ref:
+        type: string
+        pattern: "^ddd:BoundedContext:[a-z0-9_-]+$"
+        description: "DDD bounded context containing this debt (cross-domain reference)"
+      aggregate_ref:
+        type: string
+        pattern: "^ddd:Aggregate:[a-z0-9_-]+$"
+        description: "DDD aggregate containing this debt (cross-domain reference)"
+      resolutionEstimateHours:
+        type: number
+        description: Estimated hours to resolve
+        minimum: 0
+      createdDate:
+        type: string
+        format: date
+        description: When debt was identified
+      program_ref:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: "Program tracking this debt (ID reference)"
+
+validation_rules:
+  - rule: "pi_has_program"
+    description: "Every PI must belong to a program"
+  - rule: "release_has_vision"
+    description: "Every release must have a release vision"
+  - rule: "enabler_has_type"
+    description: "Every enabler must have a type (architectural, infrastructure, exploration, compliance)"
+  - rule: "technical_debt_has_priority"
+    description: "Every technical debt item must have a priority"
+
+best_practices:
+  program:
+    - "Coordinate multiple teams toward common objectives"
+    - "Maintain clear program backlogs"
+    - "Track program-level metrics"
+  program_increment:
+    - "Run PI planning every 8-12 weeks"
+    - "Set clear team objectives with business value"
+    - "Conduct confidence voting"
+    - "Track predictability over time"
+  release:
+    - "Define clear release vision"
+    - "Set measurable success criteria"
+    - "Plan deployment strategy early"
+    - "Engage stakeholders throughout"
+  enabler:
+    - "Link enablers to features they support"
+    - "Track architectural runway score"
+    - "Balance enabler vs feature work"

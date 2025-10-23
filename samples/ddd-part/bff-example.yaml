@@ -1,0 +1,651 @@
+# BFF Example: Web Application Backend-for-Frontend
+# Demonstrates BFF pattern aggregating data from multiple bounded contexts
+# Schema version: strategic-ddd.schema.yaml v1.1.0
+
+# ==============================================================================
+# BFF SCOPE: One BFF per client type
+# ==============================================================================
+
+bff_scopes:
+  - id: bff_web
+    name: WebAppBFF
+    client_type: web
+    serves_interface: "Web application SPA (Single Page Application) for desktop and tablet browsers"
+    aggregates_from_contexts:
+      - bc_user_management
+      - bc_order_management
+      - bc_product_catalog
+    owned_by_team: Web Frontend Team
+    team_type: frontend
+
+    provides:
+      endpoints:
+        - path: /api/web/users/dashboard
+          method: GET
+          aggregates_from:
+            - bc_user_management
+            - bc_order_management
+          description: "Aggregates user profile + recent orders for dashboard view"
+
+        - path: /api/web/products/detail/{productId}
+          method: GET
+          aggregates_from:
+            - bc_product_catalog
+            - bc_order_management
+          description: "Product details + user's purchase history for this product"
+
+        - path: /api/web/checkout/summary
+          method: GET
+          aggregates_from:
+            - bc_order_management
+            - bc_user_management
+            - bc_product_catalog
+          description: "Complete checkout summary with user, cart items, and pricing"
+
+      data_aggregation:
+        strategy: parallel
+        example: |
+          Dashboard endpoint makes parallel calls to:
+          1. UserQueries.getUserSummary(userId) → User profile
+          2. OrderQueries.listRecentOrders(userId) → Recent orders
+          Then combines results into single DashboardDTO response
+
+      transformations:
+        - from_context: bc_user_management
+          transformation_type: format_conversion
+          description: "Convert UserId value object to string, Status enum to human-readable label"
+
+        - from_context: bc_order_management
+          transformation_type: data_enrichment
+          description: "Enrich order summary with user display name from user context"
+
+        - from_context: bc_product_catalog
+          transformation_type: denormalization
+          description: "Flatten product hierarchy for simplified web display"
+
+      client_optimizations:
+        - "Field selection: Only include fields needed by web UI"
+        - "Image size reduction: Return web-optimized image URLs"
+        - "Pagination: Default 20 items per page for desktop list views"
+        - "Caching headers: Set appropriate cache TTLs for static data"
+
+    responsibilities:
+      data_aggregation: true
+      client_specific_orchestration: true
+      presentation_logic: true
+      format_translation: true
+      business_logic: false
+      transaction_management: false
+      direct_persistence: false
+
+    architecture_layer: integration
+
+    upstream_dependencies:
+      - api_gateway
+
+    calls:
+      - application_service
+      - bounded_context_api
+
+    pattern_type: bff
+
+    anti_patterns:
+      shared_business_logic: false
+      generic_cross_cutting_concerns: false
+      direct_database_access: false
+      serving_multiple_client_types: false
+
+# ==============================================================================
+# BFF INTERFACE 1: User Management for Web
+# ==============================================================================
+
+bff_interfaces:
+  - id: bff_if_user_web
+    name: "User Management Web BFF Interface"
+    bff_scope_ref: bff_web
+    primary_bounded_context_ref: bc_user_management
+    additional_context_refs: []
+    base_path: /api/web/users
+
+    endpoints:
+      # CREATE USER (Command)
+      - path: /create
+        method: POST
+        operation_type: command
+        description: "Create new user account"
+        delegates_to_commands:
+          - cmd_user_commands
+        delegates_to_queries: []
+        request_dto:
+          name: CreateUserRequest
+          fields:
+            - name: email
+              type: String
+              required: true
+            - name: userType
+              type: String
+              required: true
+            - name: identityProvider
+              type: String
+              required: true
+            - name: clientUrn
+              type: String
+              required: true
+        response_dto:
+          name: CreateUserResult
+          fields:
+            - name: userId
+              type: String
+        aggregates_data_from:
+          - bc_user_management
+
+      # ACTIVATE USER (Command)
+      - path: /activate
+        method: POST
+        operation_type: command
+        description: "Activate user account"
+        delegates_to_commands:
+          - cmd_user_commands
+        delegates_to_queries: []
+        request_dto:
+          name: ActivateUserRequest
+          fields:
+            - name: userId
+              type: String
+              required: true
+        response_dto:
+          name: ActivateUserResult
+          fields:
+            - name: success
+              type: Boolean
+        aggregates_data_from:
+          - bc_user_management
+
+      # DEACTIVATE USER (Command)
+      - path: /deactivate
+        method: POST
+        operation_type: command
+        description: "Deactivate user account with reason"
+        delegates_to_commands:
+          - cmd_user_commands
+        delegates_to_queries: []
+        request_dto:
+          name: DeactivateUserRequest
+          fields:
+            - name: userId
+              type: String
+              required: true
+            - name: reason
+              type: String
+              required: true
+        response_dto:
+          name: DeactivateUserResult
+          fields:
+            - name: success
+              type: Boolean
+        aggregates_data_from:
+          - bc_user_management
+
+      # LOCK USER (Command)
+      - path: /lock
+        method: POST
+        operation_type: command
+        description: "Lock user account"
+        delegates_to_commands:
+          - cmd_user_commands
+        delegates_to_queries: []
+        request_dto:
+          name: LockUserRequest
+          fields:
+            - name: userId
+              type: String
+              required: true
+            - name: reason
+              type: String
+              required: true
+        response_dto:
+          name: LockUserResult
+          fields:
+            - name: success
+              type: Boolean
+        aggregates_data_from:
+          - bc_user_management
+
+      # UNLOCK USER (Command)
+      - path: /unlock
+        method: POST
+        operation_type: command
+        description: "Unlock user account"
+        delegates_to_commands:
+          - cmd_user_commands
+        delegates_to_queries: []
+        request_dto:
+          name: UnlockUserRequest
+          fields:
+            - name: userId
+              type: String
+              required: true
+        response_dto:
+          name: UnlockUserResult
+          fields:
+            - name: success
+              type: Boolean
+        aggregates_data_from:
+          - bc_user_management
+
+      # GET USER SUMMARY (Query)
+      - path: /summary/{userId}
+        method: GET
+        operation_type: query
+        description: "Retrieve user summary information"
+        delegates_to_commands: []
+        delegates_to_queries:
+          - qry_user_queries
+        request_dto:
+          name: GetUserSummaryRequest
+          fields:
+            - name: userId
+              type: String
+              required: true
+        response_dto:
+          name: UserSummaryResponse
+          fields:
+            - name: userId
+              type: String
+            - name: email
+              type: String
+            - name: status
+              type: String
+            - name: statusLabel
+              type: String
+            - name: userType
+              type: String
+            - name: identityProvider
+              type: String
+        aggregates_data_from:
+          - bc_user_management
+
+    value_object_conversion:
+      from_string:
+        - value_object_ref: vo_user_id
+          from_field: userId
+          method: "UserId.of(string)"
+        - value_object_ref: vo_client_id
+          from_field: clientUrn
+          method: "ClientId.of(urn)"
+      to_string:
+        - value_object_ref: vo_user_id
+          to_field: userId
+          method: "userId.id()"
+        - value_object_ref: vo_client_id
+          to_field: clientUrn
+          method: "clientId.urn()"
+
+    execution_model: blocking
+
+    error_handling:
+      strategy: fail_fast
+      description: "Return HTTP error codes immediately on validation or business rule failures"
+
+    technology_stack:
+      framework: Micronaut
+      controller_annotation: "@Controller"
+
+    layer: infrastructure
+
+# ==============================================================================
+# BFF INTERFACE 2: Order Management for Web
+# ==============================================================================
+
+  - id: bff_if_order_web
+    name: "Order Management Web BFF Interface"
+    bff_scope_ref: bff_web
+    primary_bounded_context_ref: bc_order_management
+    additional_context_refs:
+      - bc_product_catalog
+      - bc_user_management
+    base_path: /api/web/orders
+
+    endpoints:
+      # PLACE ORDER (Command)
+      - path: /place
+        method: POST
+        operation_type: command
+        description: "Place new order"
+        delegates_to_commands:
+          - cmd_order_commands
+        delegates_to_queries: []
+        request_dto:
+          name: PlaceOrderRequest
+          fields:
+            - name: userId
+              type: String
+              required: true
+            - name: items
+              type: Array<OrderItemRequest>
+              required: true
+            - name: shippingAddress
+              type: AddressRequest
+              required: true
+        response_dto:
+          name: PlaceOrderResult
+          fields:
+            - name: orderId
+              type: String
+            - name: orderNumber
+              type: String
+            - name: totalAmount
+              type: Number
+        aggregates_data_from:
+          - bc_order_management
+
+      # GET ORDER DETAILS (Query with aggregation)
+      - path: /details/{orderId}
+        method: GET
+        operation_type: query
+        description: "Get complete order details with product info and user info"
+        delegates_to_commands: []
+        delegates_to_queries:
+          - qry_order_queries
+          - qry_product_queries
+          - qry_user_queries
+        request_dto:
+          name: GetOrderDetailsRequest
+          fields:
+            - name: orderId
+              type: String
+              required: true
+        response_dto:
+          name: OrderDetailsResponse
+          fields:
+            - name: orderId
+              type: String
+            - name: orderNumber
+              type: String
+            - name: status
+              type: String
+            - name: customer
+              type: Object
+            - name: items
+              type: Array<OrderItemDetail>
+            - name: totalAmount
+              type: Number
+            - name: placedAt
+              type: String
+        aggregates_data_from:
+          - bc_order_management
+          - bc_product_catalog
+          - bc_user_management
+
+      # LIST USER ORDERS (Query)
+      - path: /user/{userId}
+        method: GET
+        operation_type: query
+        description: "List all orders for a user"
+        delegates_to_commands: []
+        delegates_to_queries:
+          - qry_order_queries
+        request_dto:
+          name: ListUserOrdersRequest
+          fields:
+            - name: userId
+              type: String
+              required: true
+            - name: page
+              type: Integer
+              required: false
+            - name: pageSize
+              type: Integer
+              required: false
+        response_dto:
+          name: OrderListResponse
+          fields:
+            - name: orders
+              type: Array<OrderSummary>
+            - name: totalCount
+              type: Integer
+            - name: page
+              type: Integer
+            - name: pageSize
+              type: Integer
+        aggregates_data_from:
+          - bc_order_management
+
+    value_object_conversion:
+      from_string:
+        - value_object_ref: vo_order_id
+          from_field: orderId
+          method: "OrderId.of(string)"
+        - value_object_ref: vo_user_id
+          from_field: userId
+          method: "UserId.of(string)"
+      to_string:
+        - value_object_ref: vo_order_id
+          to_field: orderId
+          method: "orderId.id()"
+        - value_object_ref: vo_user_id
+          to_field: userId
+          method: "userId.id()"
+
+    execution_model: blocking
+
+    error_handling:
+      strategy: fail_fast
+      description: "Return HTTP 404 for not found, 400 for validation errors, 500 for system errors"
+
+    technology_stack:
+      framework: Micronaut
+      controller_annotation: "@Controller"
+
+    layer: infrastructure
+
+# ==============================================================================
+# BFF INTERFACE 3: Multi-Context Dashboard (Aggregation Example)
+# ==============================================================================
+
+  - id: bff_if_dashboard_web
+    name: "Dashboard Web BFF Interface (Multi-Context Aggregation)"
+    bff_scope_ref: bff_web
+    primary_bounded_context_ref: bc_user_management
+    additional_context_refs:
+      - bc_order_management
+      - bc_product_catalog
+    base_path: /api/web/dashboard
+
+    endpoints:
+      # USER DASHBOARD (Aggregated Query)
+      - path: /user/{userId}
+        method: GET
+        operation_type: query
+        description: |
+          Aggregates data from multiple contexts to build complete dashboard view.
+          Demonstrates BFF's core value: client-specific orchestration and aggregation.
+        delegates_to_commands: []
+        delegates_to_queries:
+          - qry_user_queries
+          - qry_order_queries
+        request_dto:
+          name: GetDashboardRequest
+          fields:
+            - name: userId
+              type: String
+              required: true
+        response_dto:
+          name: DashboardResponse
+          fields:
+            - name: user
+              type: Object
+            - name: recentOrders
+              type: Array<OrderSummary>
+            - name: orderStats
+              type: Object
+            - name: recommendations
+              type: Array<ProductSummary>
+        aggregates_data_from:
+          - bc_user_management
+          - bc_order_management
+          - bc_product_catalog
+
+    value_object_conversion:
+      from_string:
+        - value_object_ref: vo_user_id
+          from_field: userId
+          method: "UserId.of(string)"
+      to_string:
+        - value_object_ref: vo_user_id
+          to_field: userId
+          method: "userId.id()"
+
+    execution_model: blocking
+
+    error_handling:
+      strategy: graceful_degradation
+      description: |
+        If one context fails, return partial data with indicators.
+        Example: If order service is down, still return user profile with message.
+
+    technology_stack:
+      framework: Micronaut
+      controller_annotation: "@Controller"
+
+    layer: infrastructure
+
+# ==============================================================================
+# CONTEXT MAPPINGS: How BFF interacts with bounded contexts
+# ==============================================================================
+
+context_mappings:
+  - id: cm_bff_web_to_user_management
+    upstream_context: bc_user_management
+    downstream_context: bff_web
+    relationship_type: open_host_service
+    integration_pattern: REST API (synchronous HTTP calls)
+    translation_map:
+      UserCommands: "Maps to BFF request DTOs"
+      UserQueries: "Maps to BFF response DTOs"
+      UserSummary: "Converted to web-friendly format with status labels"
+    notes: |
+      BFF consumes User Management's open host service (Commands + Queries).
+      BFF translates between web client DTOs and application service interfaces.
+
+  - id: cm_bff_web_to_order_management
+    upstream_context: bc_order_management
+    downstream_context: bff_web
+    relationship_type: open_host_service
+    integration_pattern: REST API (synchronous HTTP calls)
+    translation_map:
+      OrderCommands: "Maps to BFF request DTOs"
+      OrderQueries: "Maps to BFF response DTOs"
+      OrderSummary: "Enriched with product details from product catalog"
+    notes: |
+      BFF aggregates order data with product and user data for complete views.
+      Example: Order details endpoint calls order, product, and user queries.
+
+  - id: cm_bff_web_to_product_catalog
+    upstream_context: bc_product_catalog
+    downstream_context: bff_web
+    relationship_type: open_host_service
+    integration_pattern: REST API (synchronous HTTP calls)
+    translation_map:
+      ProductQueries: "Maps to BFF response DTOs"
+      ProductSummary: "Formatted with web-optimized image URLs"
+    notes: |
+      BFF uses product catalog for enriching order displays and recommendations.
+
+# ==============================================================================
+# IMPLEMENTATION EXAMPLE: Dashboard Aggregation Flow
+# ==============================================================================
+
+# Complete flow demonstrating BFF's aggregation capability:
+#
+# 1. Web client requests: GET /api/web/dashboard/user/123
+#
+# 2. BFF DashboardController orchestrates (in parallel):
+#    a. UserQueries.getUserSummary(userId="123")
+#       → Returns: { userId, email, status, userType, identityProvider }
+#
+#    b. OrderQueries.listRecentOrders(userId="123", limit=5)
+#       → Returns: [{ orderId, orderNumber, status, totalAmount, placedAt }, ...]
+#
+#    c. ProductQueries.getRecommendations(userId="123")
+#       → Returns: [{ productId, name, price, imageUrl }, ...]
+#
+# 3. BFF aggregates results into DashboardResponse:
+#    {
+#      user: {
+#        userId: "123",
+#        email: "john@example.com",
+#        status: "Active",  // Enum translated to label
+#        statusLabel: "Active User"  // Client-friendly label
+#      },
+#      recentOrders: [
+#        { orderId: "456", orderNumber: "ORD-2024-001", ... }
+#      ],
+#      orderStats: {
+#        totalOrders: 15,
+#        totalSpent: 1299.99,
+#        lastOrderDate: "2024-10-15"
+#      },
+#      recommendations: [
+#        { productId: "789", name: "Widget Pro", ... }
+#      ]
+#    }
+#
+# 4. BFF applies client optimizations:
+#    - Formats dates for web display
+#    - Converts currency for user's locale
+#    - Optimizes image URLs for web (CDN + size)
+#    - Adds cache headers for static data
+#
+# 5. Web client receives single, optimized response
+#    - No need to make 3 separate API calls
+#    - No need to aggregate data client-side
+#    - Optimized payload for web browser
+
+# ==============================================================================
+# VALUE OBJECT CONVERSION PATTERN
+# ==============================================================================
+
+# BFF Interface Responsibility: Convert between strings and value objects
+#
+# INBOUND (Request → Command/Query):
+#   Client sends: { userId: "123e4567-e89b-12d3-a456-426614174000" }
+#   BFF converts: UserId userId = UserId.of(request.userId())
+#   BFF delegates: userCommands.activateUser(new ActivateUserCmd(userId))
+#
+# OUTBOUND (Result → Response):
+#   Service returns: UserId userId
+#   BFF converts: String userIdString = userId.id()
+#   BFF responds: { userId: "123e4567-e89b-12d3-a456-426614174000" }
+#
+# URN-based conversion:
+#   Client sends: { clientUrn: "srf:CLIENT123" }
+#   BFF converts: ClientId clientId = ClientId.of(request.clientUrn())
+#
+#   Service returns: ClientId clientId
+#   BFF converts: String clientUrn = clientId.urn()
+#   BFF responds: { clientUrn: "srf:CLIENT123" }
+
+# ==============================================================================
+# BFF vs API Gateway Separation
+# ==============================================================================
+
+# Upstream: API Gateway (Cross-cutting concerns)
+#   - Authentication/Authorization (OAuth2, JWT validation)
+#   - Rate limiting
+#   - SSL termination
+#   - Request/response logging
+#   - CORS headers
+#   - API key validation
+#
+# Downstream: BFF (Client-specific orchestration)
+#   - Data aggregation from multiple contexts
+#   - Format transformation for client needs
+#   - Client-specific field selection
+#   - Presentation logic (labels, formatting)
+#   - Client-optimized payloads
+#
+# Architecture:
+#   [Web Client] → [API Gateway] → [Web BFF] → [User Service]
+#                                            → [Order Service]
+#                                            → [Product Service]

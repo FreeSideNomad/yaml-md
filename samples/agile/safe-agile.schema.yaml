@@ -1,0 +1,183 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/agile/safe/v1
+title: SAFe Extensions Schema
+description: SAFe-specific patterns and extensions - ARTs, cadence patterns
+
+metadata:
+  author: "Igor Music"
+  created: "2025-10-17"
+  updated: "2025-10-17"
+  license: "MIT"
+  version: "1.0.0"
+  partition: "safe"
+  references:
+    - "SAFe 6.0 - Agile Release Train"
+    - "SAFe 6.0 - Cadence and Synchronization"
+
+naming_conventions:
+  art_id: "art_<name>"
+  cadence_id: "cad_<name>"
+
+$defs:
+  agile_release_train:
+    type: object
+    description: Long-lived team of agile teams (50-125 people) - core SAFe pattern
+    required:
+      - id
+      - name
+      - team_refs
+    properties:
+      id:
+        type: string
+        pattern: "^art_[a-z0-9_]+$"
+        description: Unique ART identifier
+      name:
+        type: string
+        description: ART name
+      mission:
+        type: string
+        description: ART mission statement
+      value_stream_ref:
+        type: string
+        pattern: "^vs_[a-z0-9_]+$"
+        description: "Value stream this ART supports (ID reference)"
+      program_ref:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: "Program this ART belongs to (ID reference)"
+      team_refs:
+        type: array
+        description: "Teams in this ART (ID references)"
+        items:
+          type: string
+          pattern: "^tm_[a-z0-9_]+$"
+        minItems: 5
+        maxItems: 12
+      roles:
+        type: object
+        description: Key ART roles
+        properties:
+          release_train_engineer_ref:
+            type: string
+            pattern: "^mbr_[a-z0-9_]+$"
+            description: "Release Train Engineer (ID reference)"
+          product_manager_ref:
+            type: string
+            pattern: "^mbr_[a-z0-9_]+$"
+            description: "Product Manager (ID reference)"
+          system_architect_ref:
+            type: string
+            pattern: "^mbr_[a-z0-9_]+$"
+            description: "System Architect (ID reference)"
+          business_owner_refs:
+            type: array
+            description: "Business Owner IDs (ID references)"
+            items:
+              type: string
+              pattern: "^mbr_[a-z0-9_]+$"
+      cadence_ref:
+        type: string
+        pattern: "^cad_[a-z0-9_]+$"
+        description: "ART cadence configuration (ID reference)"
+      program_backlog:
+        type: array
+        description: "Program backlog - feature IDs (ID references)"
+        items:
+          type: string
+          pattern: "^feat_[a-z0-9_]+$"
+      current_pi_ref:
+        type: string
+        pattern: "^pi_[a-z0-9_]+$"
+        description: "Current Program Increment (ID reference)"
+
+  cadence:
+    type: object
+    description: Regular rhythm or heartbeat for team and ART activities
+    required:
+      - id
+      - name
+      - frequency
+    properties:
+      id:
+        type: string
+        pattern: "^cad_[a-z0-9_]+$"
+        description: Unique cadence identifier
+      name:
+        type: string
+        description: Name of the cadence (e.g., 'Sprint Cadence', 'PI Cadence')
+      frequency:
+        type: string
+        enum:
+          - daily
+          - weekly
+          - biweekly
+          - monthly
+          - quarterly
+        description: How often activities occur
+      duration:
+        type: string
+        description: Duration of each cycle (e.g., '2 weeks', '10 weeks')
+      purpose:
+        type: string
+        description: Purpose of this cadence
+      program_ref:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: "Program using this cadence (ID reference)"
+      art_ref:
+        type: string
+        pattern: "^art_[a-z0-9_]+$"
+        description: "ART using this cadence (ID reference)"
+      pi_duration_weeks:
+        type: integer
+        minimum: 8
+        maximum: 12
+        description: Program Increment duration in weeks
+      iteration_duration_weeks:
+        type: integer
+        minimum: 1
+        maximum: 4
+        description: Iteration duration in weeks
+      synchronization_points:
+        type: array
+        description: Key synchronization points in the cadence
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: Synchronization event name (e.g., 'PI Planning', 'System Demo')
+            timing:
+              type: string
+              description: When this occurs in the cadence
+            participants:
+              type: array
+              description: "Who participates (team/member ID references)"
+              items:
+                type: string
+
+validation_rules:
+  - rule: "art_has_teams"
+    description: "Every ART must have 5-12 teams"
+  - rule: "art_has_rte"
+    description: "Every ART must have a Release Train Engineer"
+  - rule: "cadence_has_frequency"
+    description: "Every cadence must specify frequency"
+  - rule: "pi_duration_valid"
+    description: "PI duration must be 8-12 weeks"
+
+best_practices:
+  agile_release_train:
+    - "Keep ARTs between 50-125 people (5-12 teams)"
+    - "Assign dedicated RTE, Product Manager, System Architect"
+    - "Maintain regular PI Planning cadence"
+    - "Conduct System Demos each iteration"
+    - "Track program predictability"
+    - "Align ART to value stream"
+  cadence:
+    - "Establish predictable cadence and rhythm"
+    - "Synchronize across all teams in ART"
+    - "Use fixed PI duration (typically 10 weeks)"
+    - "Include Innovation and Planning iteration"
+    - "Hold PI Planning events face-to-face when possible"
+    - "Maintain cadence discipline"

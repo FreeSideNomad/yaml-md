@@ -1,0 +1,211 @@
+# Program-level Example: Mobile Platform Program
+# Demonstrates Program, PI, releases, architectural runway structure
+
+Program:
+  id: "prg_mobile_platform"
+  name: "Mobile Platform Program"
+  portfolio_ref: "pf_ecommerce"
+  team_refs:
+    - "tm_ios"
+    - "tm_android"
+    - "tm_mobile_backend"
+    - "tm_mobile_qa"
+  value_stream_ref: "vs_customer_experience"
+  program_increment_refs:
+    - "pi_2025_q1"
+    - "pi_2025_q2"
+
+program_increments:
+  - id: "pi_2025_q1"
+    name: "PI 2025 Q1"
+    number: 1
+    startDate: "2025-01-06"
+    endDate: "2025-03-27"
+    program_ref: "prg_mobile_platform"
+    iteration_refs:
+      - "it_2025_q1_1"
+      - "it_2025_q1_2"
+      - "it_2025_q1_3"
+      - "it_2025_q1_4"
+      - "it_2025_q1_5"
+      - "it_2025_q1_ip"
+    feature_refs:
+      - "feat_ios_app"
+      - "feat_android_app"
+      - "feat_mobile_checkout"
+    objectives:
+      - teamId: "tm_ios"
+        description: "Complete iOS app authentication and home screen"
+        businessValue: 10
+        committed: true
+        status: "in_progress"
+      - teamId: "tm_ios"
+        description: "Implement product catalog browsing"
+        businessValue: 9
+        committed: true
+        status: "not_started"
+      - teamId: "tm_android"
+        description: "Complete Android app authentication and home screen"
+        businessValue: 10
+        committed: true
+        status: "in_progress"
+      - teamId: "tm_android"
+        description: "Implement product catalog browsing"
+        businessValue: 9
+        committed: true
+        status: "not_started"
+      - teamId: "tm_mobile_backend"
+        description: "Build mobile API gateway with rate limiting"
+        businessValue: 10
+        committed: true
+        status: "in_progress"
+      - teamId: "tm_mobile_backend"
+        description: "Implement product catalog API v2"
+        businessValue: 9
+        committed: true
+        status: "not_started"
+      - teamId: "tm_mobile_qa"
+        description: "Setup mobile CI/CD pipeline"
+        businessValue: 8
+        committed: true
+        status: "in_progress"
+      - teamId: "tm_mobile_qa"
+        description: "Create automated test suite"
+        businessValue: 7
+        committed: false
+        status: "not_started"
+    confidenceVote: 4.3
+    planningDate: "2024-12-18"
+
+  - id: "pi_2025_q2"
+    name: "PI 2025 Q2"
+    number: 2
+    startDate: "2025-03-31"
+    endDate: "2025-06-19"
+    program_ref: "prg_mobile_platform"
+    iteration_refs:
+      - "it_2025_q2_1"
+      - "it_2025_q2_2"
+      - "it_2025_q2_3"
+      - "it_2025_q2_4"
+      - "it_2025_q2_5"
+      - "it_2025_q2_ip"
+    feature_refs:
+      - "feat_mobile_checkout"
+      - "feat_push_notifications"
+      - "feat_offline_mode"
+    objectives:
+      - teamId: "tm_ios"
+        description: "Complete mobile checkout flow"
+        businessValue: 10
+        committed: true
+        status: "not_started"
+      - teamId: "tm_android"
+        description: "Complete mobile checkout flow"
+        businessValue: 10
+        committed: true
+        status: "not_started"
+      - teamId: "tm_mobile_backend"
+        description: "Implement payment processing API"
+        businessValue: 10
+        committed: true
+        status: "not_started"
+    confidenceVote: 3.8
+    planningDate: "2025-03-19"
+
+releases:
+  - id: "rel_mobile_mvp"
+    name: "Mobile App MVP"
+    program_ref: "prg_mobile_platform"
+    version: "1.0.0"
+    releaseDate: "2025-03-31"
+    feature_refs:
+      - "feat_ios_app"
+      - "feat_android_app"
+    status: "planned"
+
+  - id: "rel_mobile_1_1"
+    name: "Mobile App v1.1"
+    program_ref: "prg_mobile_platform"
+    version: "1.1.0"
+    releaseDate: "2025-06-30"
+    feature_refs:
+      - "feat_mobile_checkout"
+      - "feat_push_notifications"
+    status: "planned"
+
+release_visions:
+  - id: "rv_mobile_2025"
+    name: "2025 Mobile Platform Vision"
+    release_ref: "rel_mobile_mvp"
+    vision: "Deliver seamless mobile shopping experience that delights customers"
+    targetMarket: "US consumers aged 18-45 with smartphones"
+    needs:
+      - "Fast, reliable mobile shopping"
+      - "Easy checkout process"
+      - "Push notifications for deals"
+    productFeatures:
+      - "Native iOS and Android apps"
+      - "One-tap checkout"
+      - "Personalized notifications"
+    businessGoals:
+      - "Achieve 100K app downloads in 6 months"
+      - "25% mobile app conversion rate"
+
+architectural_runways:
+  - id: "ar_mobile_infrastructure"
+    name: "Mobile Infrastructure Runway"
+    program_ref: "prg_mobile_platform"
+    description: "Technical foundation for mobile apps"
+    enabler_refs:
+      - "enb_api_gateway"
+      - "enb_mobile_cicd"
+      - "enb_analytics"
+    status: "in_progress"
+    capacityAllocated: 30
+
+enablers:
+  - id: "enb_api_gateway"
+    name: "Mobile API Gateway"
+    architectural_runway_ref: "ar_mobile_infrastructure"
+    type: "infrastructure"
+    description: "API gateway with rate limiting, authentication, and monitoring"
+    status: "in_progress"
+    team_ref: "tm_mobile_backend"
+
+  - id: "enb_mobile_cicd"
+    name: "Mobile CI/CD Pipeline"
+    architectural_runway_ref: "ar_mobile_infrastructure"
+    type: "infrastructure"
+    description: "Automated build, test, and deployment for mobile apps"
+    status: "in_progress"
+    team_ref: "tm_mobile_qa"
+
+  - id: "enb_analytics"
+    name: "Mobile Analytics Platform"
+    architectural_runway_ref: "ar_mobile_infrastructure"
+    type: "architecture"
+    description: "Event tracking and analytics for mobile user behavior"
+    status: "planned"
+    team_ref: "tm_mobile_backend"
+
+technical_debts:
+  - id: "td_001"
+    name: "Legacy API Compatibility"
+    program_ref: "prg_mobile_platform"
+    description: "Mobile apps still using deprecated v1 API endpoints"
+    impact: "medium"
+    effort: "high"
+    priority: "high"
+    createdDate: "2025-01-15"
+    status: "open"
+
+  - id: "td_002"
+    name: "Test Coverage Below 80%"
+    program_ref: "prg_mobile_platform"
+    description: "Unit test coverage for mobile backend is only 65%"
+    impact: "medium"
+    effort: "medium"
+    priority: "medium"
+    createdDate: "2025-02-01"
+    status: "open"

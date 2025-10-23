@@ -1,0 +1,271 @@
+# Portfolio-level Example: E-Commerce Platform Portfolio
+# Demonstrates portfolio, value streams, epics, roadmaps structure
+
+portfolio:
+  id: "pf_ecommerce"
+  name: "E-Commerce Platform Portfolio"
+  strategicThemes:
+    - "Digital-first customer experience"
+    - "Operational excellence through automation"
+    - "Market expansion to mobile platforms"
+  budgets:
+    - value_stream_ref: "vs_customer_experience"
+      allocation: 5000000
+    - value_stream_ref: "vs_order_fulfillment"
+      allocation: 3000000
+    - value_stream_ref: "vs_platform_infrastructure"
+      allocation: 2000000
+  value_stream_refs:
+    - "vs_customer_experience"
+    - "vs_order_fulfillment"
+    - "vs_platform_infrastructure"
+  epic_refs:
+    - "epic_mobile_app"
+    - "epic_ai_recommendations"
+    - "epic_multi_region"
+
+value_streams:
+  - id: "vs_customer_experience"
+    name: "Customer Experience Value Stream"
+    type: "development"
+    portfolio_ref: "pf_ecommerce"
+    steps:
+      - stepName: "Market Research"
+        leadTimeWeeks: 2
+      - stepName: "Design & Prototype"
+        leadTimeWeeks: 3
+      - stepName: "Development"
+        leadTimeWeeks: 8
+      - stepName: "Testing & QA"
+        leadTimeWeeks: 2
+      - stepName: "Production Deployment"
+        leadTimeWeeks: 1
+    program_refs:
+      - "prg_mobile_platform"
+      - "prg_web_platform"
+
+  - id: "vs_order_fulfillment"
+    name: "Order Fulfillment Value Stream"
+    type: "operational"
+    portfolio_ref: "pf_ecommerce"
+    steps:
+      - stepName: "Order Received"
+        leadTimeWeeks: 0
+      - stepName: "Inventory Check"
+        leadTimeWeeks: 0.2
+      - stepName: "Picking & Packing"
+        leadTimeWeeks: 0.5
+      - stepName: "Shipping"
+        leadTimeWeeks: 1
+      - stepName: "Delivery"
+        leadTimeWeeks: 3
+    program_refs:
+      - "prg_order_management"
+
+  - id: "vs_platform_infrastructure"
+    name: "Platform Infrastructure Value Stream"
+    type: "development"
+    portfolio_ref: "pf_ecommerce"
+    steps:
+      - stepName: "Architecture Design"
+        leadTimeWeeks: 2
+      - stepName: "Infrastructure Setup"
+        leadTimeWeeks: 4
+      - stepName: "Security Hardening"
+        leadTimeWeeks: 2
+      - stepName: "Performance Optimization"
+        leadTimeWeeks: 2
+      - stepName: "Production Release"
+        leadTimeWeeks: 1
+    program_refs:
+      - "prg_platform_engineering"
+
+epics:
+  - id: "epic_mobile_app"
+    name: "Native Mobile App Platform"
+    portfolio_ref: "pf_ecommerce"
+    description: "Build native iOS and Android apps with seamless customer experience"
+    value_stream_ref: "vs_customer_experience"
+    hypothesis:
+      statement: "Customers prefer mobile apps for shopping over mobile web"
+      leadingIndicators:
+        - "Mobile app downloads > 100K in 6 months"
+        - "Mobile app conversion rate > mobile web by 25%"
+      successCriteria:
+        - "50% of orders from mobile app within 12 months"
+        - "App store rating > 4.5 stars"
+    feature_refs:
+      - "feat_ios_app"
+      - "feat_android_app"
+      - "feat_mobile_checkout"
+    businessOutcome: "Increase mobile revenue by 40%"
+    startDate: "2025-01-01"
+    targetEndDate: "2025-09-30"
+    status: "in_progress"
+    budgetAllocated: 2000000
+
+  - id: "epic_ai_recommendations"
+    name: "AI-Powered Product Recommendations"
+    portfolio_ref: "pf_ecommerce"
+    description: "Personalized product recommendations using ML models"
+    value_stream_ref: "vs_customer_experience"
+    hypothesis:
+      statement: "AI recommendations will increase average order value"
+      leadingIndicators:
+        - "Click-through rate on recommendations > 15%"
+        - "Conversion rate on recommended products > 8%"
+      successCriteria:
+        - "Average order value increases by 20%"
+        - "Customer satisfaction score improves by 10 points"
+    feature_refs:
+      - "feat_recommendation_engine"
+      - "feat_personalization"
+    businessOutcome: "Increase average order value by 20%"
+    startDate: "2025-02-01"
+    targetEndDate: "2025-08-31"
+    status: "planning"
+    budgetAllocated: 1500000
+
+  - id: "epic_multi_region"
+    name: "Multi-Region Deployment"
+    portfolio_ref: "pf_ecommerce"
+    description: "Deploy platform to EU and APAC regions with localization"
+    value_stream_ref: "vs_platform_infrastructure"
+    hypothesis:
+      statement: "Regional deployment will reduce latency and increase international sales"
+      leadingIndicators:
+        - "Page load time < 2 seconds in all regions"
+        - "International traffic increases by 50%"
+      successCriteria:
+        - "International revenue increases by 100%"
+        - "Customer complaints about performance decrease by 80%"
+    feature_refs:
+      - "feat_eu_deployment"
+      - "feat_apac_deployment"
+      - "feat_localization"
+    businessOutcome: "Double international revenue"
+    startDate: "2025-04-01"
+    targetEndDate: "2025-12-31"
+    status: "planning"
+    budgetAllocated: 2500000
+
+roadmap:
+  id: "rm_ecommerce_2025"
+  name: "E-Commerce Platform 2025 Roadmap"
+  portfolio_ref: "pf_ecommerce"
+  timeframe: "2025"
+  epic_refs:
+    - "epic_mobile_app"
+    - "epic_ai_recommendations"
+    - "epic_multi_region"
+  milestones:
+    - name: "Q1: Mobile App MVP Launch"
+      date: "2025-03-31"
+      epic_refs:
+        - "epic_mobile_app"
+    - name: "Q2: AI Recommendations Beta"
+      date: "2025-06-30"
+      epic_refs:
+        - "epic_ai_recommendations"
+    - name: "Q3: Mobile App Full Release"
+      date: "2025-09-30"
+      epic_refs:
+        - "epic_mobile_app"
+    - name: "Q4: Multi-Region Deployment"
+      date: "2025-12-31"
+      epic_refs:
+        - "epic_multi_region"
+
+stakeholders:
+  - id: "sh_ceo"
+    name: "Jane Smith"
+    role: "CEO"
+    portfolio_ref: "pf_ecommerce"
+    influenceLevel: "high"
+    interests:
+      - "Revenue growth"
+      - "Market expansion"
+
+  - id: "sh_cto"
+    name: "David Chen"
+    role: "CTO"
+    portfolio_ref: "pf_ecommerce"
+    influenceLevel: "high"
+    interests:
+      - "Technical excellence"
+      - "Platform scalability"
+
+  - id: "sh_cmo"
+    name: "Sarah Martinez"
+    role: "CMO"
+    portfolio_ref: "pf_ecommerce"
+    influenceLevel: "high"
+    interests:
+      - "Customer engagement"
+      - "Brand reputation"
+
+metrics:
+  - id: "met_mobile_revenue"
+    name: "Mobile Revenue"
+    portfolio_ref: "pf_ecommerce"
+    type: "outcome"
+    target: 10000000
+    actual: 6000000
+    measurementFrequency: "monthly"
+
+  - id: "met_customer_satisfaction"
+    name: "Customer Satisfaction Score"
+    portfolio_ref: "pf_ecommerce"
+    type: "outcome"
+    target: 85
+    actual: 78
+    measurementFrequency: "quarterly"
+
+  - id: "met_deployment_frequency"
+    name: "Deployment Frequency"
+    portfolio_ref: "pf_ecommerce"
+    type: "flow"
+    target: 50
+    actual: 35
+    measurementFrequency: "monthly"
+
+nfrs:
+  - id: "nfr_performance"
+    name: "Page Load Performance"
+    portfolio_ref: "pf_ecommerce"
+    category: "performance"
+    description: "All pages must load within 2 seconds"
+    priority: "high"
+
+  - id: "nfr_availability"
+    name: "System Availability"
+    portfolio_ref: "pf_ecommerce"
+    category: "reliability"
+    description: "99.9% uptime SLA"
+    priority: "critical"
+
+  - id: "nfr_security"
+    name: "Data Security & Privacy"
+    portfolio_ref: "pf_ecommerce"
+    category: "security"
+    description: "GDPR and PCI-DSS compliance"
+    priority: "critical"
+
+risks:
+  - id: "risk_competition"
+    name: "Competitive Market Pressure"
+    portfolio_ref: "pf_ecommerce"
+    category: "market"
+    impact: "high"
+    probability: "medium"
+    mitigation: "Accelerate mobile app delivery to market"
+    owner_ref: "sh_ceo"
+
+  - id: "risk_talent"
+    name: "AI/ML Talent Shortage"
+    portfolio_ref: "pf_ecommerce"
+    category: "resource"
+    impact: "medium"
+    probability: "high"
+    mitigation: "Partner with ML consulting firm for epic_ai_recommendations"
+    owner_ref: "sh_cto"

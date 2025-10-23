@@ -1,0 +1,405 @@
+# UX Navigation Example: E-Commerce Product Catalog
+# Demonstrates navigation structures, pages, and breadcrumbs
+
+navigation:
+  global_navigation:
+    pattern: top_horizontal
+    position: top
+    sticky: true
+    items:
+      - id: nav_home
+        label: "Home"
+        target: page_home
+        icon: "home"
+      - id: nav_products
+        label: "Products"
+        target: page_category_list
+        bounded_context: bc_product_catalog
+        children:
+          - id: nav_electronics
+            label: "Electronics"
+            target: page_category_list
+          - id: nav_clothing
+            label: "Clothing"
+            target: page_category_list
+          - id: nav_home_garden
+            label: "Home & Garden"
+            target: page_category_list
+      - id: nav_deals
+        label: "Deals"
+        target: page_deals
+        bounded_context: bc_promotions
+        badge:
+          type: count
+          source: "active_deals_count"
+      - id: nav_cart
+        label: "Cart"
+        target: page_cart
+        bounded_context: bc_shopping_cart
+        icon: "shopping-cart"
+        badge:
+          type: count
+          source: "cart_items_count"
+      - id: nav_account
+        label: "Account"
+        target: page_account
+        bounded_context: bc_customer_account
+        icon: "user"
+
+  local_navigation:
+    - id: localnav_product_detail
+      scope: page
+      scope_id: page_product_detail
+      pattern: tabs
+      items:
+        - id: nav_overview
+          label: "Overview"
+          target: "#overview"
+        - id: nav_specs
+          label: "Specifications"
+          target: "#specifications"
+        - id: nav_reviews
+          label: "Reviews"
+          target: "#reviews"
+          badge:
+            type: count
+            source: "review_count"
+
+  utility_navigation:
+    user_menu:
+      trigger: avatar
+      items:
+        - label: "My Orders"
+          target: page_orders
+        - label: "Wishlist"
+          target: page_wishlist
+        - label: "Settings"
+          target: page_settings
+        - label: "Sign Out"
+          target: "/auth/signout"
+    search:
+      position: header
+      shortcut: "Cmd+K"
+    notifications:
+      position: header
+      badge_source: "unread_notifications_count"
+
+  mobile_navigation:
+    pattern: bottom_tabs
+    breakpoint: 768
+
+pages:
+  - id: page_home
+    name: "Home"
+    type: dashboard
+    url: "/"
+    bounded_context: bc_storefront
+    sections:
+      - sect_hero_banner
+      - sect_featured_products
+      - sect_categories
+      - sect_promotions
+
+  - id: page_category_list
+    name: "Category Listing"
+    type: list
+    url: "/products/:category"
+    bounded_context: bc_product_catalog
+    displays:
+      aggregate_type: agg_product
+      cardinality: collection
+      data_source: repo_product
+      query_params:
+        filters:
+          - category
+          - brand
+          - price_range
+        sort:
+          - relevance
+          - price_asc
+          - price_desc
+          - rating
+        pagination:
+          page_size: 24
+    sections:
+      - sect_header
+      - sect_breadcrumbs
+      - sect_filters_sidebar
+      - sect_product_grid
+      - sect_pagination
+    information_architecture_ref: ia_ecommerce_products
+
+  - id: page_product_detail
+    name: "Product Detail"
+    type: detail
+    url: "/products/:category/:product_id"
+    bounded_context: bc_product_catalog
+    displays:
+      aggregate_type: agg_product
+      cardinality: single
+      data_source: repo_product
+    sections:
+      - sect_header
+      - sect_breadcrumbs
+      - sect_product_images
+      - sect_product_info
+      - sect_add_to_cart
+      - sect_specifications
+      - sect_reviews
+      - sect_related_products
+    information_architecture_ref: ia_ecommerce_products
+
+  - id: page_cart
+    name: "Shopping Cart"
+    type: form
+    url: "/cart"
+    bounded_context: bc_shopping_cart
+    displays:
+      aggregate_type: agg_shopping_cart
+      cardinality: single
+      data_source: repo_shopping_cart
+    sections:
+      - sect_header
+      - sect_cart_items
+      - sect_cart_summary
+      - sect_checkout_button
+
+  - id: page_deals
+    name: "Special Deals"
+    type: list
+    url: "/deals"
+    bounded_context: bc_promotions
+    displays:
+      aggregate_type: agg_promotion
+      cardinality: collection
+      data_source: query_active_promotions
+    sections:
+      - sect_header
+      - sect_deal_grid
+
+  - id: page_account
+    name: "My Account"
+    type: dashboard
+    url: "/account"
+    bounded_context: bc_customer_account
+    sections:
+      - sect_header
+      - sect_account_nav
+      - sect_account_content
+
+  - id: page_orders
+    name: "My Orders"
+    type: list
+    url: "/account/orders"
+    bounded_context: bc_order_management
+    displays:
+      aggregate_type: agg_order
+      cardinality: collection
+      data_source: query_customer_orders
+    sections:
+      - sect_header
+      - sect_order_list
+
+  - id: page_wishlist
+    name: "My Wishlist"
+    type: list
+    url: "/account/wishlist"
+    bounded_context: bc_customer_account
+    displays:
+      aggregate_type: agg_wishlist
+      cardinality: single
+      data_source: repo_wishlist
+    sections:
+      - sect_header
+      - sect_wishlist_items
+
+  - id: page_settings
+    name: "Account Settings"
+    type: form
+    url: "/account/settings"
+    bounded_context: bc_customer_account
+    sections:
+      - sect_header
+      - sect_settings_form
+
+page_sections:
+  - id: sect_header
+    name: "Page Header"
+    type: header
+    components:
+      - cmp_logo
+      - cmp_global_nav
+      - cmp_search_bar
+      - cmp_cart_icon
+
+  - id: sect_breadcrumbs
+    name: "Breadcrumb Navigation"
+    type: navigation
+    components:
+      - cmp_breadcrumbs
+
+  - id: sect_hero_banner
+    name: "Hero Banner"
+    type: hero
+    components:
+      - cmp_hero_carousel
+
+  - id: sect_featured_products
+    name: "Featured Products"
+    type: content
+    components:
+      - cmp_product_carousel
+
+  - id: sect_categories
+    name: "Shop by Category"
+    type: content
+    components:
+      - cmp_category_grid
+
+  - id: sect_promotions
+    name: "Current Promotions"
+    type: content
+    components:
+      - cmp_promo_banner
+
+  - id: sect_filters_sidebar
+    name: "Filters Sidebar"
+    type: sidebar
+    position: left
+    components:
+      - cmp_facet_filter
+
+  - id: sect_product_grid
+    name: "Product Grid"
+    type: content
+    components:
+      - cmp_product_card
+
+  - id: sect_pagination
+    name: "Pagination Controls"
+    type: navigation
+    components:
+      - cmp_pagination
+
+  - id: sect_product_images
+    name: "Product Images"
+    type: media
+    components:
+      - cmp_image_carousel
+
+  - id: sect_product_info
+    name: "Product Information"
+    type: content
+    components:
+      - cmp_product_title
+      - cmp_product_price
+      - cmp_product_rating
+      - cmp_product_description
+
+  - id: sect_add_to_cart
+    name: "Add to Cart"
+    type: action
+    components:
+      - cmp_quantity_selector
+      - cmp_add_to_cart_button
+      - cmp_add_to_wishlist_button
+
+  - id: sect_specifications
+    name: "Product Specifications"
+    type: content
+    components:
+      - cmp_specs_table
+
+  - id: sect_reviews
+    name: "Customer Reviews"
+    type: content
+    components:
+      - cmp_review_list
+      - cmp_write_review_button
+
+  - id: sect_related_products
+    name: "Related Products"
+    type: content
+    components:
+      - cmp_product_carousel
+
+  - id: sect_cart_items
+    name: "Cart Items"
+    type: content
+    components:
+      - cmp_cart_item_list
+
+  - id: sect_cart_summary
+    name: "Cart Summary"
+    type: content
+    components:
+      - cmp_price_summary
+
+  - id: sect_checkout_button
+    name: "Proceed to Checkout"
+    type: action
+    components:
+      - cmp_checkout_button
+
+  - id: sect_deal_grid
+    name: "Deal Grid"
+    type: content
+    components:
+      - cmp_deal_card
+
+  - id: sect_account_nav
+    name: "Account Navigation"
+    type: navigation
+    components:
+      - cmp_account_sidebar
+
+  - id: sect_account_content
+    name: "Account Content"
+    type: content
+
+  - id: sect_order_list
+    name: "Order List"
+    type: content
+    components:
+      - cmp_order_card
+
+  - id: sect_wishlist_items
+    name: "Wishlist Items"
+    type: content
+    components:
+      - cmp_wishlist_item_card
+
+  - id: sect_settings_form
+    name: "Settings Form"
+    type: form
+    components:
+      - cmp_settings_fields
+
+breadcrumbs:
+  - id: bc_product_detail
+    page_refs:
+      - page_home
+      - page_category_list
+      - page_product_detail
+    labels:
+      - "Home"
+      - "Electronics"
+      - "MacBook Pro 16-inch"
+
+  - id: bc_category
+    page_refs:
+      - page_home
+      - page_category_list
+    labels:
+      - "Home"
+      - "Electronics"
+
+  - id: bc_account_orders
+    page_refs:
+      - page_home
+      - page_account
+      - page_orders
+    labels:
+      - "Home"
+      - "My Account"
+      - "Orders"

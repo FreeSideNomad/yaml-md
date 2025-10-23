@@ -1,0 +1,857 @@
+---
+version: 0.2.0
+status: draft
+last_updated: 2025-10-09
+---
+
+# Payment Processing System with CDC Outbox Pattern
+# Demonstrates: Exactly-once semantics, CDC outbox, fraud detection, multi-stage pipelines, PCI compliance
+
+system:
+  id: sys-payment-processing
+  name: Payment Processing System
+  description: Real-time payment processing with CDC outbox pattern for exactly-once delivery guarantees
+  owners:
+    - team: payments-platform
+      contact: payments@fintech.com
+  domains:
+    - dom-payment-ingestion
+    - dom-fraud-detection
+    - dom-reconciliation
+  tags: [pci-dss, financial, mission-critical]
+
+domains:
+  - id: dom-payment-ingestion
+    name: Payment Ingestion Domain
+    description: Captures payment transactions with exactly-once semantics
+    owners:
+      - team: payments-engineering
+        contact: payments-eng@fintech.com
+    pipelines:
+      - pip-ingest-payments
+      - pip-validate-payments
+
+  - id: dom-fraud-detection
+    name: Fraud Detection Domain
+    description: Real-time fraud scoring and risk assessment
+    owners:
+      - team: risk-engineering
+        contact: risk-eng@fintech.com
+    pipelines:
+      - pip-fraud-detection
+
+  - id: dom-reconciliation
+    name: Reconciliation Domain
+    description: Daily reconciliation with payment processors
+    owners:
+      - team: finance-engineering
+        contact: fin-eng@fintech.com
+    pipelines:
+      - pip-reconciliation
+
+pipelines:
+  - id: pip-ingest-payments
+    name: Ingest Payments Pipeline
+    description: CDC-based ingestion using transactional outbox pattern for exactly-once processing
+    mode: streaming
+    schedule:
+      id: sch-payment-continuous
+      type: continuous
+      triggers:
+        - type: cdc-event
+          source: postgresql-payments-outbox
+    traits: [exactly-once, idempotent, transactional]
+    tags: [critical, pci-compliant]
+    stages:
+      - id: stg-outbox-capture
+        name: Outbox Capture
+        description: Capture payment events from transactional outbox table
+        uses_patterns:
+          - pat-transactional-outbox
+          - pat-cdc-log-based
+        inputs: []
+        outputs:
+          - ds-payment-events-raw
+        transforms:
+          - id: trf-outbox-cdc
+            type: cdc-extract
+            description: Extract events from outbox table with exactly-once guarantees
+            config:
+              connector: debezium
+              database: payments_db
+              table: payment_outbox
+              exactly_once: true
+              offset_storage: kafka-transactions
+
+      - id: stg-event-enrichment
+        name: Event Enrichment
+        description: Enrich payment events with customer and merchant data
+        uses_patterns:
+          - pat-stream-enrichment
+        inputs:
+          - ds-payment-events-raw
+          - ds-customer-reference
+          - ds-merchant-reference
+        outputs:
+          - ds-payments-enriched
+        transforms:
+          - id: trf-join-customer
+            type: join
+            description: Join with customer reference data
+            config:
+              join_type: left
+              left_key: customer_id
+              right_key: customer_id
+              right_table: ds-customer-reference
+
+          - id: trf-join-merchant
+            type: join
+            description: Join with merchant reference data
+            config:
+              join_type: left
+              left_key: merchant_id
+              right_key: merchant_id
+              right_table: ds-merchant-reference
+
+  - id: pip-validate-payments
+    name: Validate Payments Pipeline
+    description: Multi-stage validation including schema, business rules, and compliance checks
+    mode: streaming
+    schedule:
+      id: sch-validation-continuous
+      type: continuous
+    stages:
+      - id: stg-schema-validation
+        name: Schema Validation
+        description: Validate payment schema and format
+        uses_patterns:
+          - pat-validation
+        inputs:
+          - ds-payments-enriched
+        outputs:
+          - ds-payments-validated
+        transforms:
+          - id: trf-validate-schema
+            type: custom
+            description: Validate payment schema and data types
+            config:
+              required_fields: [payment_id, customer_id, merchant_id, amount, currency, timestamp]
+              amount_range: [0.01, 1000000.00]
+              currency_whitelist: [USD, EUR, GBP]
+
+      - id: stg-business-validation
+        name: Business Rules Validation
+        description: Apply business rules and compliance checks
+        uses_patterns:
+          - pat-validation
+        inputs:
+          - ds-payments-validated
+        outputs:
+          - ds-payments-processed
+        depends_on:
+          - stg-schema-validation
+        transforms:
+          - id: trf-check-limits
+            type: filter
+            description: Check transaction limits and velocity
+            config:
+              max_transaction_amount: 10000
+              max_daily_velocity: 50
+              max_merchant_risk_score: 0.8
+
+          - id: trf-compliance-check
+            type: custom
+            description: PCI-DSS and AML compliance checks
+            config:
+              mask_pii: true
+              check_sanctions_list: true
+              log_compliance_events: true
+
+  - id: pip-fraud-detection
+    name: Fraud Detection Pipeline
+    description: Real-time fraud scoring with ML models
+    mode: streaming
+    schedule:
+      id: sch-fraud-continuous
+      type: continuous
+    traits: [low-latency, ml-inference]
+    stages:
+      - id: stg-feature-extraction
+        name: Feature Extraction
+        description: Extract fraud detection features from payment events
+        uses_patterns:
+          - pat-feature-engineering
+        inputs:
+          - ds-payments-processed
+        outputs:
+          - ds-fraud-features
+        transforms:
+          - id: trf-time-features
+            type: custom
+            description: Extract time-based features
+            config:
+              features:
+                - hour_of_day
+                - day_of_week
+                - time_since_last_transaction
+                - transaction_velocity_1h
+                - transaction_velocity_24h
+
+          - id: trf-amount-features
+            type: aggregate
+            description: Calculate amount-based features
+            config:
+              window: 24h
+              aggregations:
+                avg_amount: mean
+                max_amount: max
+                stddev_amount: stddev
+
+      - id: stg-fraud-scoring
+        name: Fraud Scoring
+        description: Score transactions using ML model
+        uses_patterns:
+          - pat-ml-inference
+        inputs:
+          - ds-fraud-features
+        outputs:
+          - ds-fraud-scores
+        depends_on:
+          - stg-feature-extraction
+        transforms:
+          - id: trf-ml-inference
+            type: custom
+            description: Run fraud detection model
+            config:
+              model_name: fraud-detector-v3
+              model_version: 3.2.1
+              threshold: 0.75
+              fallback_on_error: allow
+
+      - id: stg-risk-decision
+        name: Risk Decision
+        description: Make approve/decline decision based on fraud score
+        uses_patterns:
+          - pat-decision-engine
+        inputs:
+          - ds-fraud-scores
+        outputs:
+          - ds-payment-decisions
+        depends_on:
+          - stg-fraud-scoring
+        transforms:
+          - id: trf-decision-rules
+            type: filter
+            description: Apply risk-based decision rules
+            config:
+              rules:
+                - if: fraud_score > 0.9
+                  then: decline
+                - if: fraud_score > 0.75
+                  then: manual_review
+                - if: fraud_score <= 0.75
+                  then: approve
+
+  - id: pip-reconciliation
+    name: Reconciliation Pipeline
+    description: Daily reconciliation with payment processors
+    mode: batch
+    schedule:
+      id: sch-daily-recon
+      type: cron
+      cron_expression: "0 2 * * *"
+    stages:
+      - id: stg-fetch-processor-data
+        name: Fetch Processor Data
+        description: Fetch settlement files from payment processors
+        uses_patterns:
+          - pat-batch-ingestion
+        inputs: []
+        outputs:
+          - ds-processor-settlements
+        transforms:
+          - id: trf-fetch-sftp
+            type: custom
+            description: Fetch settlement files via SFTP
+            config:
+              protocol: sftp
+              host: processor.settlements.com
+              path: /settlements/daily/
+
+      - id: stg-reconcile-transactions
+        name: Reconcile Transactions
+        description: Match internal transactions with processor settlements
+        uses_patterns:
+          - pat-reconciliation
+        inputs:
+          - ds-payment-decisions
+          - ds-processor-settlements
+        outputs:
+          - ds-reconciliation-results
+        depends_on:
+          - stg-fetch-processor-data
+        transforms:
+          - id: trf-match-transactions
+            type: join
+            description: Match transactions by payment_id and amount
+            config:
+              join_type: full_outer
+              left_key: [payment_id, amount]
+              right_key: [transaction_id, settled_amount]
+              tolerance_cents: 1
+
+          - id: trf-identify-discrepancies
+            type: filter
+            description: Identify unmatched or discrepant transactions
+            config:
+              flag_unmatched: true
+              flag_amount_mismatch: true
+
+datasets:
+  - id: ds-payment-events-raw
+    name: Payment Events Raw Stream
+    description: Raw payment events from CDC outbox
+    type: stream
+    format: json
+    location: kafka://payment-events
+    classification: confidential
+    contains_pii: true
+    pii_fields: [customer_id, customer_email, ip_address]
+    tags: [pci-scope, encrypted-at-rest]
+
+  - id: ds-customer-reference
+    name: Customer Reference Data
+    description: Customer master data for enrichment
+    type: table
+    format: delta
+    location: s3://payments-lake/reference/customers/
+    schema:
+      fields:
+        - name: customer_id
+          type: string
+          nullable: false
+        - name: customer_email
+          type: string
+          nullable: true
+          pii: true
+        - name: customer_tier
+          type: string
+          nullable: false
+        - name: kyc_verified
+          type: boolean
+          nullable: false
+        - name: risk_level
+          type: string
+          nullable: false
+    classification: confidential
+    contains_pii: true
+    pii_fields: [customer_email]
+    tags: [reference-data, pci-scope]
+
+  - id: ds-merchant-reference
+    name: Merchant Reference Data
+    description: Merchant master data for enrichment
+    type: table
+    format: delta
+    location: s3://payments-lake/reference/merchants/
+    schema:
+      fields:
+        - name: merchant_id
+          type: string
+          nullable: false
+        - name: merchant_name
+          type: string
+          nullable: false
+        - name: merchant_category
+          type: string
+          nullable: false
+        - name: risk_score
+          type: decimal
+          nullable: false
+        - name: pci_compliant
+          type: boolean
+          nullable: false
+    classification: internal
+    contains_pii: false
+    tags: [reference-data]
+
+  - id: ds-payments-enriched
+    name: Payments Enriched
+    description: Payment events enriched with customer and merchant data
+    type: stream
+    format: avro
+    location: kafka://payments-enriched
+    schema:
+      fields:
+        - name: payment_id
+          type: string
+          nullable: false
+          description: Unique payment identifier
+        - name: customer_id
+          type: string
+          nullable: false
+          pii: true
+        - name: merchant_id
+          type: string
+          nullable: false
+        - name: amount
+          type: decimal
+          nullable: false
+        - name: currency
+          type: string
+          nullable: false
+        - name: timestamp
+          type: timestamp
+          nullable: false
+        - name: customer_tier
+          type: string
+          nullable: true
+        - name: merchant_risk_score
+          type: decimal
+          nullable: true
+        - name: ip_address
+          type: string
+          nullable: true
+          pii: true
+    classification: confidential
+    contains_pii: true
+    pii_fields: [customer_id, ip_address]
+    tags: [pci-scope, streaming]
+
+  - id: ds-payments-validated
+    name: Payments Validated
+    description: Schema-validated payment transactions
+    type: table
+    format: delta
+    location: s3://payments-lake/validated/payments/
+    partitioning:
+      columns: [transaction_date]
+      strategy: daily
+    classification: confidential
+    contains_pii: true
+    pii_fields: [customer_id]
+    tags: [validated, pci-scope]
+
+  - id: ds-payments-processed
+    name: Payments Processed
+    description: Fully validated and business-rule checked payments
+    type: table
+    format: delta
+    location: s3://payments-lake/processed/payments/
+    partitioning:
+      columns: [transaction_date]
+      strategy: daily
+    classification: confidential
+    contains_pii: true
+    pii_fields: [customer_id]
+    tags: [processed, pci-scope]
+
+  - id: ds-fraud-features
+    name: Fraud Detection Features
+    description: Features extracted for fraud detection
+    type: stream
+    format: avro
+    location: kafka://fraud-features
+    schema:
+      fields:
+        - name: payment_id
+          type: string
+          nullable: false
+        - name: hour_of_day
+          type: integer
+          nullable: false
+        - name: day_of_week
+          type: integer
+          nullable: false
+        - name: time_since_last_transaction
+          type: bigint
+          nullable: true
+        - name: transaction_velocity_1h
+          type: integer
+          nullable: false
+        - name: transaction_velocity_24h
+          type: integer
+          nullable: false
+        - name: avg_amount
+          type: decimal
+          nullable: true
+        - name: max_amount
+          type: decimal
+          nullable: true
+        - name: stddev_amount
+          type: decimal
+          nullable: true
+    classification: confidential
+    contains_pii: false
+    tags: [ml-features, fraud]
+
+  - id: ds-fraud-scores
+    name: Fraud Scores
+    description: Fraud risk scores from ML model
+    type: stream
+    format: avro
+    location: kafka://fraud-scores
+    schema:
+      fields:
+        - name: payment_id
+          type: string
+          nullable: false
+        - name: fraud_score
+          type: decimal
+          nullable: false
+          description: Score between 0 and 1
+        - name: model_version
+          type: string
+          nullable: false
+        - name: score_timestamp
+          type: timestamp
+          nullable: false
+    classification: confidential
+    contains_pii: false
+    tags: [ml-output, fraud]
+
+  - id: ds-payment-decisions
+    name: Payment Decisions
+    description: Final approve/decline decisions for payments
+    type: table
+    format: delta
+    location: s3://payments-lake/decisions/payments/
+    schema:
+      fields:
+        - name: payment_id
+          type: string
+          nullable: false
+        - name: decision
+          type: string
+          nullable: false
+          description: approve, decline, or manual_review
+        - name: fraud_score
+          type: decimal
+          nullable: false
+        - name: decision_timestamp
+          type: timestamp
+          nullable: false
+        - name: decision_reason
+          type: string
+          nullable: true
+    partitioning:
+      columns: [decision_timestamp]
+      strategy: daily
+    classification: confidential
+    contains_pii: false
+    tags: [decisions, audit-trail]
+
+  - id: ds-processor-settlements
+    name: Processor Settlements
+    description: Settlement files from payment processors
+    type: file
+    format: csv
+    location: s3://payments-lake/settlements/incoming/
+    schema:
+      fields:
+        - name: transaction_id
+          type: string
+          nullable: false
+        - name: settled_amount
+          type: decimal
+          nullable: false
+        - name: settlement_date
+          type: date
+          nullable: false
+        - name: processor_fee
+          type: decimal
+          nullable: false
+    classification: confidential
+    contains_pii: false
+    tags: [settlements, external]
+
+  - id: ds-reconciliation-results
+    name: Reconciliation Results
+    description: Daily reconciliation results and discrepancies
+    type: table
+    format: delta
+    location: s3://payments-lake/reconciliation/results/
+    schema:
+      fields:
+        - name: payment_id
+          type: string
+          nullable: true
+        - name: internal_amount
+          type: decimal
+          nullable: true
+        - name: processor_amount
+          type: decimal
+          nullable: true
+        - name: match_status
+          type: string
+          nullable: false
+          description: matched, unmatched, discrepant
+        - name: discrepancy_amount
+          type: decimal
+          nullable: true
+        - name: reconciliation_date
+          type: date
+          nullable: false
+    partitioning:
+      columns: [reconciliation_date]
+      strategy: daily
+    classification: confidential
+    contains_pii: false
+    tags: [reconciliation, audit]
+
+contracts:
+  - id: ctr-payments-processed-v1
+    name: Payments Processed Contract
+    dataset: ds-payments-processed
+    version: 1.0.0
+    schema:
+      $ref: schemas/payments-processed-v1.avsc
+    sla:
+      freshness_minutes: 1
+      completeness_percent: 100.0
+      availability_percent: 99.99
+    evolution_policy: backward-compatible
+    owners:
+      - team: payments-engineering
+        contact: payments-eng@fintech.com
+    consumers:
+      - team: risk-engineering
+        use_case: Real-time fraud detection
+      - team: finance-engineering
+        use_case: Daily reconciliation
+
+  - id: ctr-payment-decisions-v1
+    name: Payment Decisions Contract
+    dataset: ds-payment-decisions
+    version: 1.0.0
+    schema:
+      $ref: schemas/payment-decisions-v1.avsc
+    sla:
+      freshness_minutes: 1
+      completeness_percent: 100.0
+      availability_percent: 99.99
+    evolution_policy: backward-compatible
+    owners:
+      - team: risk-engineering
+        contact: risk-eng@fintech.com
+    consumers:
+      - team: customer-service
+        use_case: Transaction status lookup
+      - team: finance-engineering
+        use_case: Settlement and reconciliation
+
+checks:
+  - id: chk-freshness-payments
+    name: Freshness Check - Payment Processing
+    type: freshness
+    dataset: ds-payments-processed
+    threshold:
+      max_age_minutes: 1
+    severity: critical
+    alert:
+      channel: pagerduty
+      escalation: payments-oncall
+
+  - id: chk-completeness-payments
+    name: Completeness Check - Payments
+    type: completeness
+    dataset: ds-payments-processed
+    assertions:
+      - field: payment_id
+        not_null: true
+      - field: amount
+        not_null: true
+      - field: customer_id
+        not_null: true
+    severity: critical
+    alert:
+      channel: pagerduty
+      escalation: payments-oncall
+
+  - id: chk-fraud-model-drift
+    name: Fraud Model Drift Detection
+    type: drift
+    dataset: ds-fraud-scores
+    threshold:
+      max_distribution_change_percent: 15
+      monitoring_window_hours: 24
+    severity: high
+    alert:
+      channel: slack
+      escalation: risk-engineering
+
+  - id: chk-reconciliation-completeness
+    name: Reconciliation Completeness
+    type: completeness
+    dataset: ds-reconciliation-results
+    threshold:
+      min_match_rate_percent: 99.5
+    severity: high
+    alert:
+      channel: slack
+      escalation: finance-engineering
+
+  - id: chk-pci-compliance
+    name: PCI Compliance Check
+    type: custom
+    dataset: ds-payments-processed
+    assertions:
+      - field: customer_id
+        encrypted: true
+      - field: ip_address
+        masked: true
+    severity: critical
+    alert:
+      channel: pagerduty
+      escalation: security-team
+
+lineage:
+  - id: lin-raw-to-enriched
+    upstream: ds-payment-events-raw
+    downstream: ds-payments-enriched
+    transform: trf-join-customer
+    relationship: one-to-one
+
+  - id: lin-enriched-to-validated
+    upstream: ds-payments-enriched
+    downstream: ds-payments-validated
+    transform: trf-validate-schema
+    relationship: one-to-one
+
+  - id: lin-validated-to-processed
+    upstream: ds-payments-validated
+    downstream: ds-payments-processed
+    transform: trf-compliance-check
+    relationship: one-to-one
+
+  - id: lin-processed-to-features
+    upstream: ds-payments-processed
+    downstream: ds-fraud-features
+    transform: trf-time-features
+    relationship: one-to-one
+
+  - id: lin-features-to-scores
+    upstream: ds-fraud-features
+    downstream: ds-fraud-scores
+    transform: trf-ml-inference
+    relationship: one-to-one
+
+  - id: lin-scores-to-decisions
+    upstream: ds-fraud-scores
+    downstream: ds-payment-decisions
+    transform: trf-decision-rules
+    relationship: one-to-one
+
+  - id: lin-decisions-to-recon
+    upstream: ds-payment-decisions
+    downstream: ds-reconciliation-results
+    transform: trf-match-transactions
+    relationship: many-to-one
+
+governance:
+  retention:
+    - dataset: ds-payment-events-raw
+      policy: delete-after-days
+      days: 7
+
+    - dataset: ds-payments-processed
+      policy: archive-after-years
+      years: 7
+
+    - dataset: ds-payment-decisions
+      policy: retain-indefinitely
+
+    - dataset: ds-reconciliation-results
+      policy: archive-after-years
+      years: 10
+
+  access:
+    - dataset: ds-payments-processed
+      tier: confidential
+      roles: [payments-engineer, compliance-officer, security-admin]
+
+    - dataset: ds-payment-decisions
+      tier: restricted
+      roles: [payments-engineer, risk-engineer, finance-analyst]
+
+    - dataset: ds-reconciliation-results
+      tier: restricted
+      roles: [finance-analyst, compliance-officer]
+
+  pii_handling:
+    - dataset: ds-payment-events-raw
+      masking: [customer_id, customer_email, ip_address]
+      masking_method: tokenize
+
+    - dataset: ds-payments-enriched
+      masking: [customer_id, ip_address]
+      masking_method: tokenize
+
+    - dataset: ds-customer-reference
+      masking: [customer_email]
+      masking_method: hash
+
+observability:
+  metrics:
+    - name: payments_ingested_total
+      dataset: ds-payment-events-raw
+      type: counter
+      description: Total payments ingested from outbox
+
+    - name: payments_validated_rate
+      dataset: ds-payments-validated
+      type: gauge
+      description: Percentage of payments passing validation
+
+    - name: fraud_score_distribution
+      dataset: ds-fraud-scores
+      type: histogram
+      description: Distribution of fraud scores
+
+    - name: payment_approval_rate
+      dataset: ds-payment-decisions
+      type: gauge
+      description: Percentage of payments approved
+
+    - name: reconciliation_match_rate
+      dataset: ds-reconciliation-results
+      type: gauge
+      description: Percentage of transactions successfully reconciled
+
+  slos:
+    - name: payment-processing-latency-slo
+      target: 99.9
+      unit: percent
+      window: 30d
+      linked_check: chk-freshness-payments
+
+    - name: payment-availability-slo
+      target: 99.99
+      unit: percent
+      window: 30d
+
+    - name: fraud-detection-accuracy-slo
+      target: 95.0
+      unit: percent
+      window: 7d
+
+  alerts:
+    - name: payment-processing-stalled
+      condition: "freshness > 1 minute"
+      severity: critical
+      channel: pagerduty
+
+    - name: high-fraud-rate
+      condition: "fraud_score_avg > 0.5"
+      severity: high
+      channel: slack
+
+    - name: reconciliation-mismatch
+      condition: "match_rate < 99.5%"
+      severity: high
+      channel: slack
+
+    - name: pci-compliance-violation
+      condition: "pii_not_encrypted OR pii_not_masked"
+      severity: critical
+      channel: pagerduty

@@ -4,13 +4,13 @@ A generic framework for generating documentation from YAML schemas and documents
 
 ## Components
 
-### 1. Schema Tree Generator (`yaml_schema_tree.py`)
+### 1. Schema Tree Generator (`scripts/yaml_schema_tree.py`)
 
 Generates a navigable tree structure from a YAML schema definition.
 
 **Usage:**
 ```bash
-python yaml_schema_tree.py <schema_file> [--stats] [--no-humanize]
+python scripts/yaml_schema_tree.py <schema_file> [--stats] [--no-humanize]
 ```
 
 **Features:**
@@ -28,16 +28,16 @@ python yaml_schema_tree.py <schema_file> [--stats] [--no-humanize]
 
 **Example:**
 ```bash
-python yaml_schema_tree.py samples/ddd-schema.yaml --no-humanize > ddd-tree.md
+python scripts/yaml_schema_tree.py samples/ddd-schema.yaml --no-humanize > output/ddd-tree.md
 ```
 
-### 2. Document Visitor (`yaml_visitor_final.py`)
+### 2. Document Visitor (`scripts/yaml_visitor.py`)
 
-Visits every node in a YAML document using the schema tree structure and extracts values.
+Visits every node in a YAML document using the schema tree structure and renders documentation. The visitor can emit Markdown (legacy) or the interactive HTML experience defined in `specs/yaml-to-html-spec.md`.
 
 **Usage:**
 ```bash
-python yaml_visitor_final.py <schema_file> <document_file> <output_file>
+python scripts/yaml_visitor.py <schema_file> <document_file> <output_file>
 ```
 
 **Features:**
@@ -46,15 +46,13 @@ python yaml_visitor_final.py <schema_file> <document_file> <output_file>
 - Handles both inline objects and reference arrays
 - Detects and prevents infinite cycles
 - Extracts actual values from document
-- **Completely generic** - no hardcoded schema types
-
-**Output:**
-- Markdown file with all node paths and their values
+- Renders Markdown (for `.md`) or HTML (for `.html`) output
 - Statistics on nodes found vs not found
+- **Completely generic** - no hardcoded schema types
 
 **Example:**
 ```bash
-python yaml_visitor_final.py samples/ddd-schema.yaml samples/ddd-model.yaml ddd-tree-values.md
+python scripts/yaml_visitor.py samples/ddd-schema.yaml samples/ddd-model.yaml output/ddd.html
 ```
 
 ## Schema Requirements
@@ -109,25 +107,37 @@ For the visitor to extract values, your YAML document should:
 
 ## Output Files
 
-- **`ddd-tree.md`** - Non-humanized schema tree for navigation
-- **`ddd-tree-values.md`** - Document values extracted using the tree
-- **`yaml-schema-tree.md`** - Specification for tree generation
-- **`yaml-to-md-spec.md`** - Specification for YAML to Markdown conversion
+- `output/ddd.html` – Example HTML export for the sample Domain-Driven Design model
+- `output/ddd.md` – Legacy Markdown export for comparison/testing
+- `specs/yaml-schema-tree.md` – Specification for tree generation
+- `specs/yaml-to-md-spec.md` – Specification for YAML-to-Markdown conversion
+- `specs/yaml-to-html-spec.md` – Specification for the single-page HTML renderer
+- `samples/INDEX.md` – Catalog linking each schema to its example model
+
+## Batch Generation
+
+Generate documentation for every sample schema/model pairing:
+
+```bash
+scripts/generate_all_outputs.sh
+```
+
+Outputs are written to `output/<sample-subdir>/<model-name>.html` and `.md`, mirroring the layout of `samples/`.
 
 ## Examples
 
 ### Generate Schema Tree
 ```bash
 # With humanized names (for display)
-python yaml_schema_tree.py samples/ddd-schema.yaml --stats
+python scripts/yaml_schema_tree.py samples/ddd-schema.yaml --stats
 
 # Without humanized names (for navigation)
-python yaml_schema_tree.py samples/ddd-schema.yaml --no-humanize > ddd-tree.md
+python scripts/yaml_schema_tree.py samples/ddd-schema.yaml --no-humanize > output/ddd-tree.md
 ```
 
 ### Visit Document
 ```bash
-python yaml_visitor_final.py samples/ddd-schema.yaml samples/ddd-model.yaml output.md
+python scripts/yaml_visitor.py samples/ddd-schema.yaml samples/ddd-model.yaml output/ddd.html
 ```
 
 ## Generic Design
@@ -149,25 +159,26 @@ Both tools are **completely generic** and work with any YAML schema/document:
          │
          ▼
 ┌─────────────────────────┐
-│  yaml_schema_tree.py    │
-│  - Parses $defs         │
-│  - Builds relationships │
-│  - Generates tree       │
+│ scripts/yaml_schema_tree.py │
+│  - Parses $defs             │
+│  - Builds relationships     │
+│  - Generates tree           │
 └────────┬────────────────┘
          │
-         ├──► ddd-tree.md (navigation tree)
+         ├──► output/ddd-tree.md (navigation tree, optional)
          │
          ▼
 ┌─────────────────────────┐      ┌──────────────┐
-│  yaml_visitor_final.py  │◄─────┤ YAML Document│
+│ scripts/yaml_visitor.py │◄─────┤ YAML Document│
 │  - Loads tree structure │      └──────────────┘
 │  - Visits all nodes     │
 │  - Extracts values      │
 │  - Resolves references  │
+│  - Renders Markdown/HTML│
 └────────┬────────────────┘
          │
          ▼
-  ddd-tree-values.md (extracted values)
+  output/ddd.html (interactive documentation)
 ```
 
 ## Type Annotations

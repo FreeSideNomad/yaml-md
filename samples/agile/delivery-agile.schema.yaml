@@ -1,0 +1,659 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/agile/delivery/v1
+title: Agile Delivery Patterns Schema
+description: Product delivery patterns - products, features, stories, tasks, increments
+
+metadata:
+  author: "Igor Music"
+  created: "2025-10-17"
+  updated: "2025-10-17"
+  license: "MIT"
+  version: "1.0.0"
+  partition: "delivery"
+  references:
+    - "Scrum Guide"
+    - "SAFe 6.0 - Product Management"
+
+naming_conventions:
+  product_id: "prod_<name>"
+  vision_id: "vis_<name>"
+  feature_id: "feat_<name>"
+  user_story_id: "us_<number>"
+  task_id: "tsk_<number>"
+  increment_id: "inc_<number>"
+  dor_id: "dor_<name>"
+  estimation_id: "est_<name>"
+
+$defs:
+  product:
+    type: object
+    description: The primary organizational unit representing the solution being developed
+    required:
+      - id
+      - name
+      - vision_ref
+    properties:
+      id:
+        type: string
+        pattern: "^prod_[a-z0-9_]+$"
+        description: Unique product identifier
+      name:
+        type: string
+        description: Product name
+        minLength: 1
+        maxLength: 100
+      description:
+        type: string
+        description: Brief product description
+      vision_ref:
+        type: string
+        pattern: "^vis_[a-z0-9_]+$"
+        description: "Product vision reference (ID reference)"
+      roadmap_ref:
+        type: string
+        pattern: "^rm_[a-z0-9_]+$"
+        description: "Product roadmap reference (ID reference)"
+      release_refs:
+        type: array
+        description: "Planned and past releases for this product (ID references)"
+        items:
+          type: string
+          pattern: "^rel_[a-z0-9_]+$"
+      value_stream_refs:
+        type: array
+        description: "Value streams this product belongs to (ID references)"
+        items:
+          type: string
+          pattern: "^vs_[a-z0-9_]+$"
+      portfolio_ref:
+        type: string
+        pattern: "^pf_[a-z0-9_]+$"
+        description: "Portfolio this product belongs to (ID reference)"
+      program_refs:
+        type: array
+        description: "Programs or ARTs delivering this product (ID references)"
+        items:
+          type: string
+          pattern: "^prg_[a-z0-9_]+$"
+      stakeholder_refs:
+        type: array
+        description: "Product stakeholders (ID references)"
+        items:
+          type: string
+          pattern: "^sh_[a-z0-9_]+$"
+      metrics:
+        type: object
+        description: Key product metrics
+        properties:
+          northStar:
+            type: string
+            description: Primary success metric
+          kpi_refs:
+            type: array
+            description: "KPI metric references (ID references)"
+            items:
+              type: string
+              pattern: "^met_[a-z0-9_]+$"
+
+  vision:
+    type: object
+    description: Comprehensive product vision following SAFe best practices
+    required:
+      - id
+      - futureStateDescription
+      - customerNeeds
+    properties:
+      id:
+        type: string
+        pattern: "^vis_[a-z0-9_]+$"
+        description: Unique vision identifier
+      futureStateDescription:
+        type: string
+        description: Clear description of the intended future state
+        minLength: 50
+      customerNeeds:
+        type: object
+        description: Target customers and problems being solved
+        required:
+          - targetCustomers
+          - problemsBeingSolved
+        properties:
+          targetCustomers:
+            type: array
+            description: Target customer segments
+            items:
+              type: string
+            minItems: 1
+          problemsBeingSolved:
+            type: array
+            description: Key problems the product addresses
+            items:
+              type: string
+            minItems: 1
+          valueProposition:
+            type: string
+            description: Core value proposition
+      solutionIntent:
+        type: object
+        description: Proposed solution approach
+        properties:
+          approach:
+            type: string
+            description: High-level solution approach
+          keyCapabilities:
+            type: array
+            description: Key capabilities the solution will provide
+            items:
+              type: string
+          technicalDirection:
+            type: string
+            description: Overall technical direction
+          differentiators:
+            type: array
+            description: What makes this solution different
+            items:
+              type: string
+      boundaries:
+        type: object
+        description: Context and boundaries of the product
+        properties:
+          inScope:
+            type: array
+            description: What is included
+            items:
+              type: string
+          outOfScope:
+            type: array
+            description: What is explicitly excluded
+            items:
+              type: string
+          constraints:
+            type: array
+            description: Known constraints
+            items:
+              type: string
+          assumptions:
+            type: array
+            description: Key assumptions
+            items:
+              type: string
+          dependencies:
+            type: array
+            description: External dependencies
+            items:
+              type: string
+      strategicAlignment:
+        type: object
+        description: Connection to business objectives
+        properties:
+          businessObjectives:
+            type: array
+            description: Business objectives this supports
+            items:
+              type: string
+          strategicThemes:
+            type: array
+            description: Strategic themes this aligns with
+            items:
+              type: string
+          success_metric_refs:
+            type: array
+            description: "How success will be measured (metric ID references)"
+            items:
+              type: string
+              pattern: "^met_[a-z0-9_]+$"
+          outcomes:
+            type: array
+            description: Desired business outcomes
+            items:
+              type: string
+      motivationalNarrative:
+        type: string
+        description: Inspiring description that engages team members
+        minLength: 100
+      decisionFramework:
+        type: object
+        description: Framework for making decisions
+        properties:
+          guidingPrinciples:
+            type: array
+            description: Principles that guide decisions
+            items:
+              type: string
+          tradeoffCriteria:
+            type: array
+            description: Criteria for making trade-offs
+            items:
+              type: string
+          alignmentMechanisms:
+            type: array
+            description: How alignment is maintained
+            items:
+              type: string
+      lastUpdated:
+        type: string
+        format: date
+        description: When vision was last updated
+
+  feature:
+    type: object
+    description: Service provided by the system, sized for a Program increment
+    required:
+      - id
+      - title
+      - type
+      - bounded_context_ref
+    properties:
+      id:
+        type: string
+        pattern: "^feat_[a-z0-9_]+$"
+        description: Unique feature identifier
+      bounded_context_ref:
+        type: string
+        description: DDD bounded context this feature belongs to (required - explicit grounding)
+        pattern: "^ddd:BoundedContext:[a-z0-9_-]+$"
+        x-grounding:
+          target_canon: ddd
+          target_concept: BoundedContext
+          grounding_type: epistemic
+          strength: strong
+          rationale: Features must be scoped to a bounded context to ensure domain alignment
+      title:
+        type: string
+        minLength: 1
+        maxLength: 200
+        description: Feature title
+      type:
+        type: string
+        enum:
+          - business
+          - enabler
+        description: Business feature delivers value, enabler extends runway
+      description:
+        type: string
+        description: Feature description
+      benefitHypothesis:
+        type: string
+        description: How this feature delivers value
+      acceptanceCriteria:
+        type: array
+        description: Conditions for feature acceptance
+        items:
+          type: string
+        minItems: 1
+      nonfunctionalRequirements:
+        type: array
+        description: NFRs for this feature
+        items:
+          type: string
+      nfr_refs:
+        type: array
+        description: "References to non_functional_requirement definitions (ID references)"
+        items:
+          type: string
+          pattern: "^nfr_[a-z0-9_]+$"
+      enabler_refs:
+        type: array
+        description: "Enablers that support this feature (ID references)"
+        items:
+          type: string
+          pattern: "^enb_[a-z0-9_]+$"
+      epic_ref:
+        type: string
+        pattern: "^epic_[a-z0-9_]+$"
+        description: "Parent epic (ID reference)"
+      user_story_refs:
+        type: array
+        description: "User stories implementing this feature (ID references)"
+        items:
+          type: string
+          pattern: "^us_[a-z0-9_]+$"
+      status:
+        type: string
+        enum:
+          - backlog
+          - planned
+          - in-progress
+          - done
+          - accepted
+        description: Feature status
+      wsjf:
+        type: object
+        description: WSJF prioritization scores
+        properties:
+          userBusinessValue:
+            type: integer
+            minimum: 1
+            maximum: 20
+          timeCriticality:
+            type: integer
+            minimum: 1
+            maximum: 20
+          riskReductionOpportunity:
+            type: integer
+            minimum: 1
+            maximum: 20
+          jobSize:
+            type: integer
+            minimum: 1
+            maximum: 20
+          wsjfScore:
+            type: number
+            description: Calculated WSJF = (UBV + TC + RR) / JobSize
+      pi_ref:
+        type: string
+        pattern: "^pi_[a-z0-9_]+$"
+        description: "Target Program Increment (ID reference)"
+      team_ref:
+        type: string
+        pattern: "^tm_[a-z0-9_]+$"
+        description: "Responsible team (ID reference)"
+
+  user_story:
+    type: object
+    description: Small, vertical slice of functionality
+    required:
+      - id
+      - title
+      - asA
+      - iWant
+      - soThat
+    properties:
+      id:
+        type: string
+        pattern: "^us_[a-z0-9_]+$"
+        description: Unique user story identifier
+      ux_artifact_refs:
+        type: object
+        description: UX artifacts implementing this story (explicit grounding)
+        x-grounding:
+          target_canon: ux
+          grounding_type: procedural
+          strength: strong
+          rationale: Stories are implemented through UX artifacts (pages, components, workflows)
+        properties:
+          page_refs:
+            type: array
+            items:
+              type: string
+              pattern: "^ux:Page:[a-z0-9_-]+$"
+            description: "Page IDs where this story is implemented (cross-domain references)"
+          component_refs:
+            type: array
+            items:
+              type: string
+              pattern: "^ux:Component:[a-z0-9_-]+$"
+            description: "Component IDs implementing this story (cross-domain references)"
+          workflow_refs:
+            type: array
+            items:
+              type: string
+              pattern: "^ux:Workflow:[a-z0-9_-]+$"
+            description: "Workflow IDs implementing this story (cross-domain references)"
+      title:
+        type: string
+        minLength: 1
+        maxLength: 200
+        description: Story title
+      asA:
+        type: string
+        description: User role (As a...)
+      iWant:
+        type: string
+        description: Goal (I want...)
+      soThat:
+        type: string
+        description: Benefit (So that...)
+      description:
+        type: string
+        description: Additional details
+      acceptanceCriteria:
+        type: array
+        description: Testable acceptance criteria
+        items:
+          type: object
+          required:
+            - given
+            - when
+            - then
+          properties:
+            given:
+              type: string
+              description: Precondition
+            when:
+              type: string
+              description: Action
+            then:
+              type: string
+              description: Expected result
+        minItems: 1
+      storyPoints:
+        type: integer
+        minimum: 0
+        maximum: 21
+        description: Relative effort estimate
+      investCheck:
+        type: object
+        description: INVEST criteria validation
+        properties:
+          independent:
+            type: boolean
+          negotiable:
+            type: boolean
+          valuable:
+            type: boolean
+          estimable:
+            type: boolean
+          small:
+            type: boolean
+          testable:
+            type: boolean
+      feature_ref:
+        type: string
+        pattern: "^feat_[a-z0-9_]+$"
+        description: "Parent feature (ID reference)"
+      sprint_ref:
+        type: string
+        pattern: "^sp_[a-z0-9_]+$"
+        description: "Sprint this story is in (ID reference)"
+      iteration_ref:
+        type: string
+        pattern: "^it_[a-z0-9_]+$"
+        description: "Iteration this story is in - SAFe (ID reference)"
+      status:
+        type: string
+        enum:
+          - backlog
+          - ready
+          - in-progress
+          - review
+          - done
+        description: Story status
+      assignee_ref:
+        type: string
+        pattern: "^mbr_[a-z0-9_]+$"
+        description: "Currently assigned team member (ID reference)"
+      task_refs:
+        type: array
+        description: "Technical tasks for this story (ID references)"
+        items:
+          type: string
+          pattern: "^tsk_[a-z0-9_]+$"
+      impediment_refs:
+        type: array
+        description: "Impediments blocking this story (ID references)"
+        items:
+          type: string
+          pattern: "^imp_[a-z0-9_]+$"
+      technical_debt_refs:
+        type: array
+        description: "Technical debt addressed by this story (ID references)"
+        items:
+          type: string
+          pattern: "^td_[a-z0-9_]+$"
+
+  task:
+    type: object
+    description: Technical task for implementing a story
+    required:
+      - id
+      - description
+    properties:
+      id:
+        type: string
+        pattern: "^tsk_[a-z0-9_]+$"
+        description: Unique task identifier
+      description:
+        type: string
+        description: Task description
+      estimateHours:
+        type: number
+        minimum: 0
+        description: Estimated hours to complete
+      remainingHours:
+        type: number
+        minimum: 0
+        description: Remaining hours to complete
+      status:
+        type: string
+        enum:
+          - todo
+          - in-progress
+          - done
+        description: Task status
+      assignee_ref:
+        type: string
+        pattern: "^mbr_[a-z0-9_]+$"
+        description: "Assigned team member (ID reference)"
+      user_story_ref:
+        type: string
+        pattern: "^us_[a-z0-9_]+$"
+        description: "Parent user story (ID reference)"
+
+  increment:
+    type: object
+    description: Potentially shippable product increment from a sprint
+    required:
+      - id
+      - sprint_ref
+      - deliverables
+      - acceptanceStatus
+    properties:
+      id:
+        type: string
+        pattern: "^inc_[a-z0-9_]+$"
+        description: Unique increment identifier
+      sprint_ref:
+        type: string
+        pattern: "^sp_[a-z0-9_]+$"
+        description: "Sprint that produced this increment (ID reference)"
+      deliverables:
+        type: array
+        description: What was delivered in this increment
+        items:
+          type: string
+        minItems: 1
+      acceptanceStatus:
+        type: string
+        enum:
+          - accepted
+          - rejected
+          - pending
+        description: Whether increment was accepted
+      demoDate:
+        type: string
+        format: date
+        description: When increment was demonstrated
+
+  definition_of_ready:
+    type: object
+    description: Criteria that work items must meet before being pulled into sprint
+    required:
+      - id
+      - criteria
+      - team_ref
+    properties:
+      id:
+        type: string
+        pattern: "^dor_[a-z0-9_]+$"
+        description: Unique DoR identifier
+      criteria:
+        type: array
+        description: Readiness criteria
+        items:
+          type: string
+        minItems: 1
+      team_ref:
+        type: string
+        pattern: "^tm_[a-z0-9_]+$"
+        description: "Team that owns this DoR (ID reference)"
+      lastUpdated:
+        type: string
+        format: date
+        description: When DoR was last updated
+
+  estimation_technique:
+    type: object
+    description: Technique for estimating work items
+    required:
+      - id
+      - name
+      - description
+    properties:
+      id:
+        type: string
+        pattern: "^est_[a-z0-9_]+$"
+        description: Unique estimation technique identifier
+      name:
+        type: string
+        enum:
+          - planning_poker
+          - t_shirt_sizes
+          - affinity
+          - ideal_days
+          - story_points
+        description: Name of estimation technique
+      description:
+        type: string
+        description: Description of how technique works
+        minLength: 10
+      whenToUse:
+        type: string
+        description: Guidance on when to use this technique
+
+validation_rules:
+  - rule: "product_has_vision"
+    description: "Every product must have a vision"
+  - rule: "feature_has_bounded_context"
+    description: "Every feature must be scoped to a DDD bounded context"
+  - rule: "user_story_has_acceptance_criteria"
+    description: "Every user story must have at least one acceptance criterion"
+  - rule: "user_story_passes_invest"
+    description: "User stories should meet INVEST criteria"
+
+best_practices:
+  product:
+    - "Maintain clear product vision"
+    - "Engage stakeholders regularly"
+    - "Track product metrics"
+    - "Align with portfolio strategy"
+  vision:
+    - "Review and update vision quarterly"
+    - "Make vision inspiring and clear"
+    - "Connect vision to strategy"
+    - "Use vision to guide decisions"
+  feature:
+    - "Write clear benefit hypothesis"
+    - "Size features for one PI"
+    - "Use WSJF for prioritization"
+    - "Link features to bounded contexts"
+  user_story:
+    - "Keep stories small (completable in one sprint)"
+    - "Write clear acceptance criteria"
+    - "Validate INVEST criteria"
+    - "Include user role, goal, and benefit"
+  task:
+    - "Break stories into tasks"
+    - "Estimate tasks in hours"
+    - "Update remaining hours daily"
+    - "Keep tasks visible on task board"

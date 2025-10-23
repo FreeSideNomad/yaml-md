@@ -1,0 +1,441 @@
+# Delivery-level Example: iOS App Product Delivery
+# Demonstrates products, features, user stories, tasks, backlogs structure
+
+products:
+  - id: "prod_ios_app"
+    name: "E-Commerce iOS App"
+    description: "Native iOS shopping app for e-commerce platform"
+    portfolio_ref: "pf_ecommerce"
+    program_refs:
+      - "prg_mobile_platform"
+    feature_refs:
+      - "feat_ios_app"
+      - "feat_mobile_checkout"
+      - "feat_push_notifications"
+    status: "in_development"
+    release_refs:
+      - "rel_mobile_mvp"
+      - "rel_mobile_1_1"
+
+  - id: "prod_android_app"
+    name: "E-Commerce Android App"
+    description: "Native Android shopping app for e-commerce platform"
+    portfolio_ref: "pf_ecommerce"
+    program_refs:
+      - "prg_mobile_platform"
+    feature_refs:
+      - "feat_android_app"
+      - "feat_mobile_checkout"
+    status: "in_development"
+
+features:
+  - id: "feat_ios_app"
+    name: "iOS Native App Foundation"
+    description: "Core iOS app with authentication, navigation, and catalog browsing"
+    epic_ref: "epic_mobile_app"
+    product_ref: "prod_ios_app"
+    program_ref: "prg_mobile_platform"
+    user_story_refs:
+      - "us_login_screen"
+      - "us_signup_screen"
+      - "us_home_screen"
+      - "us_product_list"
+      - "us_product_detail"
+      - "us_search"
+    acceptanceCriteria:
+      - "Users can sign up and log in"
+      - "Users can browse product catalog"
+      - "Users can search for products"
+      - "App loads in < 2 seconds"
+    status: "in_progress"
+    priority: "high"
+
+  - id: "feat_android_app"
+    name: "Android Native App Foundation"
+    description: "Core Android app with authentication, navigation, and catalog browsing"
+    epic_ref: "epic_mobile_app"
+    product_ref: "prod_android_app"
+    program_ref: "prg_mobile_platform"
+    user_story_refs:
+      - "us_android_login"
+      - "us_android_signup"
+      - "us_android_home"
+    acceptanceCriteria:
+      - "Users can sign up and log in"
+      - "Users can browse product catalog"
+      - "App loads in < 2 seconds"
+    status: "in_progress"
+    priority: "high"
+
+  - id: "feat_mobile_checkout"
+    name: "Mobile Checkout Flow"
+    description: "Complete checkout process optimized for mobile"
+    epic_ref: "epic_mobile_app"
+    product_ref: "prod_ios_app"
+    program_ref: "prg_mobile_platform"
+    user_story_refs:
+      - "us_add_to_cart"
+      - "us_cart_view"
+      - "us_checkout"
+      - "us_payment"
+    acceptanceCriteria:
+      - "Users can add products to cart"
+      - "Users can complete checkout in < 60 seconds"
+      - "Payment processing is secure (PCI-DSS)"
+    status: "planned"
+    priority: "high"
+
+  - id: "feat_push_notifications"
+    name: "Push Notifications"
+    description: "Personalized push notifications for deals and updates"
+    epic_ref: "epic_mobile_app"
+    product_ref: "prod_ios_app"
+    user_story_refs:
+      - "us_notification_permission"
+      - "us_deal_notifications"
+    acceptanceCriteria:
+      - "Users can enable/disable notifications"
+      - "Notifications delivered within 5 seconds"
+    status: "planned"
+    priority: "medium"
+
+user_stories:
+  - id: "us_login_screen"
+    name: "User Login Screen"
+    description: "As a returning customer, I want to log in with my email and password"
+    feature_ref: "feat_ios_app"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_01"
+    storyPoints: 5
+    priority: "high"
+    acceptanceCriteria:
+      - "Login form with email and password fields"
+      - "Remember me checkbox"
+      - "Forgot password link"
+      - "Error handling for invalid credentials"
+    task_refs:
+      - "tsk_login_ui"
+      - "tsk_login_api"
+      - "tsk_login_validation"
+    status: "in_progress"
+
+  - id: "us_signup_screen"
+    name: "User Signup Screen"
+    description: "As a new customer, I want to create an account"
+    feature_ref: "feat_ios_app"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_01"
+    storyPoints: 8
+    priority: "high"
+    acceptanceCriteria:
+      - "Signup form with email, password, name"
+      - "Password strength validation"
+      - "Email verification flow"
+      - "Terms and conditions acceptance"
+    task_refs:
+      - "tsk_signup_ui"
+      - "tsk_signup_api"
+      - "tsk_email_verification"
+    status: "in_progress"
+
+  - id: "us_home_screen"
+    name: "Home Screen Layout"
+    description: "As a customer, I want to see featured products on the home screen"
+    feature_ref: "feat_ios_app"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_01"
+    storyPoints: 8
+    priority: "high"
+    acceptanceCriteria:
+      - "Hero banner with featured products"
+      - "Category navigation"
+      - "Search bar"
+      - "Pull to refresh"
+    task_refs:
+      - "tsk_home_ui"
+      - "tsk_home_api"
+    status: "completed"
+
+  - id: "us_product_list"
+    name: "Product List View"
+    description: "As a customer, I want to browse products by category"
+    feature_ref: "feat_ios_app"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_02"
+    storyPoints: 13
+    priority: "high"
+    acceptanceCriteria:
+      - "Grid view of products with images"
+      - "Product name and price"
+      - "Infinite scroll pagination"
+      - "Loading states"
+    task_refs:
+      - "tsk_product_list_ui"
+      - "tsk_product_list_api"
+      - "tsk_product_list_cache"
+    status: "planned"
+
+  - id: "us_product_detail"
+    name: "Product Detail View"
+    description: "As a customer, I want to see detailed product information"
+    feature_ref: "feat_ios_app"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_02"
+    storyPoints: 8
+    priority: "high"
+    acceptanceCriteria:
+      - "Product images carousel"
+      - "Product description"
+      - "Price and availability"
+      - "Add to cart button"
+      - "Customer reviews"
+    task_refs:
+      - "tsk_detail_ui"
+      - "tsk_detail_api"
+    status: "planned"
+
+  - id: "us_search"
+    name: "Product Search"
+    description: "As a customer, I want to search for products by keyword"
+    feature_ref: "feat_ios_app"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_02"
+    storyPoints: 5
+    priority: "medium"
+    acceptanceCriteria:
+      - "Search bar with autocomplete"
+      - "Search results with relevance sorting"
+      - "Recent searches history"
+    task_refs:
+      - "tsk_search_ui"
+      - "tsk_search_api"
+    status: "planned"
+
+  - id: "us_add_to_cart"
+    name: "Add to Cart"
+    description: "As a customer, I want to add products to my cart"
+    feature_ref: "feat_mobile_checkout"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_03"
+    storyPoints: 5
+    priority: "high"
+    acceptanceCriteria:
+      - "Add to cart button on product detail"
+      - "Quantity selector"
+      - "Cart badge with item count"
+      - "Success animation"
+    task_refs:
+      - "tsk_cart_add_ui"
+      - "tsk_cart_state"
+    status: "planned"
+
+  - id: "us_cart_view"
+    name: "Cart View"
+    description: "As a customer, I want to view and modify my cart"
+    feature_ref: "feat_mobile_checkout"
+    team_ref: "tm_ios"
+    sprint_ref: "sp_2025_03"
+    storyPoints: 8
+    priority: "high"
+    acceptanceCriteria:
+      - "List of cart items with images"
+      - "Quantity adjustment"
+      - "Remove item"
+      - "Subtotal calculation"
+      - "Proceed to checkout button"
+    task_refs:
+      - "tsk_cart_view_ui"
+      - "tsk_cart_update"
+    status: "planned"
+
+  - id: "us_checkout"
+    name: "Checkout Flow"
+    description: "As a customer, I want to complete my purchase"
+    feature_ref: "feat_mobile_checkout"
+    storyPoints: 13
+    priority: "high"
+    status: "planned"
+
+  - id: "us_payment"
+    name: "Payment Processing"
+    description: "As a customer, I want to pay securely with credit card"
+    feature_ref: "feat_mobile_checkout"
+    storyPoints: 13
+    priority: "high"
+    status: "planned"
+
+tasks:
+  - id: "tsk_login_ui"
+    name: "Design and implement login UI"
+    description: "Create login screen layout with email/password fields"
+    user_story_ref: "us_login_screen"
+    assignee_ref: "mbr_john_doe"
+    estimatedHours: 4
+    actualHours: 5
+    status: "completed"
+
+  - id: "tsk_login_api"
+    name: "Integrate login API"
+    description: "Connect login form to authentication API"
+    user_story_ref: "us_login_screen"
+    assignee_ref: "mbr_jane_smith"
+    estimatedHours: 4
+    actualHours: 3
+    status: "completed"
+
+  - id: "tsk_login_validation"
+    name: "Implement form validation"
+    description: "Add client-side validation for email and password"
+    user_story_ref: "us_login_screen"
+    assignee_ref: "mbr_john_doe"
+    estimatedHours: 2
+    status: "in_progress"
+
+  - id: "tsk_signup_ui"
+    name: "Design and implement signup UI"
+    description: "Create signup screen with form fields"
+    user_story_ref: "us_signup_screen"
+    assignee_ref: "mbr_alex_chen"
+    estimatedHours: 6
+    status: "in_progress"
+
+  - id: "tsk_signup_api"
+    name: "Integrate signup API"
+    description: "Connect signup form to user registration API"
+    user_story_ref: "us_signup_screen"
+    assignee_ref: "mbr_jane_smith"
+    estimatedHours: 4
+    status: "in_progress"
+
+  - id: "tsk_email_verification"
+    name: "Implement email verification"
+    description: "Send verification email and handle verification link"
+    user_story_ref: "us_signup_screen"
+    assignee_ref: "mbr_jane_smith"
+    estimatedHours: 6
+    status: "not_started"
+
+  - id: "tsk_home_ui"
+    name: "Design home screen layout"
+    description: "Create home screen with hero banner and categories"
+    user_story_ref: "us_home_screen"
+    assignee_ref: "mbr_john_doe"
+    estimatedHours: 8
+    actualHours: 8
+    status: "completed"
+
+  - id: "tsk_home_api"
+    name: "Integrate home screen API"
+    description: "Fetch featured products and categories"
+    user_story_ref: "us_home_screen"
+    assignee_ref: "mbr_jane_smith"
+    estimatedHours: 4
+    actualHours: 4
+    status: "completed"
+
+  - id: "tsk_product_list_ui"
+    name: "Design product list UI"
+    user_story_ref: "us_product_list"
+    estimatedHours: 8
+    status: "not_started"
+
+  - id: "tsk_product_list_api"
+    name: "Integrate product catalog API"
+    user_story_ref: "us_product_list"
+    estimatedHours: 6
+    status: "not_started"
+
+  - id: "tsk_product_list_cache"
+    name: "Implement product list caching"
+    user_story_ref: "us_product_list"
+    estimatedHours: 4
+    status: "not_started"
+
+  - id: "tsk_detail_ui"
+    name: "Design product detail UI"
+    user_story_ref: "us_product_detail"
+    estimatedHours: 8
+    status: "not_started"
+
+  - id: "tsk_detail_api"
+    name: "Integrate product detail API"
+    user_story_ref: "us_product_detail"
+    estimatedHours: 4
+    status: "not_started"
+
+  - id: "tsk_search_ui"
+    name: "Design search UI with autocomplete"
+    user_story_ref: "us_search"
+    estimatedHours: 6
+    status: "not_started"
+
+  - id: "tsk_search_api"
+    name: "Integrate search API"
+    user_story_ref: "us_search"
+    estimatedHours: 4
+    status: "not_started"
+
+  - id: "tsk_cart_add_ui"
+    name: "Design add to cart UI"
+    user_story_ref: "us_add_to_cart"
+    estimatedHours: 4
+    status: "not_started"
+
+  - id: "tsk_cart_state"
+    name: "Implement cart state management"
+    user_story_ref: "us_add_to_cart"
+    estimatedHours: 6
+    status: "not_started"
+
+  - id: "tsk_cart_view_ui"
+    name: "Design cart view UI"
+    user_story_ref: "us_cart_view"
+    estimatedHours: 8
+    status: "not_started"
+
+  - id: "tsk_cart_update"
+    name: "Implement cart update logic"
+    user_story_ref: "us_cart_view"
+    estimatedHours: 6
+    status: "not_started"
+
+product_backlogs:
+  - id: "pb_ios_app"
+    name: "iOS App Product Backlog"
+    product_ref: "prod_ios_app"
+    user_story_refs:
+      - "us_login_screen"
+      - "us_signup_screen"
+      - "us_home_screen"
+      - "us_product_list"
+      - "us_product_detail"
+      - "us_search"
+      - "us_add_to_cart"
+      - "us_cart_view"
+      - "us_checkout"
+      - "us_payment"
+    prioritizationCriteria:
+      - "Business value"
+      - "Risk reduction"
+      - "Customer feedback"
+
+sprint_backlogs:
+  - id: "sb_2025_01"
+    name: "Sprint 2025-01 Backlog"
+    sprint_ref: "sp_2025_01"
+    user_story_refs:
+      - "us_login_screen"
+      - "us_signup_screen"
+      - "us_home_screen"
+    totalPoints: 21
+    status: "in_progress"
+
+  - id: "sb_2025_02"
+    name: "Sprint 2025-02 Backlog"
+    sprint_ref: "sp_2025_02"
+    user_story_refs:
+      - "us_product_list"
+      - "us_product_detail"
+      - "us_search"
+    totalPoints: 26
+    status: "planned"

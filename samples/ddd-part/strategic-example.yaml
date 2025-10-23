@@ -1,0 +1,127 @@
+# Strategic DDD Example - Job Seeker Application
+# Focuses on domains, bounded contexts, and context mappings
+
+system:
+  id: "sys_job_seeker"
+  name: "Job Seeker Application"
+  description: "AI-powered job application assistant for data scientists"
+  version: "1.0.0"
+  domains:
+    - "dom_job_matching"
+    - "dom_job_aggregation"
+    - "dom_application_tracking"
+  bounded_contexts:
+    - "bc_profile"
+    - "bc_matching"
+    - "bc_job_catalog"
+    - "bc_applications"
+  context_mappings:
+    - "cm_job_catalog_to_matching"
+    - "cm_profile_to_matching"
+
+domains:
+  - id: "dom_job_matching"
+    name: "Job Matching"
+    type: "core"
+    description: "Core domain for intelligently matching jobs to candidate profiles"
+    strategic_importance: "critical"
+    bounded_contexts:
+      - "bc_profile"
+      - "bc_matching"
+    investment_strategy: "Best team, rigorous DDD, continuous refinement"
+    notes: "This is where we provide competitive advantage"
+
+  - id: "dom_job_aggregation"
+    name: "Job Aggregation"
+    type: "supporting"
+    description: "Aggregate jobs from various sources and normalize data"
+    strategic_importance: "important"
+    bounded_contexts:
+      - "bc_job_catalog"
+    investment_strategy: "Adequate quality, consider third-party services"
+
+  - id: "dom_application_tracking"
+    name: "Application Tracking"
+    type: "supporting"
+    description: "Track job applications and their status"
+    strategic_importance: "standard"
+    bounded_contexts:
+      - "bc_applications"
+    investment_strategy: "Simple implementation, standard patterns"
+
+bounded_contexts:
+  - id: "bc_profile"
+    name: "Candidate Profile Context"
+    domain_ref: "dom_job_matching"
+    description: "Manages candidate profiles, skills, and experience"
+    ubiquitous_language:
+      glossary:
+        - term: "Profile"
+          definition: "Complete professional representation of a candidate"
+          examples:
+            - "Data scientist with 5 years of ML experience"
+        - term: "SkillSet"
+          definition: "Collection of technical and soft skills with proficiency levels"
+        - term: "Experience"
+          definition: "Past work history with roles, companies, and achievements"
+    team_ownership: "Candidate Team"
+    aggregates:
+      - "agg_profile"
+    repositories:
+      - "repo_profile"
+
+  - id: "bc_matching"
+    name: "Job Matching Context"
+    domain_ref: "dom_job_matching"
+    description: "AI-powered matching of candidates to job opportunities"
+    ubiquitous_language:
+      glossary:
+        - term: "Match"
+          definition: "Compatibility score between candidate profile and job requirements"
+        - term: "MatchCriteria"
+          definition: "Weighted factors used in matching algorithm"
+    team_ownership: "Matching Algorithm Team"
+    aggregates:
+      - "agg_match"
+      - "agg_recommendation"
+    domain_services:
+      - "svc_dom_matching_algorithm"
+
+  - id: "bc_job_catalog"
+    name: "Job Catalog Context"
+    domain_ref: "dom_job_aggregation"
+    description: "Normalized catalog of job postings from multiple sources"
+    ubiquitous_language:
+      glossary:
+        - term: "JobPosting"
+          definition: "Structured representation of a job opportunity"
+        - term: "JobSource"
+          definition: "Origin of job data (LinkedIn, Indeed, company site)"
+    team_ownership: "Data Aggregation Team"
+    aggregates:
+      - "agg_job_posting"
+    repositories:
+      - "repo_job_catalog"
+
+  - id: "bc_applications"
+    name: "Application Tracking Context"
+    domain_ref: "dom_application_tracking"
+    description: "Tracks candidate applications and their lifecycle"
+    team_ownership: "Application Team"
+    aggregates:
+      - "agg_application"
+
+context_mappings:
+  - id: "cm_job_catalog_to_matching"
+    upstream_context: "bc_job_catalog"
+    downstream_context: "bc_matching"
+    relationship_type: "customer_supplier"
+    integration_pattern: "REST API - Job Catalog exposes job data as service"
+    notes: "Matching context consumes job data but doesn't affect catalog"
+
+  - id: "cm_profile_to_matching"
+    upstream_context: "bc_profile"
+    downstream_context: "bc_matching"
+    relationship_type: "customer_supplier"
+    integration_pattern: "Domain events - Profile publishes ProfileUpdated events"
+    notes: "Matching listens for profile changes to refresh recommendations"

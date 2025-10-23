@@ -1,0 +1,756 @@
+# UX Interaction Example: E-Commerce Product Catalog
+# Demonstrates workflows, components, behaviors, and design system
+
+workflows:
+  - id: wf_add_to_cart
+    name: "Add Product to Cart"
+    type: flexible
+    bounded_contexts:
+      - bc_product_catalog
+      - bc_shopping_cart
+    aggregate_refs:
+      - agg_product
+      - agg_shopping_cart
+    steps:
+      - step_id: "select_product"
+        name: "View Product Details"
+        page_ref: page_product_detail
+        components:
+          - cmp_product_title
+          - cmp_product_price
+          - cmp_product_images
+      - step_id: "configure_product"
+        name: "Configure Options"
+        page_ref: page_product_detail
+        components:
+          - cmp_quantity_selector
+          - cmp_option_selector
+        validations:
+          - val_quantity_min_max
+      - step_id: "add_to_cart"
+        name: "Add to Cart"
+        page_ref: page_product_detail
+        components:
+          - cmp_add_to_cart_button
+        on_complete:
+          update_aggregate: "agg_shopping_cart"
+          publish_event: "evt_product_added_to_cart"
+          navigate_to: "page_cart"
+    completion:
+      aggregate_transition: "EMPTY → CONTAINS_ITEMS"
+      publishes_event: "evt_cart_updated"
+      feedback: toast
+
+  - id: wf_user_activation
+    name: "User Account Activation"
+    type: flexible
+    bounded_contexts:
+      - bc_user_management
+    application_service: svc_app_user_management
+    aggregate_refs:
+      - agg_user
+    steps:
+      - step_number: 1
+        label: "View Pending User"
+        page_ref: page_user_management
+        collects:
+          - vo_user_id
+        validates:
+          timing: on_blur
+          rules:
+            - "User must exist"
+            - "User must be in PENDING status"
+        can_skip: false
+        next_enabled_when: "user_exists_and_pending"
+      - step_number: 2
+        label: "Confirm Activation"
+        page_ref: page_user_management
+        collects: []
+        validates:
+          timing: on_submit
+          rules:
+            - "User not locked"
+        can_skip: false
+        next_enabled_when: "validation_passed"
+        on_complete:
+          update_aggregate: "agg_user"
+          publish_event: "evt_user_activated"
+          navigate_to: "page_user_management"
+    completion:
+      aggregate_transition: "PENDING → ACTIVE"
+      publishes_event: "evt_user_activated"
+      navigate_to: page_user_management
+      feedback: toast
+    progress_indicator:
+      type: steps
+      position: top
+
+  - id: wf_checkout
+    name: "Checkout Process"
+    type: linear
+    bounded_contexts:
+      - bc_shopping_cart
+      - bc_order_management
+      - bc_payment
+    aggregate_refs:
+      - agg_shopping_cart
+      - agg_order
+      - agg_payment
+    steps:
+      - step_id: "review_cart"
+        name: "Review Cart"
+        page_ref: page_cart
+        components:
+          - cmp_cart_item_list
+          - cmp_price_summary
+        next_enabled_when: "cart_not_empty"
+      - step_id: "shipping_info"
+        name: "Shipping Information"
+        page_ref: page_checkout_shipping
+        components:
+          - cmp_address_form
+        validations:
+          - val_address_required
+          - val_email_format
+        next_enabled_when: "all_required_fields_valid"
+      - step_id: "payment_info"
+        name: "Payment Information"
+        page_ref: page_checkout_payment
+        components:
+          - cmp_payment_form
+        validations:
+          - val_card_number
+          - val_expiry_date
+          - val_cvv
+        next_enabled_when: "payment_valid"
+        on_complete:
+          update_aggregate: "agg_order"
+          publish_event: "evt_order_placed"
+    completion:
+      aggregate_transition: "PENDING → CONFIRMED"
+      publishes_event: "evt_order_confirmed"
+      navigate_to: page_order_confirmation
+      feedback: modal
+    progress_indicator:
+      type: steps
+      position: top
+
+components:
+  - id: cmp_product_card
+    name: "Product Card"
+    type: card
+    page_refs:
+      - page_category_list
+    behaviors:
+      - beh_hover_effect
+      - beh_click_to_detail
+    design_token_refs:
+      - dt_spacing_card
+      - dt_color_card_bg
+      - dt_border_radius
+    accessibility:
+      aria_label: "Product information card"
+      keyboard_navigable: true
+      screen_reader_text: "Navigate to product details"
+
+  - id: cmp_add_to_cart_button
+    name: "Add to Cart Button"
+    type: button
+    page_refs:
+      - page_product_detail
+    behaviors:
+      - beh_click_add_to_cart
+      - beh_loading_state
+      - beh_success_animation
+    design_token_refs:
+      - dt_color_primary
+      - dt_color_primary_hover
+      - dt_spacing_button
+    accessibility:
+      aria_label: "Add product to shopping cart"
+      keyboard_accessible: true
+      focus_visible: true
+
+  - id: cmp_quantity_selector
+    name: "Quantity Selector"
+    type: input
+    page_refs:
+      - page_product_detail
+    behaviors:
+      - beh_increment_decrement
+      - beh_validate_number
+    validations:
+      - val_quantity_min_max
+    design_token_refs:
+      - dt_spacing_input
+      - dt_font_body
+    accessibility:
+      aria_label: "Select product quantity"
+      keyboard_accessible: true
+
+  - id: cmp_image_carousel
+    name: "Product Image Carousel"
+    type: carousel
+    page_refs:
+      - page_product_detail
+    behaviors:
+      - beh_swipe_gesture
+      - beh_zoom_on_click
+      - beh_thumbnail_navigation
+    animations:
+      - anim_slide_transition
+    design_token_refs:
+      - dt_spacing_carousel
+      - dt_color_nav_dots
+    accessibility:
+      aria_label: "Product images carousel"
+      keyboard_navigable: true
+      alt_text_required: true
+
+  - id: cmp_facet_filter
+    name: "Facet Filter"
+    type: filter
+    page_refs:
+      - page_category_list
+    behaviors:
+      - beh_expand_collapse
+      - beh_apply_filter
+      - beh_clear_filters
+    design_token_refs:
+      - dt_spacing_filter
+      - dt_color_filter_bg
+    accessibility:
+      aria_label: "Filter products"
+      keyboard_accessible: true
+
+  - id: cmp_search_bar
+    name: "Search Bar"
+    type: input
+    page_refs:
+      - page_home
+      - page_category_list
+    behaviors:
+      - beh_autocomplete
+      - beh_submit_search
+      - beh_clear_input
+    design_token_refs:
+      - dt_spacing_input
+      - dt_font_body
+      - dt_color_input_bg
+    accessibility:
+      aria_label: "Search products"
+      keyboard_accessible: true
+      autocomplete_accessible: true
+
+  - id: cmp_breadcrumbs
+    name: "Breadcrumb Navigation"
+    type: navigation
+    behaviors:
+      - beh_click_navigate
+    design_token_refs:
+      - dt_font_small
+      - dt_color_link
+    accessibility:
+      aria_label: "Breadcrumb navigation"
+      keyboard_navigable: true
+
+  - id: cmp_rating_widget
+    name: "Rating Widget"
+    type: display
+    page_refs:
+      - page_product_detail
+    behaviors:
+      - beh_display_stars
+    design_token_refs:
+      - dt_color_rating_star
+      - dt_font_small
+    accessibility:
+      aria_label: "Product rating"
+      screen_reader_text: "Rated {rating} out of 5 stars"
+
+  - id: cmp_user_profile_card
+    name: "User Profile Card"
+    type: card
+    page_refs:
+      - page_user_dashboard
+    api_endpoints:
+      - bff_if_user_web
+      - bff_if_dashboard_web
+    behaviors:
+      - beh_load_user_data
+      - beh_display_user_status
+    design_token_refs:
+      - dt_spacing_card
+      - dt_color_card_bg
+      - dt_border_radius
+    accessibility:
+      aria_label: "User profile information"
+      keyboard_navigable: true
+      screen_reader_text: "User profile with status and account details"
+
+  - id: cmp_user_activation_button
+    name: "User Activation Button"
+    type: button
+    page_refs:
+      - page_user_management
+    api_endpoints:
+      - bff_if_user_web
+    behaviors:
+      - beh_activate_user
+      - beh_loading_state
+      - beh_success_feedback
+    design_token_refs:
+      - dt_color_primary
+      - dt_color_primary_hover
+      - dt_spacing_button
+    accessibility:
+      aria_label: "Activate user account"
+      keyboard_accessible: true
+      focus_visible: true
+
+  - id: cmp_order_list
+    name: "Order List"
+    type: list
+    page_refs:
+      - page_user_dashboard
+      - page_order_history
+    api_endpoints:
+      - bff_if_order_web
+      - bff_if_dashboard_web
+    behaviors:
+      - beh_load_orders
+      - beh_filter_orders
+      - beh_paginate_orders
+    design_token_refs:
+      - dt_spacing_card
+      - dt_font_body
+    accessibility:
+      aria_label: "User order history"
+      keyboard_navigable: true
+
+behaviors:
+  - id: beh_hover_effect
+    name: "Hover Effect"
+    trigger: hover
+    actions:
+      - type: style_change
+        properties:
+          box_shadow: "0 4px 8px rgba(0,0,0,0.1)"
+          transform: "translateY(-2px)"
+    animation_ref: anim_hover_lift
+
+  - id: beh_click_to_detail
+    name: "Click to Detail"
+    trigger: click
+    actions:
+      - type: navigate
+        target: page_product_detail
+        params:
+          - product_id
+
+  - id: beh_click_add_to_cart
+    name: "Click Add to Cart"
+    trigger: click
+    actions:
+      - type: api_call
+        endpoint: "/api/cart/add"
+        method: POST
+      - type: show_feedback
+        feedback_type: toast
+        message: "Product added to cart"
+      - type: update_badge
+        target: nav_cart
+
+  - id: beh_loading_state
+    name: "Loading State"
+    trigger: api_pending
+    actions:
+      - type: disable_button
+      - type: show_spinner
+
+  - id: beh_success_animation
+    name: "Success Animation"
+    trigger: api_success
+    actions:
+      - type: animate
+        animation_ref: anim_success_checkmark
+
+  - id: beh_increment_decrement
+    name: "Increment/Decrement"
+    trigger: click
+    actions:
+      - type: update_value
+        operation: increment
+      - type: validate
+        validation_ref: val_quantity_min_max
+
+  - id: beh_validate_number
+    name: "Validate Number Input"
+    trigger: input
+    actions:
+      - type: validate
+        validation_ref: val_quantity_min_max
+      - type: show_error
+        condition: invalid
+
+  - id: beh_expand_collapse
+    name: "Expand/Collapse"
+    trigger: click
+    actions:
+      - type: toggle_visibility
+        target: facet_values
+    animation_ref: anim_expand_collapse
+
+  - id: beh_apply_filter
+    name: "Apply Filter"
+    trigger: change
+    actions:
+      - type: update_url_params
+      - type: api_call
+        endpoint: "/api/products/search"
+        method: GET
+
+  - id: beh_autocomplete
+    name: "Autocomplete"
+    trigger: input
+    debounce_ms: 300
+    actions:
+      - type: api_call
+        endpoint: "/api/search/suggest"
+        method: GET
+      - type: show_dropdown
+        results: suggestions
+
+  - id: beh_swipe_gesture
+    name: "Swipe Gesture"
+    trigger: swipe
+    actions:
+      - type: navigate_carousel
+        direction: swipe_direction
+
+  - id: beh_zoom_on_click
+    name: "Zoom on Click"
+    trigger: click
+    actions:
+      - type: open_modal
+        content: full_size_image
+
+  - id: beh_load_user_data
+    name: "Load User Data"
+    trigger: component_mount
+    actions:
+      - type: api_call
+        endpoint: "/api/web/users/summary/{userId}"
+        method: GET
+        bff_interface_ref: bff_if_user_web
+      - type: update_component_state
+        target: user_profile_card
+
+  - id: beh_display_user_status
+    name: "Display User Status"
+    trigger: data_loaded
+    actions:
+      - type: render
+        template: user_status_badge
+      - type: conditional_style
+        condition: status_active
+        style: success_theme
+
+  - id: beh_activate_user
+    name: "Activate User"
+    trigger: click
+    actions:
+      - type: api_call
+        endpoint: "/api/web/users/activate"
+        method: POST
+        bff_interface_ref: bff_if_user_web
+      - type: show_feedback
+        feedback_type: toast
+        message: "User account activated successfully"
+      - type: update_component_state
+        target: user_profile_card
+      - type: publish_domain_event
+        event: evt_user_activated
+
+  - id: beh_success_feedback
+    name: "Success Feedback"
+    trigger: api_success
+    actions:
+      - type: animate
+        animation_ref: anim_success_checkmark
+      - type: show_toast
+        message: "Operation completed successfully"
+        duration: 3000
+
+  - id: beh_load_orders
+    name: "Load Orders"
+    trigger: component_mount
+    actions:
+      - type: api_call
+        endpoint: "/api/web/orders/user/{userId}"
+        method: GET
+        bff_interface_ref: bff_if_order_web
+      - type: update_component_state
+        target: order_list
+
+  - id: beh_filter_orders
+    name: "Filter Orders"
+    trigger: change
+    actions:
+      - type: update_url_params
+        params: ["status", "dateRange"]
+      - type: api_call
+        endpoint: "/api/web/orders/user/{userId}"
+        method: GET
+        bff_interface_ref: bff_if_order_web
+
+  - id: beh_paginate_orders
+    name: "Paginate Orders"
+    trigger: click
+    actions:
+      - type: update_url_params
+        params: ["page"]
+      - type: api_call
+        endpoint: "/api/web/orders/user/{userId}?page={page}"
+        method: GET
+        bff_interface_ref: bff_if_order_web
+
+animations:
+  - id: anim_hover_lift
+    name: "Hover Lift"
+    type: transform
+    duration_ms: 200
+    easing: ease-out
+    properties:
+      transform: "translateY(-2px)"
+
+  - id: anim_success_checkmark
+    name: "Success Checkmark"
+    type: sequence
+    duration_ms: 600
+    keyframes:
+      - time: 0
+        properties:
+          opacity: 0
+          scale: 0
+      - time: 300
+        properties:
+          opacity: 1
+          scale: 1.2
+      - time: 600
+        properties:
+          scale: 1
+
+  - id: anim_expand_collapse
+    name: "Expand/Collapse"
+    type: height
+    duration_ms: 300
+    easing: ease-in-out
+
+  - id: anim_slide_transition
+    name: "Slide Transition"
+    type: transform
+    duration_ms: 400
+    easing: ease-in-out
+    properties:
+      transform: "translateX(-100%)"
+
+  - id: anim_fade_in
+    name: "Fade In"
+    type: opacity
+    duration_ms: 300
+    easing: ease-in
+    properties:
+      opacity: 1
+
+validation_configs:
+  - id: val_quantity_min_max
+    name: "Quantity Min/Max Validation"
+    rules:
+      - type: min_value
+        value: 1
+        message: "Quantity must be at least 1"
+      - type: max_value
+        value: 99
+        message: "Quantity cannot exceed 99"
+
+  - id: val_address_required
+    name: "Address Required Validation"
+    rules:
+      - type: required
+        field: street_address
+        message: "Street address is required"
+      - type: required
+        field: city
+        message: "City is required"
+      - type: required
+        field: postal_code
+        message: "Postal code is required"
+
+  - id: val_email_format
+    name: "Email Format Validation"
+    rules:
+      - type: required
+        field: email
+        message: "Email is required"
+      - type: pattern
+        field: email
+        pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+        message: "Please enter a valid email address"
+
+  - id: val_card_number
+    name: "Card Number Validation"
+    rules:
+      - type: required
+        field: card_number
+        message: "Card number is required"
+      - type: pattern
+        field: card_number
+        pattern: "^[0-9]{16}$"
+        message: "Card number must be 16 digits"
+      - type: luhn_check
+        field: card_number
+        message: "Invalid card number"
+
+  - id: val_expiry_date
+    name: "Expiry Date Validation"
+    rules:
+      - type: required
+        field: expiry_date
+        message: "Expiry date is required"
+      - type: future_date
+        field: expiry_date
+        message: "Card has expired"
+
+  - id: val_cvv
+    name: "CVV Validation"
+    rules:
+      - type: required
+        field: cvv
+        message: "CVV is required"
+      - type: pattern
+        field: cvv
+        pattern: "^[0-9]{3,4}$"
+        message: "CVV must be 3 or 4 digits"
+
+design_tokens:
+  colors:
+    - id: dt_color_primary
+      value: "#007bff"
+      description: "Primary brand color"
+    - id: dt_color_primary_hover
+      value: "#0056b3"
+      description: "Primary color on hover"
+    - id: dt_color_card_bg
+      value: "#ffffff"
+      description: "Card background color"
+    - id: dt_color_input_bg
+      value: "#f8f9fa"
+      description: "Input background color"
+    - id: dt_color_link
+      value: "#007bff"
+      description: "Link color"
+    - id: dt_color_rating_star
+      value: "#ffd700"
+      description: "Rating star color"
+    - id: dt_color_filter_bg
+      value: "#f8f9fa"
+      description: "Filter background color"
+    - id: dt_color_nav_dots
+      value: "#dee2e6"
+      description: "Carousel navigation dots"
+
+  spacing:
+    - id: dt_spacing_card
+      value: "16px"
+      description: "Card padding"
+    - id: dt_spacing_button
+      value: "12px 24px"
+      description: "Button padding"
+    - id: dt_spacing_input
+      value: "8px 12px"
+      description: "Input padding"
+    - id: dt_spacing_carousel
+      value: "24px"
+      description: "Carousel spacing"
+    - id: dt_spacing_filter
+      value: "16px"
+      description: "Filter section spacing"
+
+  typography:
+    - id: dt_font_body
+      value: "'Inter', sans-serif"
+      size: "16px"
+      weight: 400
+      line_height: 1.5
+    - id: dt_font_small
+      value: "'Inter', sans-serif"
+      size: "14px"
+      weight: 400
+      line_height: 1.4
+
+  borders:
+    - id: dt_border_radius
+      value: "8px"
+      description: "Standard border radius"
+
+accessibility_specs:
+  - id: acc_wcag_aa
+    name: "WCAG 2.1 Level AA Compliance"
+    guidelines:
+      - code: "1.4.3"
+        name: "Contrast (Minimum)"
+        requirement: "4.5:1 for normal text, 3:1 for large text"
+        implementation: "All text meets minimum contrast ratios"
+      - code: "2.1.1"
+        name: "Keyboard"
+        requirement: "All functionality available from keyboard"
+        implementation: "Tab navigation, Enter/Space for actions"
+      - code: "2.4.7"
+        name: "Focus Visible"
+        requirement: "Keyboard focus indicator visible"
+        implementation: "Visible focus ring on all interactive elements"
+      - code: "4.1.2"
+        name: "Name, Role, Value"
+        requirement: "All UI components have accessible names"
+        implementation: "ARIA labels on all components"
+
+  - id: acc_screen_reader
+    name: "Screen Reader Support"
+    features:
+      - "Alt text for all images"
+      - "ARIA labels for interactive elements"
+      - "Live regions for dynamic content updates"
+      - "Skip navigation links"
+      - "Semantic HTML structure"
+
+  - id: acc_keyboard_navigation
+    name: "Keyboard Navigation"
+    features:
+      - "Tab order follows visual flow"
+      - "Enter/Space activate buttons"
+      - "Escape closes modals/dropdowns"
+      - "Arrow keys for navigation within components"
+      - "Focus trap in modals"
+
+responsive_configs:
+  - id: resp_mobile
+    breakpoint: 768
+    changes:
+      navigation_pattern: bottom_tabs
+      grid_columns: 1
+      font_size_multiplier: 0.9
+
+  - id: resp_tablet
+    breakpoint: 1024
+    changes:
+      navigation_pattern: top_horizontal
+      grid_columns: 2
+      font_size_multiplier: 0.95
+
+  - id: resp_desktop
+    breakpoint: 1440
+    changes:
+      navigation_pattern: top_horizontal
+      grid_columns: 4
+      font_size_multiplier: 1.0

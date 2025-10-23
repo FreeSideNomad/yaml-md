@@ -1,0 +1,1250 @@
+---
+version: 0.2.0
+status: draft
+last_updated: 2025-10-09
+---
+
+# ML Feature Store System
+# Demonstrates: Feature engineering, point-in-time correct joins, backfill orchestration, feature drift monitoring
+
+system:
+  id: sys-ml-feature-store
+  name: ML Feature Store Platform
+  description: Centralized feature store for ML model training and serving with point-in-time correctness
+  owners:
+    - team: ml-platform
+      contact: ml-platform@mlcompany.com
+  domains:
+    - dom-feature-ingestion
+    - dom-feature-materialization
+    - dom-feature-serving
+  tags: [ml, feature-store, point-in-time-correct]
+
+domains:
+  - id: dom-feature-ingestion
+    name: Feature Ingestion Domain
+    description: Ingest raw data sources for feature computation
+    owners:
+      - team: ml-engineering
+        contact: ml-eng@mlcompany.com
+    pipelines:
+      - pip-ingest-user-events
+      - pip-ingest-transactions
+
+  - id: dom-feature-materialization
+    name: Feature Materialization Domain
+    description: Compute and materialize features with point-in-time correctness
+    owners:
+      - team: ml-platform
+        contact: ml-platform@mlcompany.com
+    pipelines:
+      - pip-compute-user-features
+      - pip-compute-transaction-features
+      - pip-backfill-features
+
+  - id: dom-feature-serving
+    name: Feature Serving Domain
+    description: Serve features for online and offline ML workloads
+    owners:
+      - team: ml-platform
+        contact: ml-platform@mlcompany.com
+    pipelines:
+      - pip-serve-online-features
+      - pip-create-training-datasets
+
+pipelines:
+  - id: pip-ingest-user-events
+    name: Ingest User Events Pipeline
+    description: Ingest user behavioral events for feature computation
+    mode: streaming
+    schedule:
+      id: sch-user-events-continuous
+      type: continuous
+      triggers:
+        - type: message
+          source: kafka-user-events
+    traits: [streaming, event-driven]
+    stages:
+      - id: stg-consume-events
+        name: Consume User Events
+        description: Consume user events from Kafka
+        uses_patterns:
+          - pat-event-streaming
+        inputs: []
+        outputs:
+          - ds-user-events-raw
+        transforms:
+          - id: trf-kafka-consume
+            type: custom
+            description: Consume from Kafka topic
+            config:
+              topic: user-events
+              consumer_group: feature-store-consumers
+              offset_reset: earliest
+
+      - id: stg-parse-events
+        name: Parse and Validate Events
+        description: Parse JSON events and validate schema
+        uses_patterns:
+          - pat-validation
+        inputs:
+          - ds-user-events-raw
+        outputs:
+          - ds-user-events-parsed
+        depends_on:
+          - stg-consume-events
+        transforms:
+          - id: trf-parse-json
+            type: custom
+            description: Parse JSON and validate schema
+            config:
+              schema_validation: true
+              drop_invalid: true
+
+  - id: pip-ingest-transactions
+    name: Ingest Transactions Pipeline
+    description: CDC-based ingestion of transaction data
+    mode: streaming
+    schedule:
+      id: sch-transactions-cdc
+      type: continuous
+      triggers:
+        - type: cdc-event
+          source: postgresql-transactions
+    stages:
+      - id: stg-cdc-transactions
+        name: CDC Capture Transactions
+        description: Capture transaction changes via CDC
+        uses_patterns:
+          - pat-cdc-log-based
+        inputs: []
+        outputs:
+          - ds-transactions-cdc
+        transforms:
+          - id: trf-cdc-extract
+            type: cdc-extract
+            description: Extract from PostgreSQL via Debezium
+            config:
+              connector: debezium
+              database: transactions_db
+              table: transactions
+
+  - id: pip-compute-user-features
+    name: Compute User Features Pipeline
+    description: Compute user behavioral features with windowed aggregations
+    mode: streaming
+    schedule:
+      id: sch-user-features-continuous
+      type: continuous
+    traits: [windowed, point-in-time-correct]
+    stages:
+      - id: stg-aggregate-user-events
+        name: Aggregate User Events
+        description: Time-windowed aggregation of user events
+        uses_patterns:
+          - pat-tumbling-window
+          - pat-feature-engineering
+        inputs:
+          - ds-user-events-parsed
+        outputs:
+          - ds-user-event-features-raw
+        transforms:
+          - id: trf-window-1h
+            type: window
+            description: 1-hour tumbling window for event aggregation
+            config:
+              window_type: tumbling
+              window_size: 1h
+              watermark_delay: 10m
+
+          - id: trf-agg-user-events
+            type: aggregate
+            description: Calculate user event statistics
+            config:
+              group_by: [user_id, window_start]
+              aggregations:
+                event_count_1h: count
+                unique_pages_1h: count_distinct(page_id)
+                session_duration_1h: sum(duration)
+                avg_time_on_page_1h: avg(duration)
+
+      - id: stg-compute-rolling-features
+        name: Compute Rolling Features
+        description: Compute rolling window features (7d, 30d, 90d)
+        uses_patterns:
+          - pat-sliding-window
+          - pat-feature-engineering
+        inputs:
+          - ds-user-events-parsed
+        outputs:
+          - ds-user-rolling-features
+        transforms:
+          - id: trf-rolling-7d
+            type: window
+            description: 7-day rolling window
+            config:
+              window_type: sliding
+              window_size: 7d
+              slide_interval: 1d
+
+          - id: trf-agg-rolling
+            type: aggregate
+            description: Calculate rolling statistics
+            config:
+              group_by: [user_id, window_end]
+              aggregations:
+                total_events_7d: count
+                unique_days_active_7d: count_distinct(date)
+                avg_daily_events_7d: avg(daily_event_count)
+                total_purchases_7d: sum(is_purchase)
+                total_spend_7d: sum(purchase_amount)
+
+      - id: stg-materialize-user-features
+        name: Materialize User Features
+        description: Write features to feature store with timestamps
+        uses_patterns:
+          - pat-feature-store
+          - pat-upsert
+        inputs:
+          - ds-user-event-features-raw
+          - ds-user-rolling-features
+        outputs:
+          - ds-user-features-online
+          - ds-user-features-offline
+        depends_on:
+          - stg-aggregate-user-events
+          - stg-compute-rolling-features
+        transforms:
+          - id: trf-join-features
+            type: join
+            description: Join different feature sets
+            config:
+              join_type: inner
+              left_key: user_id
+              right_key: user_id
+
+          - id: trf-add-feature-metadata
+            type: custom
+            description: Add feature metadata (entity, timestamp, version)
+            config:
+              entity_key: user_id
+              event_timestamp_column: window_end
+              created_timestamp_column: processing_time
+              feature_version: v1
+
+          - id: trf-upsert-online
+            type: upsert
+            description: Upsert to online feature store (Redis)
+            config:
+              target: ds-user-features-online
+              merge_key: user_id
+              ttl_hours: 168
+
+          - id: trf-append-offline
+            type: append
+            description: Append to offline feature store (Delta)
+            config:
+              target: ds-user-features-offline
+              mode: append
+
+  - id: pip-compute-transaction-features
+    name: Compute Transaction Features Pipeline
+    description: Compute transaction-based features for fraud detection and credit scoring
+    mode: streaming
+    schedule:
+      id: sch-transaction-features-continuous
+      type: continuous
+    traits: [point-in-time-correct, real-time]
+    stages:
+      - id: stg-compute-velocity-features
+        name: Compute Velocity Features
+        description: Calculate transaction velocity features
+        uses_patterns:
+          - pat-feature-engineering
+          - pat-stateful-processing
+        inputs:
+          - ds-transactions-cdc
+        outputs:
+          - ds-transaction-velocity-features
+        transforms:
+          - id: trf-velocity-1h
+            type: aggregate
+            description: Transaction velocity in last 1 hour
+            config:
+              window: 1h
+              group_by: [user_id]
+              aggregations:
+                transaction_count_1h: count
+                total_amount_1h: sum(amount)
+                avg_amount_1h: avg(amount)
+                max_amount_1h: max(amount)
+
+          - id: trf-velocity-24h
+            type: aggregate
+            description: Transaction velocity in last 24 hours
+            config:
+              window: 24h
+              group_by: [user_id]
+              aggregations:
+                transaction_count_24h: count
+                total_amount_24h: sum(amount)
+                unique_merchants_24h: count_distinct(merchant_id)
+
+      - id: stg-compute-historical-features
+        name: Compute Historical Features
+        description: Calculate historical transaction patterns
+        uses_patterns:
+          - pat-feature-engineering
+        inputs:
+          - ds-transactions-cdc
+        outputs:
+          - ds-transaction-historical-features
+        transforms:
+          - id: trf-historical-stats
+            type: aggregate
+            description: Historical transaction statistics
+            config:
+              window: 90d
+              group_by: [user_id]
+              aggregations:
+                lifetime_transaction_count: count
+                lifetime_total_spend: sum(amount)
+                avg_transaction_amount: avg(amount)
+                stddev_transaction_amount: stddev(amount)
+                days_since_first_transaction: datediff(current_date, min(transaction_date))
+                days_since_last_transaction: datediff(current_date, max(transaction_date))
+
+      - id: stg-materialize-transaction-features
+        name: Materialize Transaction Features
+        description: Write transaction features to feature store
+        uses_patterns:
+          - pat-feature-store
+        inputs:
+          - ds-transaction-velocity-features
+          - ds-transaction-historical-features
+        outputs:
+          - ds-transaction-features-online
+          - ds-transaction-features-offline
+        depends_on:
+          - stg-compute-velocity-features
+          - stg-compute-historical-features
+        transforms:
+          - id: trf-merge-transaction-features
+            type: join
+            description: Merge all transaction feature sets
+            config:
+              join_type: inner
+              left_key: user_id
+              right_key: user_id
+
+          - id: trf-write-feature-store
+            type: upsert
+            description: Write to feature store with versioning
+            config:
+              online_store: redis
+              offline_store: delta
+              entity_key: user_id
+              feature_version: v2
+
+  - id: pip-backfill-features
+    name: Backfill Features Pipeline
+    description: Backfill historical features for model retraining
+    mode: batch
+    schedule:
+      id: sch-backfill-manual
+      type: manual
+    traits: [point-in-time-correct, idempotent]
+    stages:
+      - id: stg-identify-backfill-dates
+        name: Identify Backfill Dates
+        description: Identify date ranges that need backfilling
+        uses_patterns:
+          - pat-incremental-processing
+        inputs:
+          - ds-feature-backfill-config
+        outputs:
+          - ds-backfill-dates
+        transforms:
+          - id: trf-generate-date-range
+            type: custom
+            description: Generate date range for backfill
+            config:
+              start_date_param: backfill_start
+              end_date_param: backfill_end
+              granularity: daily
+
+      - id: stg-recompute-features
+        name: Recompute Features
+        description: Recompute features for historical dates
+        uses_patterns:
+          - pat-feature-engineering
+          - pat-point-in-time-join
+        inputs:
+          - ds-backfill-dates
+          - ds-user-events-parsed
+          - ds-transactions-cdc
+        outputs:
+          - ds-features-backfilled
+        depends_on:
+          - stg-identify-backfill-dates
+        transforms:
+          - id: trf-point-in-time-join
+            type: custom
+            description: Join features as of specific points in time
+            config:
+              event_timestamp_column: event_time
+              as_of_timestamp_column: backfill_date
+              max_age_hours: 720
+
+          - id: trf-recompute-aggregates
+            type: aggregate
+            description: Recompute aggregated features
+            config:
+              respect_event_time: true
+              point_in_time_correct: true
+
+      - id: stg-validate-backfill
+        name: Validate Backfill
+        description: Validate backfilled features against expectations
+        uses_patterns:
+          - pat-validation
+        inputs:
+          - ds-features-backfilled
+        outputs:
+          - ds-features-validated
+        depends_on:
+          - stg-recompute-features
+        transforms:
+          - id: trf-validate-completeness
+            type: custom
+            description: Ensure no missing dates or entities
+            config:
+              check_missing_dates: true
+              check_missing_entities: true
+              expected_coverage_percent: 99.0
+
+          - id: trf-validate-distributions
+            type: custom
+            description: Validate feature distributions
+            config:
+              check_outliers: true
+              check_nulls: true
+              max_null_percent: 5.0
+
+  - id: pip-serve-online-features
+    name: Serve Online Features Pipeline
+    description: Serve features for real-time inference
+    mode: streaming
+    schedule:
+      id: sch-online-serving-continuous
+      type: continuous
+      triggers:
+        - type: api-call
+          source: feature-serving-api
+    traits: [low-latency, cached]
+    stages:
+      - id: stg-fetch-online-features
+        name: Fetch Online Features
+        description: Fetch features from online store (Redis)
+        uses_patterns:
+          - pat-caching
+        inputs:
+          - ds-user-features-online
+          - ds-transaction-features-online
+        outputs:
+          - ds-online-feature-vectors
+        transforms:
+          - id: trf-fetch-from-redis
+            type: custom
+            description: Fetch latest features from Redis
+            config:
+              store_type: redis
+              cache_ttl_seconds: 60
+              fallback_to_offline: true
+
+      - id: stg-assemble-feature-vector
+        name: Assemble Feature Vector
+        description: Assemble complete feature vector for model
+        uses_patterns:
+          - pat-feature-engineering
+        inputs:
+          - ds-online-feature-vectors
+        outputs:
+          - ds-model-feature-vectors
+        depends_on:
+          - stg-fetch-online-features
+        transforms:
+          - id: trf-join-feature-sets
+            type: join
+            description: Join multiple feature sets
+            config:
+              join_type: left
+              entity_key: user_id
+
+          - id: trf-handle-missing
+            type: custom
+            description: Handle missing features with defaults
+            config:
+              fill_strategy: default_values
+              default_numeric: 0
+              default_categorical: unknown
+
+  - id: pip-create-training-datasets
+    name: Create Training Datasets Pipeline
+    description: Create point-in-time correct training datasets
+    mode: batch
+    schedule:
+      id: sch-training-datasets-weekly
+      type: cron
+      cron_expression: "0 0 * * 0"
+    traits: [point-in-time-correct, reproducible]
+    stages:
+      - id: stg-define-training-labels
+        name: Define Training Labels
+        description: Define labels and timestamps for training examples
+        uses_patterns:
+          - pat-labeling
+        inputs:
+          - ds-training-label-source
+        outputs:
+          - ds-training-labels
+        transforms:
+          - id: trf-extract-labels
+            type: custom
+            description: Extract labels with event timestamps
+            config:
+              label_column: is_fraud
+              event_timestamp_column: label_timestamp
+              entity_key: user_id
+
+      - id: stg-point-in-time-join
+        name: Point-in-Time Correct Join
+        description: Join features as of label timestamp
+        uses_patterns:
+          - pat-point-in-time-join
+        inputs:
+          - ds-training-labels
+          - ds-user-features-offline
+          - ds-transaction-features-offline
+        outputs:
+          - ds-training-features
+        depends_on:
+          - stg-define-training-labels
+        transforms:
+          - id: trf-pit-join-user
+            type: custom
+            description: PIT join with user features
+            config:
+              left_key: user_id
+              right_key: user_id
+              left_timestamp: label_timestamp
+              right_timestamp: event_timestamp
+              join_type: asof
+              tolerance: 24h
+
+          - id: trf-pit-join-transaction
+            type: custom
+            description: PIT join with transaction features
+            config:
+              left_key: user_id
+              right_key: user_id
+              left_timestamp: label_timestamp
+              right_timestamp: event_timestamp
+              join_type: asof
+              tolerance: 24h
+
+      - id: stg-create-train-test-split
+        name: Create Train/Test Split
+        description: Split dataset for training and validation
+        uses_patterns:
+          - pat-data-splitting
+        inputs:
+          - ds-training-features
+        outputs:
+          - ds-training-dataset-train
+          - ds-training-dataset-test
+        depends_on:
+          - stg-point-in-time-join
+        transforms:
+          - id: trf-time-based-split
+            type: custom
+            description: Time-based train/test split
+            config:
+              split_strategy: time_based
+              train_ratio: 0.8
+              split_date: auto
+
+datasets:
+  - id: ds-user-events-raw
+    name: User Events Raw
+    description: Raw user behavioral events
+    type: stream
+    format: json
+    location: kafka://user-events
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id, ip_address]
+    tags: [raw, events]
+
+  - id: ds-user-events-parsed
+    name: User Events Parsed
+    description: Parsed and validated user events
+    type: table
+    format: delta
+    location: s3://feature-store/events/user-events/
+    partitioning:
+      columns: [event_date]
+      strategy: daily
+    schema:
+      fields:
+        - name: user_id
+          type: string
+          nullable: false
+          pii: true
+        - name: event_type
+          type: string
+          nullable: false
+        - name: page_id
+          type: string
+          nullable: true
+        - name: duration
+          type: integer
+          nullable: true
+        - name: event_time
+          type: timestamp
+          nullable: false
+        - name: processing_time
+          type: timestamp
+          nullable: false
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [parsed, events]
+
+  - id: ds-transactions-cdc
+    name: Transactions CDC
+    description: Transaction changes from CDC
+    type: stream
+    format: avro
+    location: kafka://transactions-cdc
+    schema:
+      fields:
+        - name: transaction_id
+          type: string
+          nullable: false
+        - name: user_id
+          type: string
+          nullable: false
+          pii: true
+        - name: merchant_id
+          type: string
+          nullable: false
+        - name: amount
+          type: decimal
+          nullable: false
+        - name: transaction_date
+          type: timestamp
+          nullable: false
+        - name: is_purchase
+          type: boolean
+          nullable: false
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [cdc, transactions]
+
+  - id: ds-user-event-features-raw
+    name: User Event Features Raw
+    description: Raw aggregated user event features
+    type: table
+    format: delta
+    location: s3://feature-store/features/user-events-raw/
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [features, intermediate]
+
+  - id: ds-user-rolling-features
+    name: User Rolling Features
+    description: Rolling window user features
+    type: table
+    format: delta
+    location: s3://feature-store/features/user-rolling/
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [features, rolling]
+
+  - id: ds-user-features-online
+    name: User Features Online Store
+    description: User features in online store for low-latency serving
+    type: table
+    format: custom
+    location: redis://feature-store:user-features
+    schema:
+      fields:
+        - name: user_id
+          type: string
+          nullable: false
+          pii: true
+        - name: event_count_1h
+          type: bigint
+          nullable: true
+        - name: unique_pages_1h
+          type: bigint
+          nullable: true
+        - name: session_duration_1h
+          type: bigint
+          nullable: true
+        - name: total_events_7d
+          type: bigint
+          nullable: true
+        - name: total_purchases_7d
+          type: bigint
+          nullable: true
+        - name: total_spend_7d
+          type: decimal
+          nullable: true
+        - name: event_timestamp
+          type: timestamp
+          nullable: false
+        - name: created_timestamp
+          type: timestamp
+          nullable: false
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [features, online, serving]
+
+  - id: ds-user-features-offline
+    name: User Features Offline Store
+    description: Historical user features for training
+    type: table
+    format: delta
+    location: s3://feature-store/features/user-features-offline/
+    partitioning:
+      columns: [event_date]
+      strategy: daily
+    schema:
+      fields:
+        - name: user_id
+          type: string
+          nullable: false
+          pii: true
+        - name: event_count_1h
+          type: bigint
+          nullable: true
+        - name: unique_pages_1h
+          type: bigint
+          nullable: true
+        - name: session_duration_1h
+          type: bigint
+          nullable: true
+        - name: total_events_7d
+          type: bigint
+          nullable: true
+        - name: total_purchases_7d
+          type: bigint
+          nullable: true
+        - name: total_spend_7d
+          type: decimal
+          nullable: true
+        - name: event_timestamp
+          type: timestamp
+          nullable: false
+        - name: created_timestamp
+          type: timestamp
+          nullable: false
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [features, offline, training]
+
+  - id: ds-transaction-velocity-features
+    name: Transaction Velocity Features
+    description: Transaction velocity and count features
+    type: table
+    format: delta
+    location: s3://feature-store/features/transaction-velocity/
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [features, transactions]
+
+  - id: ds-transaction-historical-features
+    name: Transaction Historical Features
+    description: Historical transaction pattern features
+    type: table
+    format: delta
+    location: s3://feature-store/features/transaction-historical/
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [features, transactions]
+
+  - id: ds-transaction-features-online
+    name: Transaction Features Online Store
+    description: Transaction features for online serving
+    type: table
+    format: custom
+    location: redis://feature-store:transaction-features
+    schema:
+      fields:
+        - name: user_id
+          type: string
+          nullable: false
+          pii: true
+        - name: transaction_count_1h
+          type: bigint
+          nullable: true
+        - name: total_amount_1h
+          type: decimal
+          nullable: true
+        - name: transaction_count_24h
+          type: bigint
+          nullable: true
+        - name: unique_merchants_24h
+          type: bigint
+          nullable: true
+        - name: lifetime_transaction_count
+          type: bigint
+          nullable: true
+        - name: avg_transaction_amount
+          type: decimal
+          nullable: true
+        - name: event_timestamp
+          type: timestamp
+          nullable: false
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [features, online, transactions]
+
+  - id: ds-transaction-features-offline
+    name: Transaction Features Offline Store
+    description: Historical transaction features for training
+    type: table
+    format: delta
+    location: s3://feature-store/features/transaction-features-offline/
+    partitioning:
+      columns: [event_date]
+      strategy: daily
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [features, offline, transactions]
+
+  - id: ds-feature-backfill-config
+    name: Feature Backfill Configuration
+    description: Configuration for feature backfill jobs
+    type: table
+    format: delta
+    location: s3://feature-store/config/backfill/
+    schema:
+      fields:
+        - name: backfill_id
+          type: string
+          nullable: false
+        - name: backfill_start
+          type: date
+          nullable: false
+        - name: backfill_end
+          type: date
+          nullable: false
+        - name: feature_groups
+          type: array<string>
+          nullable: false
+    classification: internal
+    contains_pii: false
+    tags: [config, backfill]
+
+  - id: ds-backfill-dates
+    name: Backfill Dates
+    description: Date ranges for backfill processing
+    type: table
+    format: delta
+    location: s3://feature-store/backfill/dates/
+    classification: internal
+    contains_pii: false
+    tags: [backfill, intermediate]
+
+  - id: ds-features-backfilled
+    name: Features Backfilled
+    description: Backfilled features
+    type: table
+    format: delta
+    location: s3://feature-store/backfill/features/
+    partitioning:
+      columns: [backfill_date]
+      strategy: daily
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [backfill, features]
+
+  - id: ds-features-validated
+    name: Features Validated
+    description: Validated backfilled features
+    type: table
+    format: delta
+    location: s3://feature-store/backfill/validated/
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [backfill, validated]
+
+  - id: ds-online-feature-vectors
+    name: Online Feature Vectors
+    description: Assembled feature vectors from online store
+    type: stream
+    format: json
+    location: memory://feature-vectors
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [serving, online]
+
+  - id: ds-model-feature-vectors
+    name: Model Feature Vectors
+    description: Complete feature vectors for model inference
+    type: stream
+    format: json
+    location: memory://model-features
+    classification: internal
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [serving, inference]
+
+  - id: ds-training-label-source
+    name: Training Label Source
+    description: Source data for training labels
+    type: table
+    format: delta
+    location: s3://feature-store/labels/source/
+    schema:
+      fields:
+        - name: user_id
+          type: string
+          nullable: false
+          pii: true
+        - name: label_timestamp
+          type: timestamp
+          nullable: false
+        - name: is_fraud
+          type: boolean
+          nullable: false
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [labels, training]
+
+  - id: ds-training-labels
+    name: Training Labels
+    description: Prepared training labels with timestamps
+    type: table
+    format: delta
+    location: s3://feature-store/labels/prepared/
+    partitioning:
+      columns: [label_date]
+      strategy: daily
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [labels, training]
+
+  - id: ds-training-features
+    name: Training Features
+    description: Features joined with labels (point-in-time correct)
+    type: table
+    format: delta
+    location: s3://feature-store/training/features/
+    partitioning:
+      columns: [label_date]
+      strategy: daily
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [training, pit-correct]
+
+  - id: ds-training-dataset-train
+    name: Training Dataset (Train Split)
+    description: Training split of dataset
+    type: table
+    format: parquet
+    location: s3://feature-store/training/datasets/train/
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [training, train-split]
+
+  - id: ds-training-dataset-test
+    name: Training Dataset (Test Split)
+    description: Test split of dataset
+    type: table
+    format: parquet
+    location: s3://feature-store/training/datasets/test/
+    classification: confidential
+    contains_pii: true
+    pii_fields: [user_id]
+    tags: [training, test-split]
+
+contracts:
+  - id: ctr-user-features-v1
+    name: User Features Contract
+    dataset: ds-user-features-offline
+    version: 1.0.0
+    schema:
+      $ref: schemas/user-features-v1.avsc
+    sla:
+      freshness_minutes: 60
+      completeness_percent: 99.0
+      availability_percent: 99.9
+    evolution_policy: backward-compatible
+    owners:
+      - team: ml-platform
+        contact: ml-platform@mlcompany.com
+    consumers:
+      - team: fraud-detection
+        use_case: Fraud detection model training and serving
+      - team: recommendation
+        use_case: Recommendation model features
+
+  - id: ctr-transaction-features-v2
+    name: Transaction Features Contract
+    dataset: ds-transaction-features-offline
+    version: 2.0.0
+    schema:
+      $ref: schemas/transaction-features-v2.avsc
+    sla:
+      freshness_minutes: 30
+      completeness_percent: 99.5
+      availability_percent: 99.9
+    evolution_policy: backward-compatible
+    owners:
+      - team: ml-platform
+        contact: ml-platform@mlcompany.com
+    consumers:
+      - team: fraud-detection
+        use_case: Real-time fraud scoring
+      - team: credit-risk
+        use_case: Credit scoring models
+
+checks:
+  - id: chk-freshness-user-features
+    name: Freshness Check - User Features
+    type: freshness
+    dataset: ds-user-features-offline
+    threshold:
+      max_age_minutes: 60
+    severity: high
+    alert:
+      channel: slack
+      escalation: ml-platform
+
+  - id: chk-drift-user-features
+    name: Drift Detection - User Features
+    type: drift
+    dataset: ds-user-features-offline
+    threshold:
+      max_distribution_change_percent: 20
+      monitoring_window_days: 7
+    severity: high
+    alert:
+      channel: slack
+      escalation: ml-engineering
+
+  - id: chk-pit-correctness
+    name: Point-in-Time Correctness Check
+    type: custom
+    dataset: ds-training-features
+    assertions:
+      - condition: event_timestamp <= label_timestamp
+        description: Features must be from before label timestamp
+    severity: critical
+    alert:
+      channel: pagerduty
+      escalation: ml-platform
+
+  - id: chk-feature-null-rate
+    name: Feature Null Rate Check
+    type: completeness
+    dataset: ds-user-features-offline
+    threshold:
+      max_null_rate_percent: 5.0
+    severity: medium
+    alert:
+      channel: slack
+      escalation: ml-platform
+
+  - id: chk-backfill-completeness
+    name: Backfill Completeness Check
+    type: completeness
+    dataset: ds-features-backfilled
+    threshold:
+      min_coverage_percent: 99.0
+    severity: high
+    alert:
+      channel: slack
+      escalation: ml-platform
+
+lineage:
+  - id: lin-raw-events-to-parsed
+    upstream: ds-user-events-raw
+    downstream: ds-user-events-parsed
+    transform: trf-parse-json
+    relationship: one-to-one
+
+  - id: lin-parsed-to-event-features
+    upstream: ds-user-events-parsed
+    downstream: ds-user-event-features-raw
+    transform: trf-agg-user-events
+    relationship: many-to-one
+
+  - id: lin-parsed-to-rolling-features
+    upstream: ds-user-events-parsed
+    downstream: ds-user-rolling-features
+    transform: trf-agg-rolling
+    relationship: many-to-one
+
+  - id: lin-features-to-offline
+    upstream: ds-user-event-features-raw
+    downstream: ds-user-features-offline
+    transform: trf-append-offline
+    relationship: one-to-one
+
+  - id: lin-features-to-online
+    upstream: ds-user-event-features-raw
+    downstream: ds-user-features-online
+    transform: trf-upsert-online
+    relationship: one-to-one
+
+  - id: lin-transactions-to-velocity
+    upstream: ds-transactions-cdc
+    downstream: ds-transaction-velocity-features
+    transform: trf-velocity-1h
+    relationship: many-to-one
+
+  - id: lin-transactions-to-historical
+    upstream: ds-transactions-cdc
+    downstream: ds-transaction-historical-features
+    transform: trf-historical-stats
+    relationship: many-to-one
+
+  - id: lin-labels-to-training
+    upstream: ds-training-labels
+    downstream: ds-training-features
+    transform: trf-pit-join-user
+    relationship: one-to-one
+
+governance:
+  retention:
+    - dataset: ds-user-events-raw
+      policy: delete-after-days
+      days: 7
+
+    - dataset: ds-user-events-parsed
+      policy: archive-after-years
+      years: 2
+
+    - dataset: ds-user-features-offline
+      policy: archive-after-years
+      years: 5
+
+    - dataset: ds-transaction-features-offline
+      policy: archive-after-years
+      years: 7
+
+    - dataset: ds-training-dataset-train
+      policy: retain-indefinitely
+
+  access:
+    - dataset: ds-user-features-offline
+      tier: general
+      roles: [ml-engineer, data-scientist, ml-platform-admin]
+
+    - dataset: ds-transaction-features-offline
+      tier: restricted
+      roles: [ml-engineer, ml-platform-admin]
+
+    - dataset: ds-training-dataset-train
+      tier: restricted
+      roles: [data-scientist, ml-engineer]
+
+  pii_handling:
+    - dataset: ds-user-events-parsed
+      masking: [user_id]
+      masking_method: pseudonymize
+
+    - dataset: ds-user-features-offline
+      masking: [user_id]
+      masking_method: pseudonymize
+
+    - dataset: ds-transaction-features-offline
+      masking: [user_id]
+      masking_method: pseudonymize
+
+observability:
+  metrics:
+    - name: feature_computation_latency
+      dataset: ds-user-features-offline
+      type: histogram
+      description: Time from event to feature materialization
+
+    - name: feature_drift_score
+      dataset: ds-user-features-offline
+      type: gauge
+      description: Statistical drift score for features
+
+    - name: online_feature_cache_hit_rate
+      dataset: ds-user-features-online
+      type: gauge
+      description: Cache hit rate for online features
+
+    - name: backfill_completeness_rate
+      dataset: ds-features-backfilled
+      type: gauge
+      description: Percentage of successfully backfilled features
+
+    - name: pit_join_accuracy
+      dataset: ds-training-features
+      type: gauge
+      description: Accuracy of point-in-time joins
+
+  slos:
+    - name: feature-freshness-slo
+      target: 99.0
+      unit: percent
+      window: 30d
+      linked_check: chk-freshness-user-features
+
+    - name: feature-serving-latency-slo
+      target: 95.0
+      unit: percent
+      window: 7d
+
+    - name: pit-correctness-slo
+      target: 100.0
+      unit: percent
+      window: 30d
+      linked_check: chk-pit-correctness
+
+  alerts:
+    - name: high-feature-drift
+      condition: "drift_score > 0.2"
+      severity: high
+      channel: slack
+
+    - name: feature-staleness
+      condition: "freshness > 60 minutes"
+      severity: high
+      channel: slack
+
+    - name: pit-join-violation
+      condition: "event_timestamp > label_timestamp"
+      severity: critical
+      channel: pagerduty
+
+    - name: high-null-rate
+      condition: "null_rate > 5%"
+      severity: medium
+      channel: slack

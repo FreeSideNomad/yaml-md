@@ -1,0 +1,477 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/agile/portfolio/v1
+title: Agile Portfolio Patterns Schema
+description: Portfolio-level patterns for agile at scale - portfolios, value streams, epics, roadmaps
+
+metadata:
+  author: "Igor Music"
+  created: "2025-10-17"
+  updated: "2025-10-17"
+  license: "MIT"
+  version: "1.0.0"
+  partition: "portfolio"
+  references:
+    - "SAFe 6.0 - Portfolio Level"
+    - "Lean Portfolio Management"
+
+naming_conventions:
+  portfolio_id: "pf_<name>"
+  value_stream_id: "vs_<name>"
+  epic_id: "epic_<name>"
+  roadmap_id: "rm_<name>"
+  stakeholder_id: "sh_<name>"
+  metric_id: "met_<name>"
+  nfr_id: "nfr_<name>"
+  risk_id: "risk_<name>"
+
+$defs:
+  portfolio:
+    type: object
+    description: Portfolio management and governance at the highest organizational level
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        pattern: "^pf_[a-z0-9_]+$"
+        description: Unique portfolio identifier
+      name:
+        type: string
+        description: Portfolio name
+      strategicThemes:
+        type: array
+        description: Strategic themes driving portfolio investments
+        items:
+          type: string
+      budgets:
+        type: array
+        description: Budget allocations by value stream
+        items:
+          type: object
+          properties:
+            value_stream_ref:
+              type: string
+              pattern: "^vs_[a-z0-9_]+$"
+              description: "Value stream ID reference"
+            allocation:
+              type: number
+              description: Budget allocation amount
+      value_stream_refs:
+        type: array
+        description: "Value streams in this portfolio (ID references)"
+        items:
+          type: string
+          pattern: "^vs_[a-z0-9_]+$"
+      epic_refs:
+        type: array
+        description: "Portfolio epics (ID references)"
+        items:
+          type: string
+          pattern: "^epic_[a-z0-9_]+$"
+
+  value_stream:
+    type: object
+    description: End-to-end flow of value from concept to customer
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        pattern: "^vs_[a-z0-9_]+$"
+        description: Unique value stream identifier
+      name:
+        type: string
+        description: Value stream name
+      type:
+        type: string
+        enum:
+          - operational
+          - development
+        description: Type of value stream
+      portfolio_ref:
+        type: string
+        pattern: "^pf_[a-z0-9_]+$"
+        description: "Portfolio this value stream belongs to (ID reference)"
+      steps:
+        type: array
+        description: Steps in the value stream
+        items:
+          type: string
+
+  epic:
+    type: object
+    description: Large body of work spanning multiple features and programs
+    required:
+      - id
+      - title
+      - type
+    properties:
+      id:
+        type: string
+        pattern: "^epic_[a-z0-9_]+$"
+        description: Unique epic identifier
+      title:
+        type: string
+        minLength: 1
+        maxLength: 200
+        description: Epic title
+      type:
+        type: string
+        enum:
+          - business
+          - enabler
+        description: Business epic delivers value, enabler extends runway
+      description:
+        type: string
+        description: Detailed epic description
+      hypothesis:
+        type: string
+        description: Epic hypothesis statement
+      businessOutcome:
+        type: string
+        description: Expected business outcome
+      portfolio_ref:
+        type: string
+        pattern: "^pf_[a-z0-9_]+$"
+        description: "Portfolio this epic belongs to (ID reference)"
+      leadingIndicators:
+        type: array
+        description: Metrics indicating progress toward outcome
+        items:
+          type: string
+          pattern: "^met_[a-z0-9_]+$"
+          description: "Metric ID reference"
+      leanBusinessCase:
+        type: object
+        description: Lean business case for portfolio approval
+        properties:
+          summary:
+            type: string
+            description: Executive summary
+          analysis:
+            type: object
+            properties:
+              costEstimate:
+                type: number
+                description: Estimated cost
+              valueEstimate:
+                type: number
+                description: Estimated business value
+              durationEstimate:
+                type: string
+                description: Estimated duration
+          recommendation:
+            type: string
+            description: Recommendation for portfolio
+      feature_refs:
+        type: array
+        description: "Features that implement this epic (ID references)"
+        items:
+          type: string
+          pattern: "^feat_[a-z0-9_]+$"
+      status:
+        type: string
+        enum:
+          - funnel
+          - reviewing
+          - analyzing
+          - portfolio-backlog
+          - implementing
+          - done
+        description: Epic status in portfolio kanban
+      priority:
+        type: integer
+        minimum: 1
+        description: Epic priority
+      owner:
+        type: string
+        description: Epic Owner
+      nfr_refs:
+        type: array
+        description: "Non-functional requirements for this epic (ID references)"
+        items:
+          type: string
+          pattern: "^nfr_[a-z0-9_]+$"
+      risk_refs:
+        type: array
+        description: "Risks associated with this epic (ID references)"
+        items:
+          type: string
+          pattern: "^risk_[a-z0-9_]+$"
+
+  roadmap:
+    type: object
+    description: Strategic view of deliverables over time
+    required:
+      - id
+      - timeHorizon
+      - level
+      - items
+    properties:
+      id:
+        type: string
+        pattern: "^rm_[a-z0-9_]+$"
+        description: Unique roadmap identifier
+      level:
+        type: string
+        enum:
+          - portfolio
+          - product
+          - release
+          - pi
+        description: Level of roadmap (portfolio, product, release, or PI)
+      timeHorizon:
+        type: string
+        description: Roadmap time horizon (e.g., '12 months', '4 PIs', '3 releases')
+      portfolio_ref:
+        type: string
+        pattern: "^pf_[a-z0-9_]+$"
+        description: "Portfolio this roadmap belongs to (ID reference)"
+      items:
+        type: array
+        description: Roadmap items organized by timeframe
+        items:
+          type: object
+          required:
+            - timeframe
+          properties:
+            timeframe:
+              type: string
+              description: When (e.g., 'Q1 2025', 'PI 3', 'Release 2.1')
+            theme:
+              type: string
+              description: Theme or objective for this period
+            objectives:
+              type: array
+              description: High-level objectives for this timeframe
+              items:
+                type: string
+            epic_refs:
+              type: array
+              description: "Epic IDs planned for this timeframe"
+              items:
+                type: string
+                pattern: "^epic_[a-z0-9_]+$"
+            feature_refs:
+              type: array
+              description: "Feature IDs planned for this timeframe"
+              items:
+                type: string
+                pattern: "^feat_[a-z0-9_]+$"
+            milestones:
+              type: array
+              description: Key milestones in this timeframe
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  date:
+                    type: string
+                    format: date
+                  type:
+                    type: string
+            confidence:
+              type: string
+              enum:
+                - high
+                - medium
+                - low
+              description: Confidence level in this timeframe's plan
+            dependencies:
+              type: array
+              description: Key dependencies for this timeframe
+              items:
+                type: string
+        minItems: 1
+      lastReviewed:
+        type: string
+        format: date
+        description: When roadmap was last reviewed/updated
+      reviewCadence:
+        type: string
+        description: How often roadmap is reviewed (e.g., 'quarterly', 'per PI')
+      notes:
+        type: string
+        description: Additional context or assumptions
+
+  stakeholder:
+    type: object
+    description: Key stakeholder in the portfolio or product
+    required:
+      - id
+      - name
+      - role
+    properties:
+      id:
+        type: string
+        pattern: "^sh_[a-z0-9_]+$"
+        description: Unique stakeholder identifier
+      name:
+        type: string
+        description: Stakeholder name
+      role:
+        type: string
+        description: Stakeholder role or title
+      influence:
+        type: string
+        enum:
+          - high
+          - medium
+          - low
+        description: Level of influence on decisions
+      interest:
+        type: string
+        enum:
+          - high
+          - medium
+          - low
+        description: Level of interest in the work
+      portfolio_ref:
+        type: string
+        pattern: "^pf_[a-z0-9_]+$"
+        description: "Portfolio this stakeholder is associated with (ID reference)"
+
+  metric:
+    type: object
+    description: Business or product metric for measuring success
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        pattern: "^met_[a-z0-9_]+$"
+        description: Unique metric identifier
+      name:
+        type: string
+        description: Metric name
+      description:
+        type: string
+        description: Metric description
+      target:
+        type: number
+        description: Target value for the metric
+      current:
+        type: number
+        description: Current value of the metric
+      unit:
+        type: string
+        description: Unit of measurement
+
+  non_functional_requirement:
+    type: object
+    description: Quality attributes and constraints for system behavior (NFR)
+    required:
+      - id
+      - category
+      - description
+      - acceptanceCriteria
+    properties:
+      id:
+        type: string
+        pattern: "^nfr_[a-z0-9_]+$"
+        description: Unique identifier for the NFR
+      category:
+        type: string
+        enum:
+          - performance
+          - security
+          - scalability
+          - usability
+          - reliability
+          - maintainability
+        description: NFR category
+      description:
+        type: string
+        description: Description of the non-functional requirement
+        minLength: 10
+      acceptanceCriteria:
+        type: array
+        description: Testable criteria for meeting this NFR
+        items:
+          type: string
+        minItems: 1
+      feature_refs:
+        type: array
+        description: "Features that must satisfy this NFR (ID references)"
+        items:
+          type: string
+          pattern: "^feat_[a-z0-9_]+$"
+      qualityMetricRef:
+        type: string
+        pattern: "^met_[a-z0-9_]+$"
+        description: "Reference to quality metric for measuring this NFR (ID reference)"
+
+  risk:
+    type: object
+    description: Portfolio or program risk
+    required:
+      - id
+      - description
+      - roam
+    properties:
+      id:
+        type: string
+        pattern: "^risk_[a-z0-9_]+$"
+        description: Unique risk identifier
+      description:
+        type: string
+        description: Risk description
+      impact:
+        type: string
+        enum:
+          - high
+          - medium
+          - low
+        description: Potential impact if risk occurs
+      probability:
+        type: string
+        enum:
+          - high
+          - medium
+          - low
+        description: Probability of risk occurring
+      roam:
+        type: string
+        enum:
+          - resolved
+          - owned
+          - accepted
+          - mitigated
+        description: ROAM classification
+      owner:
+        type: string
+        description: Risk owner responsible for mitigation
+      mitigation:
+        type: string
+        description: Mitigation plan or strategy
+
+validation_rules:
+  - rule: "epic_has_portfolio"
+    description: "Every epic must belong to a portfolio"
+  - rule: "value_stream_has_portfolio"
+    description: "Every value stream must belong to a portfolio"
+  - rule: "nfr_has_acceptance_criteria"
+    description: "Every NFR must have at least one testable acceptance criterion"
+  - rule: "risk_has_roam"
+    description: "Every risk must have ROAM classification"
+
+best_practices:
+  portfolio:
+    - "Align portfolio epics with business strategy"
+    - "Establish clear value streams"
+    - "Track portfolio-level metrics and risks"
+    - "Maintain lean business cases for epics"
+    - "Review roadmap quarterly or per PI"
+  epic:
+    - "Write clear hypothesis statements"
+    - "Define measurable business outcomes"
+    - "Identify leading indicators early"
+    - "Keep lean business cases current"
+  nfr:
+    - "Make acceptance criteria testable"
+    - "Link NFRs to quality metrics"
+    - "Review NFRs during PI planning"

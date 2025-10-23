@@ -1,0 +1,404 @@
+# Tactical DDD Example - Job Seeker Application
+# Focuses on aggregates, entities, value objects, and services
+
+aggregates:
+  - id: "agg_profile"
+    name: "CandidateProfile"
+    bounded_context_ref: "bc_profile"
+    root_ref: "ent_candidate"
+    entities:
+      - "ent_candidate"
+    value_objects:
+      - "vo_email"
+      - "vo_phone"
+      - "vo_skill_level"
+      - "vo_location"
+    consistency_rules:
+      - "Email must be unique across system"
+      - "Profile must have at least one contact method"
+      - "Skills cannot have proficiency level > 10"
+    invariants:
+      - "Candidate must have valid email"
+      - "At least one skill must be specified"
+    size_estimate: "medium"
+
+  - id: "agg_match"
+    name: "JobMatch"
+    bounded_context_ref: "bc_matching"
+    root_ref: "ent_match"
+    entities:
+      - "ent_match"
+    value_objects:
+      - "vo_match_score"
+      - "vo_match_criteria"
+    consistency_rules:
+      - "Match score must be between 0 and 100"
+      - "Match must reference valid candidate and job"
+    invariants:
+      - "Match score reflects weighted criteria"
+    size_estimate: "small"
+
+  - id: "agg_job_posting"
+    name: "JobPosting"
+    bounded_context_ref: "bc_job_catalog"
+    root_ref: "ent_job"
+    entities:
+      - "ent_job"
+    value_objects:
+      - "vo_salary_range"
+      - "vo_job_requirements"
+    consistency_rules:
+      - "Job must have title and company"
+      - "Salary range min <= max"
+    size_estimate: "medium"
+
+entities:
+  - id: "ent_candidate"
+    name: "Candidate"
+    bounded_context_ref: "bc_profile"
+    is_aggregate_root: true
+    identity_field: "candidate_id"
+    identity_generation: "auto_generated"
+    attributes:
+      - name: "candidate_id"
+        type: "UUID"
+        required: true
+        description: "Unique candidate identifier"
+      - name: "email"
+        type: "Email"
+        value_object_ref: "vo_email"
+        required: true
+      - name: "phone"
+        type: "Phone"
+        value_object_ref: "vo_phone"
+        required: false
+      - name: "location"
+        type: "Location"
+        value_object_ref: "vo_location"
+        required: true
+      - name: "skills"
+        type: "List<SkillLevel>"
+        value_object_ref: "vo_skill_level"
+        required: true
+    business_methods:
+      - name: "addSkill"
+        description: "Add a new skill with proficiency level"
+        parameters: ["skill_name", "proficiency_level"]
+        returns: "void"
+      - name: "updateContactInfo"
+        description: "Update email or phone"
+        parameters: ["email_or_phone"]
+        returns: "void"
+    invariants:
+      - "Must have at least one skill"
+      - "Email must be verified before activation"
+
+  - id: "ent_match"
+    name: "Match"
+    bounded_context_ref: "bc_matching"
+    is_aggregate_root: true
+    identity_field: "match_id"
+    identity_generation: "auto_generated"
+    attributes:
+      - name: "match_id"
+        type: "UUID"
+        required: true
+      - name: "candidate_id"
+        type: "UUID"
+        required: true
+        description: "Reference to Candidate (by ID only)"
+      - name: "job_id"
+        type: "UUID"
+        required: true
+        description: "Reference to JobPosting (by ID only)"
+      - name: "score"
+        type: "MatchScore"
+        value_object_ref: "vo_match_score"
+        required: true
+      - name: "criteria"
+        type: "MatchCriteria"
+        value_object_ref: "vo_match_criteria"
+        required: true
+    invariants:
+      - "Score must be calculated from criteria"
+
+  - id: "ent_job"
+    name: "Job"
+    bounded_context_ref: "bc_job_catalog"
+    is_aggregate_root: true
+    identity_field: "job_id"
+    identity_generation: "auto_generated"
+    attributes:
+      - name: "job_id"
+        type: "UUID"
+        required: true
+      - name: "title"
+        type: "string"
+        required: true
+      - name: "company"
+        type: "string"
+        required: true
+      - name: "salary_range"
+        type: "SalaryRange"
+        value_object_ref: "vo_salary_range"
+        required: false
+      - name: "requirements"
+        type: "JobRequirements"
+        value_object_ref: "vo_job_requirements"
+        required: true
+
+value_objects:
+  - id: "vo_email"
+    name: "Email"
+    bounded_context_ref: "bc_profile"
+    description: "Email address value object with validation"
+    attributes:
+      - name: "address"
+        type: "string"
+        required: true
+        validation: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+    validation_rules:
+      - "Must be valid email format"
+      - "Must not be from disposable email domain"
+    equality_criteria:
+      - "address"
+    immutability: true
+
+  - id: "vo_phone"
+    name: "Phone"
+    bounded_context_ref: "bc_profile"
+    attributes:
+      - name: "country_code"
+        type: "string"
+        required: true
+      - name: "number"
+        type: "string"
+        required: true
+    validation_rules:
+      - "Number must be valid for country code"
+    equality_criteria:
+      - "country_code"
+      - "number"
+    immutability: true
+
+  - id: "vo_skill_level"
+    name: "SkillLevel"
+    bounded_context_ref: "bc_profile"
+    attributes:
+      - name: "skill_name"
+        type: "string"
+        required: true
+      - name: "proficiency"
+        type: "integer"
+        required: true
+        validation: "1 <= proficiency <= 10"
+      - name: "years_experience"
+        type: "integer"
+        required: false
+    validation_rules:
+      - "Proficiency must be between 1 and 10"
+    equality_criteria:
+      - "skill_name"
+      - "proficiency"
+    immutability: true
+
+  - id: "vo_location"
+    name: "Location"
+    bounded_context_ref: "bc_profile"
+    attributes:
+      - name: "city"
+        type: "string"
+        required: true
+      - name: "state"
+        type: "string"
+        required: false
+      - name: "country"
+        type: "string"
+        required: true
+    equality_criteria:
+      - "city"
+      - "country"
+    immutability: true
+
+  - id: "vo_match_score"
+    name: "MatchScore"
+    bounded_context_ref: "bc_matching"
+    attributes:
+      - name: "value"
+        type: "integer"
+        required: true
+        validation: "0 <= value <= 100"
+      - name: "confidence"
+        type: "float"
+        required: true
+        validation: "0.0 <= confidence <= 1.0"
+    validation_rules:
+      - "Score must be 0-100"
+      - "Confidence must be 0.0-1.0"
+    equality_criteria:
+      - "value"
+    immutability: true
+
+  - id: "vo_match_criteria"
+    name: "MatchCriteria"
+    bounded_context_ref: "bc_matching"
+    attributes:
+      - name: "skill_weight"
+        type: "float"
+        required: true
+      - name: "experience_weight"
+        type: "float"
+        required: true
+      - name: "location_weight"
+        type: "float"
+        required: true
+    validation_rules:
+      - "All weights must sum to 1.0"
+    immutability: true
+
+  - id: "vo_salary_range"
+    name: "SalaryRange"
+    bounded_context_ref: "bc_job_catalog"
+    attributes:
+      - name: "min"
+        type: "integer"
+        required: true
+      - name: "max"
+        type: "integer"
+        required: true
+      - name: "currency"
+        type: "string"
+        required: true
+    validation_rules:
+      - "Min must be less than or equal to max"
+      - "Min and max must be positive"
+    equality_criteria:
+      - "min"
+      - "max"
+      - "currency"
+    immutability: true
+
+  - id: "vo_job_requirements"
+    name: "JobRequirements"
+    bounded_context_ref: "bc_job_catalog"
+    attributes:
+      - name: "required_skills"
+        type: "List<string>"
+        required: true
+      - name: "preferred_skills"
+        type: "List<string>"
+        required: false
+      - name: "min_years_experience"
+        type: "integer"
+        required: true
+    validation_rules:
+      - "At least one required skill must be specified"
+    immutability: true
+
+repositories:
+  - id: "repo_profile"
+    name: "CandidateProfileRepository"
+    aggregate_ref: "agg_profile"
+    bounded_context_ref: "bc_profile"
+    interface_methods:
+      - name: "findById"
+        description: "Find candidate by ID"
+        parameters: ["candidate_id"]
+        returns: "CandidateProfile"
+        query_type: "by_id"
+      - name: "findByEmail"
+        description: "Find candidate by email address"
+        parameters: ["email"]
+        returns: "CandidateProfile"
+        query_type: "by_criteria"
+      - name: "findBySkill"
+        description: "Find candidates with specific skill"
+        parameters: ["skill_name", "min_proficiency"]
+        returns: "List<CandidateProfile>"
+        query_type: "custom"
+    persistence_strategy: "PostgreSQL with JSON columns for skills"
+
+  - id: "repo_job_catalog"
+    name: "JobCatalogRepository"
+    aggregate_ref: "agg_job_posting"
+    bounded_context_ref: "bc_job_catalog"
+    interface_methods:
+      - name: "findById"
+        parameters: ["job_id"]
+        returns: "JobPosting"
+        query_type: "by_id"
+      - name: "findByCompany"
+        parameters: ["company_name"]
+        returns: "List<JobPosting>"
+        query_type: "by_criteria"
+      - name: "findActiveJobs"
+        returns: "List<JobPosting>"
+        query_type: "all"
+    persistence_strategy: "MongoDB for flexible job structure"
+
+domain_services:
+  - id: "svc_dom_matching_algorithm"
+    name: "MatchingAlgorithmService"
+    bounded_context_ref: "bc_matching"
+    description: "Calculates match scores between candidates and jobs"
+    operations:
+      - name: "calculateMatch"
+        description: "Calculate match score for candidate-job pair"
+        parameters: ["candidate_id", "job_id", "criteria"]
+        returns: "MatchScore"
+      - name: "findTopMatches"
+        description: "Find best N job matches for candidate"
+        parameters: ["candidate_id", "limit"]
+        returns: "List<Match>"
+    stateless: true
+
+domain_events:
+  - id: "evt_profile_created"
+    name: "ProfileCreated"
+    bounded_context_ref: "bc_profile"
+    aggregate_ref: "agg_profile"
+    description: "Fired when new candidate profile is created"
+    data_carried:
+      - name: "candidate_id"
+        type: "UUID"
+        description: "ID of created candidate"
+      - name: "email"
+        type: "string"
+        description: "Candidate email"
+      - name: "timestamp"
+        type: "datetime"
+        description: "When profile was created"
+    immutable: true
+
+  - id: "evt_profile_updated"
+    name: "ProfileUpdated"
+    bounded_context_ref: "bc_profile"
+    aggregate_ref: "agg_profile"
+    description: "Fired when candidate profile is updated"
+    data_carried:
+      - name: "candidate_id"
+        type: "UUID"
+      - name: "updated_fields"
+        type: "List<string>"
+        description: "Which fields changed"
+      - name: "timestamp"
+        type: "datetime"
+    immutable: true
+
+  - id: "evt_match_created"
+    name: "MatchCreated"
+    bounded_context_ref: "bc_matching"
+    aggregate_ref: "agg_match"
+    description: "Fired when new job match is calculated"
+    data_carried:
+      - name: "match_id"
+        type: "UUID"
+      - name: "candidate_id"
+        type: "UUID"
+      - name: "job_id"
+        type: "UUID"
+      - name: "score"
+        type: "integer"
+      - name: "timestamp"
+        type: "datetime"
+    immutable: true

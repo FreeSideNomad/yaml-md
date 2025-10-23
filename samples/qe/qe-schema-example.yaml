@@ -1,0 +1,2489 @@
+# Job Seeker Application - QE Schema Example
+# Quality Engineering Test Specification
+# Based on: research/qe/deliverables/qe-schema-definition.yaml
+# Integrates with: DDD schema (ddd-schema-example.yaml) and UX schema (ux-schema-example.yaml)
+
+# ============================================================================
+# SYSTEM
+# ============================================================================
+system:
+  id: "sys_job_seeker"
+  name: "Job Seeker Application"
+  description: "AI-powered job application assistant for data scientists"
+  version: "1.0.0"
+  test_strategy_ref: "ts_job_seeker_main"
+
+# ============================================================================
+# TEST STRATEGIES
+# ============================================================================
+test_strategies:
+  - id: "ts_job_seeker_main"
+    name: "Job Seeker Application Test Strategy"
+    system_ref: "sys_job_seeker"
+    description: "Comprehensive testing strategy covering all test levels and types for the Job Seeker application"
+    risk_level: "high"
+
+    test_levels:
+      - unit
+      - integration
+      - component
+      - contract
+      - e2e
+      - acceptance
+      - exploratory
+      - performance
+      - security
+
+    test_types:
+      - functional
+      - non_functional
+      - regression
+      - smoke
+      - compatibility
+
+    automation_target: 80
+
+    quality_gates:
+      - gate: "Unit test coverage >= 90% for domain layer"
+        blocking: true
+      - gate: "Integration test coverage >= 85% for application layer"
+        blocking: true
+      - gate: "All critical E2E tests passing"
+        blocking: true
+      - gate: "No critical or high severity defects"
+        blocking: true
+      - gate: "Performance benchmarks met"
+        blocking: false
+
+    scope:
+      in_scope:
+        - "All bounded contexts from DDD model"
+        - "All user flows from UX specification"
+        - "API contracts between contexts"
+        - "Domain invariants and business rules"
+        - "UI components and accessibility"
+      out_of_scope:
+        - "Third-party service internals (SendGrid, etc.)"
+        - "Infrastructure automation testing"
+
+    dependencies:
+      - dependency: "DDD schema v1.0"
+        type: "architecture"
+      - dependency: "UX schema v1.0"
+        type: "user_interface"
+
+# ============================================================================
+# TEST PLANS
+# ============================================================================
+test_plans:
+  - id: "tp_profile_management"
+    name: "Profile Management Test Plan"
+    test_strategy_ref: "ts_job_seeker_main"
+    bounded_context_ref: "bc_profile"
+    description: "Test plan for candidate profile management features"
+
+    objectives:
+      - "Verify profile creation, update, and validation"
+      - "Validate all value objects (email, skills, location, etc.)"
+      - "Ensure profile completeness calculation accuracy"
+      - "Test domain events publishing (ProfileUpdated, SkillsChanged)"
+
+    scope:
+      aggregates: ["agg_candidate_profile"]
+      repositories: ["repo_profile"]
+      services: ["svc_app_update_profile", "svc_app_import_resume", "svc_dom_profile_scorer"]
+      events: ["evt_profile_created", "evt_profile_updated", "evt_skills_changed"]
+
+    test_approach:
+      - "Unit tests for all value objects"
+      - "Integration tests for repository operations"
+      - "Component tests for profile UI components"
+      - "E2E tests for profile creation workflow"
+
+    schedule:
+      start_date: "2025-10-10"
+      end_date: "2025-10-20"
+      milestones:
+        - milestone: "Unit tests complete"
+          date: "2025-10-12"
+        - milestone: "Integration tests complete"
+          date: "2025-10-15"
+        - milestone: "E2E tests complete"
+          date: "2025-10-18"
+
+    owner: "QA Team - Profile Domain"
+    priority: "critical"
+
+  - id: "tp_job_matching"
+    name: "Job Matching Test Plan"
+    test_strategy_ref: "ts_job_seeker_main"
+    bounded_context_ref: "bc_matching"
+    description: "Test plan for intelligent job matching engine"
+
+    objectives:
+      - "Verify match score calculation algorithm accuracy"
+      - "Validate match tier assignment (High, Medium, Low)"
+      - "Test criteria scoring (skills, experience, education, location, domain)"
+      - "Ensure high match notifications triggered correctly"
+
+    scope:
+      aggregates: ["agg_job_match"]
+      repositories: ["repo_job_match"]
+      services: ["svc_dom_matching_engine", "svc_dom_scoring_algorithm", "svc_app_calculate_matches"]
+      events: ["evt_match_calculated", "evt_high_match_found"]
+
+    test_approach:
+      - "Unit tests for match score value object"
+      - "Integration tests for matching engine service"
+      - "Performance tests for large-scale matching (1000 candidates x 1000 jobs)"
+      - "Acceptance tests for match quality"
+
+    owner: "QA Team - Matching Domain"
+    priority: "critical"
+
+  - id: "tp_job_search"
+    name: "Job Search and Catalog Test Plan"
+    test_strategy_ref: "ts_job_seeker_main"
+    bounded_context_ref: "bc_job_catalog"
+    description: "Test plan for job catalog, search, and filtering functionality"
+
+    objectives:
+      - "Verify job ingestion and deduplication"
+      - "Test faceted search with multiple filters"
+      - "Validate search performance and relevance"
+      - "Ensure job card components render correctly"
+
+    scope:
+      aggregates: ["agg_job_posting"]
+      repositories: ["repo_job_posting"]
+      services: ["svc_dom_deduplication", "svc_app_ingest_jobs"]
+      events: ["evt_job_posted", "evt_job_expired"]
+
+    test_approach:
+      - "Component tests for job card UI"
+      - "Integration tests for search API"
+      - "Performance tests for search queries"
+      - "E2E tests for job search user flow"
+
+    owner: "QA Team - Catalog Domain"
+    priority: "high"
+
+  - id: "tp_application_tracking"
+    name: "Application Tracking Test Plan"
+    test_strategy_ref: "ts_job_seeker_main"
+    bounded_context_ref: "bc_applications"
+    description: "Test plan for job application submission and tracking"
+
+    objectives:
+      - "Verify application submission workflow"
+      - "Validate application status transitions"
+      - "Test notification triggers"
+      - "Ensure application history tracking"
+
+    scope:
+      aggregates: ["agg_job_application"]
+      repositories: ["repo_application"]
+      services: ["svc_app_submit_application", "svc_app_update_status"]
+      events: ["evt_application_submitted", "evt_application_status_changed"]
+
+    test_approach:
+      - "E2E tests for application workflow"
+      - "Contract tests for notification integration"
+      - "Component tests for application UI"
+
+    owner: "QA Team - Application Domain"
+    priority: "high"
+
+# ============================================================================
+# TEST SUITES
+# ============================================================================
+test_suites:
+  # Unit Test Suites
+  - id: "tsuite_profile_value_objects"
+    name: "Profile Value Objects Unit Tests"
+    test_plan_ref: "tp_profile_management"
+    test_level: "unit"
+    bounded_context_ref: "bc_profile"
+    description: "Unit tests for all profile-related value objects"
+    test_cases: ["tc_email_valid", "tc_email_invalid", "tc_skills_validation", "tc_location_validation", "tc_experience_validation"]
+    execution_order: "sequential"
+    tags: ["unit", "value_objects", "bc_profile"]
+
+  - id: "tsuite_matching_unit"
+    name: "Matching Engine Unit Tests"
+    test_plan_ref: "tp_job_matching"
+    test_level: "unit"
+    bounded_context_ref: "bc_matching"
+    description: "Unit tests for match score calculation and tier assignment"
+    test_cases: ["tc_match_score_valid", "tc_match_score_boundaries", "tc_match_tier_assignment", "tc_criteria_scores"]
+    execution_order: "sequential"
+    tags: ["unit", "matching", "bc_matching"]
+
+  # Integration Test Suites
+  - id: "tsuite_profile_repository"
+    name: "Profile Repository Integration Tests"
+    test_plan_ref: "tp_profile_management"
+    test_level: "integration"
+    bounded_context_ref: "bc_profile"
+    repository_under_test: "repo_profile"
+    description: "Integration tests for profile repository operations"
+    test_cases: ["tc_profile_save", "tc_profile_find_by_id", "tc_profile_find_by_email", "tc_profile_find_incomplete"]
+    execution_order: "sequential"
+    tags: ["integration", "repository", "bc_profile"]
+
+  - id: "tsuite_matching_service"
+    name: "Matching Engine Service Integration Tests"
+    test_plan_ref: "tp_job_matching"
+    test_level: "integration"
+    bounded_context_ref: "bc_matching"
+    service_under_test: "svc_dom_matching_engine"
+    description: "Integration tests for matching engine domain service"
+    test_cases: ["tc_calculate_match_integration", "tc_find_best_matches", "tc_match_high_threshold"]
+    execution_order: "sequential"
+    tags: ["integration", "service", "bc_matching"]
+
+  # Component Test Suites
+  - id: "tsuite_job_card_component"
+    name: "Job Card Component Tests"
+    test_plan_ref: "tp_job_search"
+    test_level: "component"
+    component_under_test: "comp_job_card"
+    description: "Component tests for job card UI rendering and interaction"
+    test_cases: ["tc_job_card_render", "tc_job_card_match_score", "tc_job_card_save", "tc_job_card_apply"]
+    automation_framework_ref: "af_cypress"
+    tags: ["component", "ui", "job_card"]
+
+  - id: "tsuite_profile_form_component"
+    name: "Profile Form Component Tests"
+    test_plan_ref: "tp_profile_management"
+    test_level: "component"
+    component_under_test: "comp_form_field"
+    description: "Component tests for profile form validation and interaction"
+    test_cases: ["tc_profile_form_validation", "tc_profile_form_submit", "tc_profile_form_autosave"]
+    automation_framework_ref: "af_cypress"
+    tags: ["component", "ui", "profile_form"]
+
+  # Contract Test Suites
+  - id: "tsuite_context_contracts"
+    name: "Bounded Context Contract Tests"
+    test_plan_ref: "tp_job_matching"
+    test_level: "contract"
+    description: "Contract tests for API boundaries between bounded contexts"
+    test_cases: ["tc_profile_to_matching_contract", "tc_catalog_to_matching_contract", "tc_matching_to_notifications_contract"]
+    automation_framework_ref: "af_jest"
+    tags: ["contract", "api", "integration"]
+
+  # E2E Test Suites
+  - id: "tsuite_profile_creation_e2e"
+    name: "Profile Creation E2E Tests"
+    test_plan_ref: "tp_profile_management"
+    test_level: "e2e"
+    user_flow_ref: "wf_profile_setup"
+    description: "End-to-end tests for complete profile creation workflow"
+    test_cases: ["tc_profile_setup_wizard_complete", "tc_profile_setup_validation", "tc_profile_setup_autosave"]
+    automation_framework_ref: "af_playwright"
+    tags: ["e2e", "workflow", "profile"]
+
+  - id: "tsuite_job_search_e2e"
+    name: "Job Search E2E Tests"
+    test_plan_ref: "tp_job_search"
+    test_level: "e2e"
+    description: "End-to-end tests for job search and filtering"
+    test_cases: ["tc_job_search_basic", "tc_job_search_filters", "tc_job_search_pagination", "tc_job_save"]
+    automation_framework_ref: "af_playwright"
+    tags: ["e2e", "search", "jobs"]
+
+  - id: "tsuite_application_submission_e2e"
+    name: "Application Submission E2E Tests"
+    test_plan_ref: "tp_application_tracking"
+    test_level: "e2e"
+    user_flow_ref: "wf_job_application"
+    description: "End-to-end tests for job application workflow"
+    test_cases: ["tc_apply_job_complete", "tc_apply_job_validation", "tc_apply_job_notification"]
+    automation_framework_ref: "af_playwright"
+    tags: ["e2e", "workflow", "application"]
+
+  # Performance Test Suites
+  - id: "tsuite_matching_performance"
+    name: "Matching Engine Performance Tests"
+    test_plan_ref: "tp_job_matching"
+    test_level: "performance"
+    bounded_context_ref: "bc_matching"
+    description: "Performance tests for matching engine at scale"
+    test_cases: ["tc_match_calculation_performance", "tc_match_bulk_calculation", "tc_match_concurrent_users"]
+    automation_framework_ref: "af_k6"
+    tags: ["performance", "load", "matching"]
+
+  # Security Test Suites
+  - id: "tsuite_authentication_security"
+    name: "Authentication and Authorization Security Tests"
+    test_plan_ref: "tp_profile_management"
+    test_level: "security"
+    description: "Security tests for authentication and authorization"
+    test_cases: ["tc_auth_login_valid", "tc_auth_login_invalid", "tc_auth_session_timeout", "tc_authz_profile_access"]
+    automation_framework_ref: "af_jest"
+    tags: ["security", "auth", "authorization"]
+
+# ============================================================================
+# TEST CASES - UNIT TESTS
+# ============================================================================
+test_cases:
+  # Value Object: Email
+  - id: "tc_email_valid"
+    name: "Email value object accepts valid email addresses"
+    test_suite_ref: "tsuite_profile_value_objects"
+    test_type: "functional"
+    test_level: "unit"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      value_object: "vo_email"
+
+    given:
+      - condition: "Valid email string provided"
+        setup: "test_data_refs: td_valid_emails"
+
+    when:
+      - action: "Create Email value object"
+        parameters:
+          email_string: "marina@example.com"
+
+    then:
+      - expectation: "Email value object created successfully"
+        verification_method: "Assert no exception thrown"
+      - expectation: "Email value accessible and normalized to lowercase"
+        verification_method: "Assert email.value == 'marina@example.com'"
+
+    test_data_refs: ["td_valid_emails"]
+    automated: true
+    automation_framework: "jest"
+    author: "qa_team"
+    tags: ["unit", "value_object", "validation", "bc_profile"]
+
+  - id: "tc_email_invalid"
+    name: "Email value object rejects invalid email addresses"
+    test_suite_ref: "tsuite_profile_value_objects"
+    test_type: "functional"
+    test_level: "unit"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      value_object: "vo_email"
+
+    given:
+      - condition: "Invalid email string provided"
+        setup: "test_data_refs: td_invalid_emails"
+
+    when:
+      - action: "Attempt to create Email value object"
+        parameters:
+          email_string: "invalid-email"
+
+    then:
+      - expectation: "Email value object creation fails"
+        verification_method: "Assert ValidationException thrown"
+      - expectation: "Error message describes the validation failure"
+        verification_method: "Assert error.message contains 'Invalid email format'"
+
+    test_data_refs: ["td_invalid_emails"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["unit", "value_object", "validation", "negative", "bc_profile"]
+
+  # Value Object: Skills
+  - id: "tc_skills_validation"
+    name: "Skills value object validates proficiency levels and minimum skills"
+    test_suite_ref: "tsuite_profile_value_objects"
+    test_type: "functional"
+    test_level: "unit"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      value_object: "vo_skills"
+
+    design_technique: "equivalence_partitioning"
+
+    given:
+      - condition: "Skills data with valid proficiency levels"
+        setup: "Create skills map: {Python: 'expert', 'Machine Learning': 'advanced', SQL: 'intermediate'}"
+
+    when:
+      - action: "Create Skills value object"
+        parameters:
+          technical_skills:
+            Python: "expert"
+            "Machine Learning": "advanced"
+            SQL: "intermediate"
+
+    then:
+      - expectation: "Skills value object created successfully"
+        verification_method: "Assert no exception thrown"
+      - expectation: "Skills are accessible"
+        verification_method: "Assert skills.hasSkill('Python') == true"
+      - expectation: "Proficiency levels are correct"
+        verification_method: "Assert skills.proficiencyFor('Python') == 'expert'"
+
+    automated: true
+    automation_framework: "jest"
+    tags: ["unit", "value_object", "skills", "bc_profile"]
+
+  # Value Object: Location
+  - id: "tc_location_validation"
+    name: "Location value object validates Canadian provinces"
+    test_suite_ref: "tsuite_profile_value_objects"
+    test_type: "functional"
+    test_level: "unit"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      value_object: "vo_location"
+
+    design_technique: "boundary_value_analysis"
+
+    given:
+      - condition: "Location data with valid Canadian province"
+        setup: "city: 'Toronto', province: 'ON', country: 'Canada'"
+
+    when:
+      - action: "Create Location value object"
+        parameters:
+          city: "Toronto"
+          province: "ON"
+          country: "Canada"
+
+    then:
+      - expectation: "Location value object created successfully"
+        verification_method: "Assert no exception thrown"
+      - expectation: "Location properties accessible"
+        verification_method: "Assert location.city == 'Toronto' && location.province == 'ON'"
+
+    automated: true
+    automation_framework: "jest"
+    tags: ["unit", "value_object", "location", "bc_profile"]
+
+  # Value Object: Match Score
+  - id: "tc_match_score_valid"
+    name: "Match score value object accepts valid scores (0-100)"
+    test_suite_ref: "tsuite_matching_unit"
+    test_type: "functional"
+    test_level: "unit"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      value_object: "vo_match_score"
+
+    design_technique: "equivalence_partitioning"
+
+    given:
+      - condition: "Valid match score value"
+        setup: "score_value: 85"
+
+    when:
+      - action: "Create MatchScore value object"
+        parameters:
+          value: 85
+
+    then:
+      - expectation: "MatchScore created successfully"
+        verification_method: "Assert no exception thrown"
+      - expectation: "Score value accessible"
+        verification_method: "Assert matchScore.value == 85"
+      - expectation: "isHighMatch returns true for score >= 80"
+        verification_method: "Assert matchScore.isHighMatch() == true"
+
+    automated: true
+    automation_framework: "jest"
+    tags: ["unit", "value_object", "match_score", "bc_matching"]
+
+  - id: "tc_match_score_boundaries"
+    name: "Match score value object validates boundaries (0 and 100)"
+    test_suite_ref: "tsuite_matching_unit"
+    test_type: "functional"
+    test_level: "unit"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      value_object: "vo_match_score"
+
+    design_technique: "boundary_value_analysis"
+
+    test_steps:
+      - step_number: 1
+        action: "Create MatchScore with value 0"
+        expected_result: "Success - minimum boundary accepted"
+
+      - step_number: 2
+        action: "Create MatchScore with value 100"
+        expected_result: "Success - maximum boundary accepted"
+
+      - step_number: 3
+        action: "Attempt to create MatchScore with value -1"
+        expected_result: "Failure - ValidationException thrown"
+
+      - step_number: 4
+        action: "Attempt to create MatchScore with value 101"
+        expected_result: "Failure - ValidationException thrown"
+
+    automated: true
+    automation_framework: "jest"
+    tags: ["unit", "value_object", "boundary", "match_score", "bc_matching"]
+
+  - id: "tc_match_tier_assignment"
+    name: "Match tier correctly assigned based on score"
+    test_suite_ref: "tsuite_matching_unit"
+    test_type: "functional"
+    test_level: "unit"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      value_object: "vo_match_tier"
+
+    design_technique: "decision_table"
+
+    test_steps:
+      - step_number: 1
+        action: "Calculate tier for score 85"
+        expected_result: "Tier = HIGH"
+
+      - step_number: 2
+        action: "Calculate tier for score 65"
+        expected_result: "Tier = MEDIUM"
+
+      - step_number: 3
+        action: "Calculate tier for score 45"
+        expected_result: "Tier = LOW"
+
+      - step_number: 4
+        action: "Calculate tier for score 80 (boundary)"
+        expected_result: "Tier = HIGH"
+
+      - step_number: 5
+        action: "Calculate tier for score 50 (boundary)"
+        expected_result: "Tier = MEDIUM"
+
+    automated: true
+    automation_framework: "jest"
+    tags: ["unit", "business_logic", "match_tier", "bc_matching"]
+
+  # Entity: Candidate
+  - id: "tc_experience_validation"
+    name: "Candidate entity validates experience years"
+    test_suite_ref: "tsuite_profile_value_objects"
+    test_type: "functional"
+    test_level: "unit"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      aggregate: "agg_candidate_profile"
+      entity: "ent_candidate"
+      value_object: "vo_experience"
+
+    given:
+      - condition: "Candidate with experience data"
+        setup: "test_data_refs: td_candidate_valid"
+
+    when:
+      - action: "Call candidate.calculateCompleteness()"
+        parameters: {}
+
+    then:
+      - expectation: "Profile completeness calculated correctly"
+        verification_method: "Assert completeness >= 60%"
+
+    test_data_refs: ["td_candidate_valid"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["unit", "entity", "business_logic", "bc_profile"]
+
+# ============================================================================
+# TEST CASES - INTEGRATION TESTS
+# ============================================================================
+
+  # Repository: Profile
+  - id: "tc_profile_save"
+    name: "Profile repository persists and retrieves candidate profile"
+    test_suite_ref: "tsuite_profile_repository"
+    test_type: "functional"
+    test_level: "integration"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      aggregate: "agg_candidate_profile"
+      repository: "repo_profile"
+
+    given:
+      - condition: "Valid candidate profile aggregate"
+        setup: "Create candidate with email, skills, location"
+      - condition: "Clean database state"
+        setup: "Delete any existing candidate with same email"
+
+    when:
+      - action: "Call profileRepository.save(candidate)"
+        parameters:
+          candidate: "td_candidate_valid"
+
+    then:
+      - expectation: "Profile saved to database"
+        verification_method: "Query database, assert record exists"
+      - expectation: "Profile retrievable by ID"
+        verification_method: "Call findById(candidateId), assert returned profile matches saved"
+      - expectation: "All value objects persisted correctly"
+        verification_method: "Assert email, skills, location match original"
+
+    test_environment_ref: "env_integration"
+    test_data_refs: ["td_candidate_valid"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["integration", "repository", "persistence", "bc_profile"]
+
+  - id: "tc_profile_find_by_email"
+    name: "Profile repository finds candidate by email"
+    test_suite_ref: "tsuite_profile_repository"
+    test_type: "functional"
+    test_level: "integration"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      repository: "repo_profile"
+      value_object: "vo_email"
+
+    given:
+      - condition: "Candidate profile exists in database"
+        setup: "Seed database with td_candidate_valid"
+
+    when:
+      - action: "Call profileRepository.findByEmail(email)"
+        parameters:
+          email: "marina@example.com"
+
+    then:
+      - expectation: "Profile found and returned"
+        verification_method: "Assert Optional<CandidateProfile> is present"
+      - expectation: "Returned profile has matching email"
+        verification_method: "Assert profile.email.value == 'marina@example.com'"
+
+    test_environment_ref: "env_integration"
+    test_data_refs: ["td_candidate_valid"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["integration", "repository", "query", "bc_profile"]
+
+  - id: "tc_profile_find_by_id"
+    name: "Profile repository finds candidate by ID"
+    test_suite_ref: "tsuite_profile_repository"
+    test_type: "functional"
+    test_level: "integration"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      repository: "repo_profile"
+
+    given:
+      - condition: "Candidate profile exists with known ID"
+        setup: "Seed database, capture candidate_id"
+
+    when:
+      - action: "Call profileRepository.findById(candidateId)"
+        parameters:
+          id: "cand_12345"
+
+    then:
+      - expectation: "Profile found and returned"
+        verification_method: "Assert Optional is present"
+
+    test_environment_ref: "env_integration"
+    automated: true
+    automation_framework: "jest"
+    tags: ["integration", "repository", "bc_profile"]
+
+  - id: "tc_profile_find_incomplete"
+    name: "Profile repository finds incomplete profiles (completeness < 100%)"
+    test_suite_ref: "tsuite_profile_repository"
+    test_type: "functional"
+    test_level: "integration"
+    test_priority: "medium"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      repository: "repo_profile"
+
+    given:
+      - condition: "Multiple profiles with varying completeness"
+        setup: "Seed profiles with 50%, 75%, 100% completeness"
+
+    when:
+      - action: "Call profileRepository.findIncompleteProfiles()"
+        parameters: {}
+
+    then:
+      - expectation: "Only profiles with completeness < 100% returned"
+        verification_method: "Assert all returned profiles have completeness < 100%"
+      - expectation: "Complete profiles excluded"
+        verification_method: "Assert profile with 100% completeness not in results"
+
+    test_environment_ref: "env_integration"
+    test_data_refs: ["td_candidate_incomplete", "td_candidate_complete"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["integration", "repository", "custom_query", "bc_profile"]
+
+  # Domain Service: Matching Engine
+  - id: "tc_calculate_match_integration"
+    name: "Matching engine calculates match score between candidate and job"
+    test_suite_ref: "tsuite_matching_service"
+    test_type: "functional"
+    test_level: "integration"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      aggregate: "agg_job_match"
+      domain_service: "svc_dom_matching_engine"
+
+    given:
+      - condition: "Candidate profile with Python, ML, SQL skills"
+        setup: "test_data_refs: td_candidate_ml_expert"
+      - condition: "Job posting requiring Python, ML (Senior Data Scientist)"
+        setup: "test_data_refs: td_job_senior_ds"
+
+    when:
+      - action: "Call matchingEngine.calculateMatch(candidate, job)"
+        parameters:
+          candidate: "td_candidate_ml_expert"
+          job: "td_job_senior_ds"
+
+    then:
+      - expectation: "Match created with score between 0-100"
+        verification_method: "Assert match.matchScore.value >= 0 && <= 100"
+      - expectation: "Match score reflects high skills overlap"
+        verification_method: "Assert match.matchScore.value >= 80 (HIGH tier)"
+      - expectation: "Criteria scores calculated"
+        verification_method: "Assert match.criteriaScores contains skills, experience, education, location, domain"
+      - expectation: "Match tier assigned correctly"
+        verification_method: "Assert match.matchTier == 'HIGH'"
+
+    test_environment_ref: "env_integration"
+    test_data_refs: ["td_candidate_ml_expert", "td_job_senior_ds"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["integration", "domain_service", "matching", "bc_matching"]
+
+  - id: "tc_find_best_matches"
+    name: "Matching engine finds top N best matches for candidate"
+    test_suite_ref: "tsuite_matching_service"
+    test_type: "functional"
+    test_level: "integration"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      domain_service: "svc_dom_matching_engine"
+
+    given:
+      - condition: "Candidate with specific skills"
+        setup: "test_data_refs: td_candidate_ml_expert"
+      - condition: "Multiple job matches calculated"
+        setup: "Seed 10 job matches with varying scores (50, 60, 70, 75, 80, 85, 88, 90, 92, 95)"
+
+    when:
+      - action: "Call matchingEngine.findBestMatches(candidateId, 5)"
+        parameters:
+          candidateId: "cand_12345"
+          limit: 5
+
+    then:
+      - expectation: "Top 5 matches returned"
+        verification_method: "Assert result.size() == 5"
+      - expectation: "Matches sorted by score descending"
+        verification_method: "Assert scores are [95, 92, 90, 88, 85]"
+      - expectation: "All returned matches are high quality"
+        verification_method: "Assert all scores >= 80"
+
+    test_environment_ref: "env_integration"
+    test_data_refs: ["td_candidate_ml_expert", "td_job_matches_varied"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["integration", "domain_service", "matching", "sorting", "bc_matching"]
+
+  - id: "tc_match_high_threshold"
+    name: "Matching engine filters matches by minimum threshold"
+    test_suite_ref: "tsuite_matching_service"
+    test_type: "functional"
+    test_level: "integration"
+    test_priority: "medium"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      domain_service: "svc_dom_matching_engine"
+
+    given:
+      - condition: "Job matches with scores below and above threshold"
+        setup: "Matches with scores: 45, 55, 65, 75, 85, 95"
+
+    when:
+      - action: "Call findBestMatches with minimum threshold 80"
+        parameters:
+          candidateId: "cand_12345"
+          minimumScore: 80
+
+    then:
+      - expectation: "Only matches >= 80 returned"
+        verification_method: "Assert all returned scores >= 80"
+      - expectation: "Matches below threshold excluded"
+        verification_method: "Assert scores 45, 55, 65, 75 not in results"
+
+    test_environment_ref: "env_integration"
+    automated: true
+    automation_framework: "jest"
+    tags: ["integration", "filtering", "bc_matching"]
+
+  # Application Service: Update Profile
+  - id: "tc_update_profile_service"
+    name: "Update profile service orchestrates aggregate update and event publishing"
+    test_suite_ref: "tsuite_profile_repository"
+    test_type: "functional"
+    test_level: "integration"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      aggregate: "agg_candidate_profile"
+      application_service: "svc_app_update_profile"
+      repository: "repo_profile"
+      domain_event: "evt_profile_updated"
+
+    ux_references:
+      page: "page_profile_edit"
+      workflow: "wf_profile_setup"
+
+    given:
+      - condition: "Existing candidate profile"
+        setup: "Seed database with candidate"
+      - condition: "Updated skills data"
+        setup: "New skills: [Python, Java, React, Kubernetes]"
+
+    when:
+      - action: "Call updateProfileService.execute(candidateId, updateData)"
+        parameters:
+          candidateId: "cand_12345"
+          updates:
+            skills: ["Python", "Java", "React", "Kubernetes"]
+
+    then:
+      - expectation: "Profile aggregate updated in database"
+        verification_method: "Query repo, assert skills updated"
+      - expectation: "ProfileUpdated event published"
+        verification_method: "Assert event bus received evt_profile_updated with correct candidateId"
+      - expectation: "Updated profile returned"
+        verification_method: "Assert service returns updated CandidateProfile"
+
+    test_environment_ref: "env_integration"
+    test_data_refs: ["td_candidate_valid"]
+    test_doubles_refs: ["mock_event_bus"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["integration", "application_service", "event_publishing", "bc_profile"]
+
+# ============================================================================
+# TEST CASES - COMPONENT TESTS
+# ============================================================================
+
+  # Component: Job Card
+  - id: "tc_job_card_render"
+    name: "Job card component displays job information correctly"
+    test_suite_ref: "tsuite_job_card_component"
+    test_type: "functional"
+    test_level: "component"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_job_catalog"
+      aggregate: "agg_job_posting"
+
+    ux_references:
+      component: "comp_job_card"
+      component_type: "organism"
+      page: "page_job_listings"
+
+    given:
+      - condition: "Job posting aggregate data"
+        setup: "test_data_refs: td_job_senior_ds"
+
+    when:
+      - action: "Render JobCard component with job data"
+        parameters:
+          job: "td_job_senior_ds"
+
+    then:
+      - expectation: "Job title displayed"
+        verification_method: "Assert text 'Senior Data Scientist' visible"
+      - expectation: "Company name displayed"
+        verification_method: "Assert text 'Netflix' visible"
+      - expectation: "Location displayed"
+        verification_method: "Assert text 'Toronto, ON' visible"
+      - expectation: "Salary range displayed"
+        verification_method: "Assert text '$120k - $160k' visible"
+      - expectation: "Apply button rendered"
+        verification_method: "Assert button with text 'Apply' exists"
+
+    test_data_refs: ["td_job_senior_ds"]
+    automated: true
+    automation_framework: "cypress"
+    tags: ["component", "ui", "rendering", "job_card"]
+
+  - id: "tc_job_card_match_score"
+    name: "Job card displays match score badge when provided"
+    test_suite_ref: "tsuite_job_card_component"
+    test_type: "functional"
+    test_level: "component"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      value_object: "vo_match_score"
+
+    ux_references:
+      component: "comp_job_card"
+      component_type: "organism"
+
+    given:
+      - condition: "Job with match score 85"
+        setup: "job: td_job_senior_ds, matchScore: 85"
+
+    when:
+      - action: "Render JobCard with matchScore prop"
+        parameters:
+          job: "td_job_senior_ds"
+          matchScore: 85
+
+    then:
+      - expectation: "Match score badge displayed"
+        verification_method: "Assert badge with text '85% Match' visible"
+      - expectation: "Badge has HIGH tier styling (green)"
+        verification_method: "Assert badge has 'success' variant class"
+
+    test_data_refs: ["td_job_senior_ds"]
+    automated: true
+    automation_framework: "cypress"
+    tags: ["component", "ui", "match_score", "badge"]
+
+  - id: "tc_job_card_save"
+    name: "Job card save button triggers save action"
+    test_suite_ref: "tsuite_job_card_component"
+    test_type: "functional"
+    test_level: "component"
+    test_priority: "medium"
+
+    ux_references:
+      component: "comp_job_card"
+      behavior: "bhv_job_card_save"
+
+    given:
+      - condition: "Job card rendered with save handler"
+        setup: "Mock onSave callback function"
+
+    when:
+      - action: "Click save button (bookmark icon)"
+        parameters: {}
+
+    then:
+      - expectation: "onSave callback invoked with job ID"
+        verification_method: "Assert onSave called with jobId"
+      - expectation: "Save button state changes to 'saved'"
+        verification_method: "Assert button shows filled bookmark icon"
+
+    test_doubles_refs: ["mock_save_handler"]
+    automated: true
+    automation_framework: "cypress"
+    tags: ["component", "interaction", "save", "job_card"]
+
+  - id: "tc_job_card_apply"
+    name: "Job card apply button triggers application workflow"
+    test_suite_ref: "tsuite_job_card_component"
+    test_type: "functional"
+    test_level: "component"
+    test_priority: "high"
+
+    ux_references:
+      component: "comp_job_card"
+      workflow: "wf_job_application"
+
+    given:
+      - condition: "Job card rendered with apply handler"
+        setup: "Mock onApply callback"
+
+    when:
+      - action: "Click 'Apply' button"
+        parameters: {}
+
+    then:
+      - expectation: "onApply callback invoked with job ID"
+        verification_method: "Assert onApply called with jobId"
+
+    test_doubles_refs: ["mock_apply_handler"]
+    automated: true
+    automation_framework: "cypress"
+    tags: ["component", "interaction", "apply", "job_card"]
+
+  # Component: Profile Form
+  - id: "tc_profile_form_validation"
+    name: "Profile form validates fields on blur"
+    test_suite_ref: "tsuite_profile_form_component"
+    test_type: "functional"
+    test_level: "component"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      value_object: "vo_email"
+
+    ux_references:
+      component: "comp_form_field"
+      page: "page_profile_edit"
+      behavior: "bhv_profile_validation"
+
+    design_technique: "error_guessing"
+
+    test_steps:
+      - step_number: 1
+        action: "Enter invalid email 'invalid-email' in email field"
+        expected_result: "No error shown (validation waits for blur)"
+
+      - step_number: 2
+        action: "Blur email field (tab away)"
+        expected_result: "Error message displayed: 'Please enter a valid email address'"
+
+      - step_number: 3
+        action: "Correct email to 'marina@example.com'"
+        expected_result: "Error clears on blur"
+
+      - step_number: 4
+        action: "Add only 2 skills (minimum is 3)"
+        expected_result: "Error: 'Please add 3-20 skills'"
+
+    automated: true
+    automation_framework: "cypress"
+    tags: ["component", "validation", "form", "profile"]
+
+  - id: "tc_profile_form_submit"
+    name: "Profile form submits valid data"
+    test_suite_ref: "tsuite_profile_form_component"
+    test_type: "functional"
+    test_level: "component"
+    test_priority: "critical"
+
+    ux_references:
+      page: "page_profile_edit"
+      behavior: "bhv_profile_autosave"
+
+    given:
+      - condition: "Profile form with valid data"
+        setup: "Fill all required fields with valid values"
+
+    when:
+      - action: "Click 'Save Profile' button"
+        parameters: {}
+
+    then:
+      - expectation: "Form submits without errors"
+        verification_method: "Assert no validation errors shown"
+      - expectation: "Loading state shown during save"
+        verification_method: "Assert button shows spinner"
+      - expectation: "Success feedback displayed"
+        verification_method: "Assert toast 'Profile updated successfully' appears"
+
+    automated: true
+    automation_framework: "cypress"
+    tags: ["component", "form", "submission", "profile"]
+
+  - id: "tc_profile_form_autosave"
+    name: "Profile form auto-saves changes after 30 seconds"
+    test_suite_ref: "tsuite_profile_form_component"
+    test_type: "functional"
+    test_level: "component"
+    test_priority: "medium"
+
+    ux_references:
+      page: "page_profile_edit"
+      behavior: "bhv_profile_autosave"
+
+    given:
+      - condition: "Profile form open with changes"
+        setup: "Modify skills field"
+
+    when:
+      - action: "Wait 30 seconds without explicit save"
+        parameters: {}
+
+    then:
+      - expectation: "Auto-save triggered"
+        verification_method: "Assert inline message 'Saving...' appears"
+      - expectation: "Success feedback shown"
+        verification_method: "Assert 'Saved' appears after auto-save completes"
+
+    automated: true
+    automation_framework: "cypress"
+    tags: ["component", "autosave", "async", "profile"]
+
+# ============================================================================
+# TEST CASES - CONTRACT TESTS
+# ============================================================================
+
+  # Contract: Profile → Matching
+  - id: "tc_profile_to_matching_contract"
+    name: "Profile context ProfileUpdated event contract with Matching context"
+    test_suite_ref: "tsuite_context_contracts"
+    test_type: "functional"
+    test_level: "contract"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      domain_event: "evt_profile_updated"
+
+    given:
+      - condition: "Profile Updated event published"
+        setup: "ProfileUpdated event with candidateId, updated_fields, occurred_at"
+
+    when:
+      - action: "Matching context consumes event"
+        parameters: {}
+
+    then:
+      - expectation: "Event structure matches contract"
+        verification_method: "Assert event has candidateId, updated_fields, occurred_at fields"
+      - expectation: "Matching context handler processes event successfully"
+        verification_method: "Assert RecalculateMatchesHandler invoked without errors"
+
+    automated: true
+    automation_framework: "jest"
+    tags: ["contract", "event", "bc_profile", "bc_matching"]
+
+  # Contract: Catalog → Matching
+  - id: "tc_catalog_to_matching_contract"
+    name: "Job Catalog JobPosted event contract with Matching context"
+    test_suite_ref: "tsuite_context_contracts"
+    test_type: "contract"
+    test_level: "contract"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_job_catalog"
+      domain_event: "evt_job_posted"
+
+    given:
+      - condition: "JobPosted event published"
+        setup: "Event with job_id, title, location, occurred_at"
+
+    when:
+      - action: "Matching context consumes event"
+        parameters: {}
+
+    then:
+      - expectation: "Event structure valid"
+        verification_method: "Assert required fields present"
+      - expectation: "Matching handler triggered"
+        verification_method: "Assert CalculateMatchesForNewJob handler invoked"
+
+    automated: true
+    automation_framework: "jest"
+    tags: ["contract", "event", "bc_job_catalog", "bc_matching"]
+
+  # Contract: Matching → Notifications
+  - id: "tc_matching_to_notifications_contract"
+    name: "Matching HighMatchFound event contract with Notifications context"
+    test_suite_ref: "tsuite_context_contracts"
+    test_type: "contract"
+    test_level: "contract"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      domain_event: "evt_high_match_found"
+
+    given:
+      - condition: "HighMatchFound event published"
+        setup: "Event with match_id, candidate_id, job_id, match_score >= 80"
+
+    when:
+      - action: "Notifications context consumes event"
+        parameters: {}
+
+    then:
+      - expectation: "Event structure valid"
+        verification_method: "Assert all required fields present"
+      - expectation: "Notification handler triggered"
+        verification_method: "Assert NotifyHighMatch handler invoked"
+      - expectation: "Notification sent to candidate"
+        verification_method: "Assert email notification queued/sent"
+
+    test_doubles_refs: ["stub_sendgrid_api"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["contract", "event", "bc_matching", "bc_notifications"]
+
+# ============================================================================
+# TEST CASES - E2E TESTS
+# ============================================================================
+
+  # E2E: Profile Setup Wizard
+  - id: "tc_profile_setup_wizard_complete"
+    name: "User completes profile setup wizard from start to finish"
+    test_suite_ref: "tsuite_profile_creation_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      aggregate: "agg_candidate_profile"
+      application_service: "svc_app_update_profile"
+      domain_event: "evt_profile_completed"
+
+    ux_references:
+      workflow: "wf_profile_setup"
+      pages: ["page_profile_setup_step1", "page_profile_setup_step2", "page_profile_setup_step3", "page_profile_setup_step4", "page_profile_setup_step5"]
+
+    test_steps:
+      - step_number: 1
+        action: "Navigate to /profile/new"
+        expected_result: "Profile setup wizard opens at Step 1: Basic Information"
+
+      - step_number: 2
+        action: "Enter email: marina@example.com, name: Marina, location: Toronto, ON"
+        expected_result: "Fields validated on blur, no errors"
+
+      - step_number: 3
+        action: "Click 'Next' to Step 2"
+        expected_result: "Step 2: Work Experience displayed"
+
+      - step_number: 4
+        action: "Add work experience: Data Scientist at TechCorp, 2 years"
+        expected_result: "Experience added to list"
+
+      - step_number: 5
+        action: "Click 'Next' to Step 3"
+        expected_result: "Step 3: Skills & Expertise displayed"
+
+      - step_number: 6
+        action: "Add skills: Python (expert), Machine Learning (advanced), SQL (intermediate)"
+        expected_result: "Skills added with proficiency levels"
+
+      - step_number: 7
+        action: "Click 'Next' to Step 4"
+        expected_result: "Step 4: Job Preferences displayed"
+
+      - step_number: 8
+        action: "Set preferences: Remote, Full-time, $100k+ salary"
+        expected_result: "Preferences saved"
+
+      - step_number: 9
+        action: "Click 'Next' to Step 5: Review"
+        expected_result: "Review page shows summary of all entered data"
+
+      - step_number: 10
+        action: "Click 'Submit Profile'"
+        expected_result: "Profile saved, state transitions DRAFT → ACTIVE"
+
+      - step_number: 11
+        action: "Wait for redirect"
+        expected_result: "Redirected to /dashboard"
+
+      - step_number: 12
+        action: "Verify toast notification"
+        expected_result: "Toast shows 'Profile completed successfully!'"
+
+    test_environment_ref: "env_e2e"
+    test_data_refs: ["td_candidate_wizard"]
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "workflow", "critical_path", "profile", "wizard"]
+
+  - id: "tc_profile_setup_validation"
+    name: "Profile setup wizard validates required fields at each step"
+    test_suite_ref: "tsuite_profile_creation_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "high"
+
+    ux_references:
+      workflow: "wf_profile_setup"
+      behavior: "bhv_profile_validation"
+
+    test_steps:
+      - step_number: 1
+        action: "On Step 1, leave email blank and click 'Next'"
+        expected_result: "Error: 'Email is required', cannot proceed"
+
+      - step_number: 2
+        action: "Enter invalid email 'invalid' and click 'Next'"
+        expected_result: "Error: 'Please enter a valid email address', cannot proceed"
+
+      - step_number: 3
+        action: "Enter valid email, proceed to Step 3 (Skills)"
+        expected_result: "Step 3 displayed"
+
+      - step_number: 4
+        action: "Add only 2 skills, click 'Next'"
+        expected_result: "Error: 'Please add 3-20 skills', cannot proceed"
+
+      - step_number: 5
+        action: "Add third skill, click 'Next'"
+        expected_result: "Validation passes, proceed to next step"
+
+    test_environment_ref: "env_e2e"
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "validation", "error_handling", "profile"]
+
+  - id: "tc_profile_setup_autosave"
+    name: "Profile setup wizard auto-saves progress every 30 seconds"
+    test_suite_ref: "tsuite_profile_creation_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "medium"
+
+    ux_references:
+      workflow: "wf_profile_setup"
+
+    test_steps:
+      - step_number: 1
+        action: "Enter data in Step 1, wait 30 seconds without clicking 'Next'"
+        expected_result: "Auto-save triggered, 'Saving...' indicator appears briefly"
+
+      - step_number: 2
+        action: "Close browser tab"
+        expected_result: "Progress lost (no test, setup for next step)"
+
+      - step_number: 3
+        action: "Reopen /profile/new in new session"
+        expected_result: "Previously entered data restored from auto-save"
+
+    test_environment_ref: "env_e2e"
+    automated: false
+    tags: ["e2e", "autosave", "persistence", "profile"]
+
+  # E2E: Job Search
+  - id: "tc_job_search_basic"
+    name: "User searches for jobs and views results"
+    test_suite_ref: "tsuite_job_search_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_job_catalog"
+      aggregate: "agg_job_posting"
+      repository: "repo_job_posting"
+
+    ux_references:
+      page: "page_job_listings"
+      component: "comp_search_box"
+
+    test_steps:
+      - step_number: 1
+        action: "Navigate to /jobs"
+        expected_result: "Job listings page displayed with initial results"
+
+      - step_number: 2
+        action: "Enter 'Data Scientist' in search box"
+        expected_result: "Autocomplete suggestions appear"
+
+      - step_number: 3
+        action: "Press Enter to search"
+        expected_result: "Results filtered to show only Data Scientist jobs"
+
+      - step_number: 4
+        action: "Verify result count"
+        expected_result: "Result count displayed: 'X jobs found'"
+
+      - step_number: 5
+        action: "Verify job cards rendered"
+        expected_result: "Job cards show title, company, location, salary, match score"
+
+    test_environment_ref: "env_e2e"
+    test_data_refs: ["td_jobs_sample"]
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "search", "critical_path", "jobs"]
+
+  - id: "tc_job_search_filters"
+    name: "User applies faceted filters to narrow job search"
+    test_suite_ref: "tsuite_job_search_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "high"
+
+    ux_references:
+      page: "page_job_listings"
+      component: "comp_filter_panel"
+      behavior: "bhv_filter_update"
+
+    design_technique: "use_case_testing"
+
+    test_steps:
+      - step_number: 1
+        action: "On /jobs, verify initial results count"
+        expected_result: "100+ jobs displayed"
+
+      - step_number: 2
+        action: "Select 'Remote' location filter"
+        expected_result: "Results filtered, count updated, only remote jobs shown"
+
+      - step_number: 3
+        action: "Select 'Senior Level' experience filter"
+        expected_result: "Results further filtered to remote senior jobs"
+
+      - step_number: 4
+        action: "Adjust salary range slider to $120k+"
+        expected_result: "Results show only senior remote jobs with salary >= $120k"
+
+      - step_number: 5
+        action: "Select 'Python' skill filter"
+        expected_result: "Final filtered results: senior remote Python jobs $120k+"
+
+      - step_number: 6
+        action: "Click 'Clear Filters'"
+        expected_result: "All filters removed, full results restored"
+
+    test_environment_ref: "env_e2e"
+    test_data_refs: ["td_jobs_sample"]
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "faceted_search", "filters", "jobs"]
+
+  - id: "tc_job_search_pagination"
+    name: "User navigates through paginated job results"
+    test_suite_ref: "tsuite_job_search_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "medium"
+
+    ux_references:
+      page: "page_job_listings"
+      component: "comp_pagination"
+
+    test_steps:
+      - step_number: 1
+        action: "Navigate to /jobs with 100+ results"
+        expected_result: "First 20 jobs displayed (page 1)"
+
+      - step_number: 2
+        action: "Click 'Next' or page 2"
+        expected_result: "Jobs 21-40 displayed"
+
+      - step_number: 3
+        action: "Click page 5"
+        expected_result: "Jobs 81-100 displayed"
+
+      - step_number: 4
+        action: "Click 'Previous'"
+        expected_result: "Return to page 4 (jobs 61-80)"
+
+    test_environment_ref: "env_e2e"
+    test_data_refs: ["td_jobs_large_set"]
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "pagination", "jobs"]
+
+  - id: "tc_job_save"
+    name: "User saves a job for later viewing"
+    test_suite_ref: "tsuite_job_search_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      aggregate: "agg_candidate_profile"
+
+    ux_references:
+      component: "comp_job_card"
+      behavior: "bhv_job_card_save"
+
+    test_steps:
+      - step_number: 1
+        action: "On job listing page, click bookmark icon on job card"
+        expected_result: "Bookmark icon fills (saved state)"
+
+      - step_number: 2
+        action: "Verify toast notification"
+        expected_result: "Toast: 'Job saved!'"
+
+      - step_number: 3
+        action: "Navigate to /jobs/saved"
+        expected_result: "Saved jobs page shows the saved job"
+
+      - step_number: 4
+        action: "Return to /jobs, verify job card still shows saved state"
+        expected_result: "Bookmark icon remains filled"
+
+    test_environment_ref: "env_e2e"
+    test_data_refs: ["td_job_senior_ds"]
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "save_job", "interaction", "jobs"]
+
+  # E2E: Job Application
+  - id: "tc_apply_job_complete"
+    name: "User completes full job application workflow"
+    test_suite_ref: "tsuite_application_submission_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_applications"
+      aggregate: "agg_job_application"
+      application_service: "svc_app_submit_application"
+      domain_event: "evt_application_submitted"
+
+    ux_references:
+      workflow: "wf_job_application"
+      pages: ["page_job_detail", "page_application_resume", "page_application_questions", "page_application_review"]
+
+    test_steps:
+      - step_number: 1
+        action: "Navigate to job detail page /jobs/job_123"
+        expected_result: "Job details displayed with 'Apply for Job' button"
+
+      - step_number: 2
+        action: "Click 'Apply for Job' button"
+        expected_result: "Application wizard opens, Step 1: Select Job confirmation"
+
+      - step_number: 3
+        action: "Click 'Continue' to Step 2"
+        expected_result: "Step 2: Upload Resume displayed"
+
+      - step_number: 4
+        action: "Upload resume PDF file"
+        expected_result: "File validated and uploaded successfully"
+
+      - step_number: 5
+        action: "Click 'Next' to Step 3"
+        expected_result: "Step 3: Answer Screening Questions displayed"
+
+      - step_number: 6
+        action: "Answer all screening questions"
+        expected_result: "All questions marked as complete"
+
+      - step_number: 7
+        action: "Click 'Next' to Step 4: Review"
+        expected_result: "Review page shows job, resume, answers"
+
+      - step_number: 8
+        action: "Click 'Submit Application'"
+        expected_result: "Loading spinner appears"
+
+      - step_number: 9
+        action: "Wait for submission"
+        expected_result: "Application created, state: SUBMITTED"
+
+      - step_number: 10
+        action: "Verify redirect"
+        expected_result: "Redirected to /applications/active"
+
+      - step_number: 11
+        action: "Verify toast notification"
+        expected_result: "Toast: 'Application submitted successfully!'"
+
+      - step_number: 12
+        action: "Verify application appears in list"
+        expected_result: "Application card shows job title, status SUBMITTED, submitted date"
+
+    test_environment_ref: "env_e2e"
+    test_data_refs: ["td_job_senior_ds", "td_resume_file"]
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "workflow", "critical_path", "application"]
+
+  - id: "tc_apply_job_validation"
+    name: "Application workflow validates eligibility and required fields"
+    test_suite_ref: "tsuite_application_submission_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "high"
+
+    ux_references:
+      workflow: "wf_job_application"
+
+    test_steps:
+      - step_number: 1
+        action: "Attempt to apply with incomplete profile (<80% complete)"
+        expected_result: "Error: 'Please complete your profile before applying'"
+
+      - step_number: 2
+        action: "Attempt to apply to job already applied to"
+        expected_result: "Error: 'You have already applied to this job'"
+
+      - step_number: 3
+        action: "On resume upload, select invalid file type (.txt)"
+        expected_result: "Error: 'Please upload PDF or DOCX file'"
+
+      - step_number: 4
+        action: "Upload file > 5MB"
+        expected_result: "Error: 'File size must be less than 5MB'"
+
+    test_environment_ref: "env_e2e"
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "validation", "error_handling", "application"]
+
+  - id: "tc_apply_job_notification"
+    name: "Application submission triggers confirmation email"
+    test_suite_ref: "tsuite_application_submission_e2e"
+    test_type: "functional"
+    test_level: "e2e"
+    test_priority: "medium"
+
+    ddd_references:
+      bounded_context: "bc_notifications"
+      domain_event: "evt_application_submitted"
+
+    test_steps:
+      - step_number: 1
+        action: "Complete application submission"
+        expected_result: "Application submitted successfully"
+
+      - step_number: 2
+        action: "Check notification queue/email inbox"
+        expected_result: "Confirmation email sent to candidate email"
+
+      - step_number: 3
+        action: "Verify email content"
+        expected_result: "Email contains application ID, job title, submitted date"
+
+    test_environment_ref: "env_e2e"
+    test_doubles_refs: ["stub_sendgrid_api"]
+    automated: true
+    automation_framework: "playwright"
+    tags: ["e2e", "notification", "email", "application"]
+
+# ============================================================================
+# TEST CASES - PERFORMANCE TESTS
+# ============================================================================
+
+  # Performance: Match Calculation
+  - id: "tc_match_calculation_performance"
+    name: "Match calculation completes within performance budget"
+    test_suite_ref: "tsuite_matching_performance"
+    test_type: "performance"
+    test_level: "performance"
+    test_priority: "high"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      domain_service: "svc_dom_matching_engine"
+
+    given:
+      - condition: "1 candidate profile"
+        setup: "test_data_refs: td_candidate_ml_expert"
+      - condition: "1000 active job postings"
+        setup: "Seed database with 1000 jobs"
+
+    when:
+      - action: "Call calculateMatches for candidate against all jobs"
+        parameters:
+          candidateId: "cand_12345"
+
+    then:
+      - expectation: "All 1000 matches calculated"
+        verification_method: "Assert 1000 JobMatch records created"
+      - expectation: "Total calculation time < 5 seconds"
+        verification_method: "Assert total_time_ms < 5000"
+      - expectation: "Average match calculation < 5ms"
+        verification_method: "Assert avg_time_per_match < 5"
+
+    test_environment_ref: "env_performance"
+    test_data_refs: ["td_candidate_ml_expert", "td_jobs_1000"]
+    automated: true
+    automation_framework: "k6"
+    tags: ["performance", "load", "matching"]
+
+  - id: "tc_match_bulk_calculation"
+    name: "Bulk match calculation for 100 candidates x 1000 jobs"
+    test_suite_ref: "tsuite_matching_performance"
+    test_type: "performance"
+    test_level: "performance"
+    test_priority: "medium"
+
+    ddd_references:
+      bounded_context: "bc_matching"
+      application_service: "svc_app_calculate_matches"
+
+    given:
+      - condition: "100 candidate profiles"
+        setup: "Seed 100 candidates"
+      - condition: "1000 job postings"
+        setup: "Seed 1000 jobs"
+
+    when:
+      - action: "Calculate matches for all candidates and jobs"
+        parameters: {}
+
+    then:
+      - expectation: "100,000 matches calculated (100 x 1000)"
+        verification_method: "Assert JobMatch count == 100000"
+      - expectation: "Bulk calculation completes in < 10 minutes"
+        verification_method: "Assert total_time_seconds < 600"
+
+    test_environment_ref: "env_performance"
+    automated: true
+    automation_framework: "k6"
+    tags: ["performance", "bulk", "stress", "matching"]
+
+  - id: "tc_match_concurrent_users"
+    name: "System handles concurrent match calculations for multiple users"
+    test_suite_ref: "tsuite_matching_performance"
+    test_type: "performance"
+    test_level: "performance"
+    test_priority: "high"
+
+    given:
+      - condition: "50 concurrent users"
+        setup: "Simulate 50 simultaneous requests"
+
+    when:
+      - action: "Each user requests match calculation"
+        parameters:
+          concurrent_users: 50
+
+    then:
+      - expectation: "All requests complete successfully"
+        verification_method: "Assert 100% success rate"
+      - expectation: "95th percentile response time < 3 seconds"
+        verification_method: "Assert p95_response_time < 3000ms"
+      - expectation: "No database connection pool exhaustion"
+        verification_method: "Assert no connection timeout errors"
+
+    test_environment_ref: "env_performance"
+    automated: true
+    automation_framework: "k6"
+    tags: ["performance", "concurrency", "load", "matching"]
+
+# ============================================================================
+# TEST CASES - SECURITY TESTS
+# ============================================================================
+
+  # Security: Authentication
+  - id: "tc_auth_login_valid"
+    name: "User logs in successfully with valid credentials"
+    test_suite_ref: "tsuite_authentication_security"
+    test_type: "security"
+    test_level: "security"
+    test_priority: "critical"
+
+    test_steps:
+      - step_number: 1
+        action: "Navigate to /login"
+        expected_result: "Login page displayed"
+
+      - step_number: 2
+        action: "Enter valid email and password"
+        expected_result: "Credentials accepted"
+
+      - step_number: 3
+        action: "Click 'Login'"
+        expected_result: "Authentication successful, redirected to /dashboard"
+
+      - step_number: 4
+        action: "Verify session created"
+        expected_result: "Session cookie set, authenticated state"
+
+    test_environment_ref: "env_integration"
+    test_data_refs: ["td_valid_credentials"]
+    automated: true
+    automation_framework: "jest"
+    tags: ["security", "authentication", "login"]
+
+  - id: "tc_auth_login_invalid"
+    name: "Login fails with invalid credentials"
+    test_suite_ref: "tsuite_authentication_security"
+    test_type: "security"
+    test_level: "security"
+    test_priority: "critical"
+
+    design_technique: "error_guessing"
+
+    test_steps:
+      - step_number: 1
+        action: "Attempt login with incorrect password"
+        expected_result: "Error: 'Invalid email or password'"
+
+      - step_number: 2
+        action: "Attempt login with non-existent email"
+        expected_result: "Error: 'Invalid email or password' (same message for security)"
+
+      - step_number: 3
+        action: "Verify no session created"
+        expected_result: "No session cookie, unauthenticated state"
+
+    test_environment_ref: "env_integration"
+    automated: true
+    automation_framework: "jest"
+    tags: ["security", "authentication", "negative", "login"]
+
+  - id: "tc_auth_session_timeout"
+    name: "Session expires after inactivity timeout"
+    test_suite_ref: "tsuite_authentication_security"
+    test_type: "security"
+    test_level: "security"
+    test_priority: "high"
+
+    test_steps:
+      - step_number: 1
+        action: "Login successfully"
+        expected_result: "Authenticated, session active"
+
+      - step_number: 2
+        action: "Wait 30 minutes (session timeout period)"
+        expected_result: "Session expires"
+
+      - step_number: 3
+        action: "Attempt to access protected resource /profile"
+        expected_result: "Redirected to /login with message 'Session expired'"
+
+    test_environment_ref: "env_integration"
+    automated: false
+    tags: ["security", "session", "timeout"]
+
+  # Security: Authorization
+  - id: "tc_authz_profile_access"
+    name: "User can only access their own profile"
+    test_suite_ref: "tsuite_authentication_security"
+    test_type: "security"
+    test_level: "security"
+    test_priority: "critical"
+
+    ddd_references:
+      bounded_context: "bc_profile"
+      aggregate: "agg_candidate_profile"
+
+    test_steps:
+      - step_number: 1
+        action: "Login as user A (candidate_id: cand_123)"
+        expected_result: "Authenticated as user A"
+
+      - step_number: 2
+        action: "Access own profile /profile/cand_123"
+        expected_result: "Success - profile displayed"
+
+      - step_number: 3
+        action: "Attempt to access user B's profile /profile/cand_456"
+        expected_result: "Error 403 Forbidden or redirect to own profile"
+
+      - step_number: 4
+        action: "Attempt API call to update user B's profile"
+        expected_result: "Error 403 Forbidden"
+
+    test_environment_ref: "env_integration"
+    automated: true
+    automation_framework: "jest"
+    tags: ["security", "authorization", "access_control"]
+
+# ============================================================================
+# TEST DATA
+# ============================================================================
+test_data:
+  - id: "td_valid_emails"
+    name: "Valid Email Addresses"
+    type: "fixture"
+    format: "json"
+    aggregate_type: "vo_email"
+    bounded_context: "bc_profile"
+    data:
+      - "marina@example.com"
+      - "john.doe@company.co.uk"
+      - "test+tag@domain.org"
+      - "user_123@test-domain.com"
+    satisfies_invariants: true
+    reusable: true
+    tags: ["email", "valid", "value_object"]
+
+  - id: "td_invalid_emails"
+    name: "Invalid Email Addresses"
+    type: "fixture"
+    format: "json"
+    aggregate_type: "vo_email"
+    bounded_context: "bc_profile"
+    data:
+      - "invalid-email"
+      - "@example.com"
+      - "user@"
+      - "user @example.com"
+      - "user@example"
+    satisfies_invariants: false
+    reusable: true
+    tags: ["email", "invalid", "negative"]
+
+  - id: "td_candidate_valid"
+    name: "Valid Candidate Profile"
+    type: "fixture"
+    format: "json"
+    aggregate_type: "agg_candidate_profile"
+    bounded_context: "bc_profile"
+    data:
+      candidate_id: "cand_12345"
+      email: "marina@example.com"
+      name:
+        first: "Marina"
+        last: "Rodriguez"
+      skills:
+        technical_skills:
+          Python: "expert"
+          "Machine Learning": "advanced"
+          SQL: "intermediate"
+        soft_skills: ["Communication", "Problem Solving"]
+      education:
+        - degree: "Master of Science"
+          field: "Computer Science"
+          institution: "University of Toronto"
+          graduation_year: 2022
+      experience:
+        - company: "TechCorp"
+          title: "Data Scientist"
+          years: 2
+          current: true
+      location:
+        city: "Toronto"
+        province: "ON"
+        country: "Canada"
+      preferences:
+        work_mode: "remote"
+        job_type: "full_time"
+        min_salary: 100000
+    satisfies_invariants: true
+    reusable: true
+    tags: ["candidate", "profile", "valid"]
+
+  - id: "td_candidate_ml_expert"
+    name: "ML Expert Candidate Profile"
+    type: "fixture"
+    format: "json"
+    aggregate_type: "agg_candidate_profile"
+    bounded_context: "bc_profile"
+    data:
+      candidate_id: "cand_ml_001"
+      email: "ml.expert@example.com"
+      name:
+        first: "Alex"
+        last: "Chen"
+      skills:
+        technical_skills:
+          Python: "expert"
+          "Machine Learning": "expert"
+          "Deep Learning": "advanced"
+          TensorFlow: "expert"
+          PyTorch: "advanced"
+          SQL: "advanced"
+          "Data Visualization": "intermediate"
+      education:
+        - degree: "PhD"
+          field: "Machine Learning"
+          institution: "MIT"
+          graduation_year: 2020
+      experience:
+        - company: "Big Tech Co"
+          title: "Senior ML Engineer"
+          years: 5
+          current: true
+      location:
+        city: "Toronto"
+        province: "ON"
+        country: "Canada"
+    satisfies_invariants: true
+    reusable: true
+    tags: ["candidate", "ml_expert"]
+
+  - id: "td_candidate_incomplete"
+    name: "Incomplete Candidate Profile"
+    type: "fixture"
+    format: "json"
+    aggregate_type: "agg_candidate_profile"
+    bounded_context: "bc_profile"
+    data:
+      candidate_id: "cand_incomplete"
+      email: "incomplete@example.com"
+      name:
+        first: "John"
+        last: "Doe"
+      skills:
+        technical_skills:
+          Python: "beginner"
+      # Missing: education, experience, preferences
+    satisfies_invariants: false
+    reusable: true
+    tags: ["candidate", "incomplete"]
+
+  - id: "td_candidate_complete"
+    name: "100% Complete Candidate Profile"
+    type: "fixture"
+    format: "json"
+    aggregate_type: "agg_candidate_profile"
+    bounded_context: "bc_profile"
+    data:
+      candidate_id: "cand_complete"
+      email: "complete@example.com"
+      name:
+        first: "Jane"
+        last: "Smith"
+      skills:
+        technical_skills:
+          Python: "expert"
+          Java: "advanced"
+          React: "intermediate"
+      education:
+        - degree: "Bachelor of Science"
+          field: "Computer Science"
+          institution: "UBC"
+          graduation_year: 2018
+      experience:
+        - company: "StartupXYZ"
+          title: "Full Stack Developer"
+          years: 4
+          current: true
+      location:
+        city: "Vancouver"
+        province: "BC"
+        country: "Canada"
+      preferences:
+        work_mode: "hybrid"
+        job_type: "full_time"
+        min_salary: 90000
+      portfolio_projects: 3
+      certifications: ["AWS Certified"]
+    satisfies_invariants: true
+    reusable: true
+    tags: ["candidate", "complete"]
+
+  - id: "td_job_senior_ds"
+    name: "Senior Data Scientist Job Posting"
+    type: "fixture"
+    format: "json"
+    aggregate_type: "agg_job_posting"
+    bounded_context: "bc_job_catalog"
+    data:
+      job_id: "job_12345"
+      title: "Senior Data Scientist"
+      company:
+        name: "Netflix"
+        size: "enterprise"
+      location:
+        city: "Toronto"
+        province: "ON"
+        country: "Canada"
+        work_mode: "hybrid"
+      salary_range:
+        min: 120000
+        max: 160000
+        currency: "CAD"
+      requirements:
+        technical_skills:
+          - skill: "Python"
+            required: true
+            years: 5
+          - skill: "Machine Learning"
+            required: true
+            years: 3
+          - skill: "SQL"
+            required: true
+            years: 3
+          - skill: "TensorFlow"
+            required: false
+            years: 2
+        education:
+          minimum_degree: "Masters"
+          fields: ["Computer Science", "Statistics", "Mathematics"]
+        experience_years: 5
+      description: "We are seeking a Senior Data Scientist to join our Recommendations team..."
+      source:
+        name: "LinkedIn"
+        url: "https://linkedin.com/jobs/12345"
+      posted_date: "2025-10-01"
+      expiry_date: "2025-11-01"
+    satisfies_invariants: true
+    reusable: true
+    tags: ["job", "senior", "data_scientist"]
+
+  - id: "td_jobs_sample"
+    name: "Sample Job Postings Collection"
+    type: "seed_data"
+    format: "json"
+    aggregate_type: "agg_job_posting"
+    bounded_context: "bc_job_catalog"
+    data:
+      count: 25
+      jobs:
+        - job_id: "job_001"
+          title: "Junior Data Analyst"
+          company: "Shopify"
+          location: "Toronto, ON"
+          salary_min: 60000
+          work_mode: "remote"
+        - job_id: "job_002"
+          title: "ML Engineer"
+          company: "Google"
+          location: "Waterloo, ON"
+          salary_min: 130000
+          work_mode: "hybrid"
+        # ... 23 more jobs
+    reusable: true
+    tags: ["job", "collection", "seed"]
+
+  - id: "td_resume_file"
+    name: "Sample Resume PDF"
+    type: "file"
+    format: "pdf"
+    bounded_context: "bc_applications"
+    data:
+      filename: "marina_resume.pdf"
+      size_bytes: 245760
+      mime_type: "application/pdf"
+    tags: ["resume", "file", "application"]
+
+# ============================================================================
+# TEST ENVIRONMENTS
+# ============================================================================
+test_environments:
+  - id: "env_local"
+    name: "Local Development Environment"
+    type: "development"
+    database:
+      type: "postgresql"
+      connection_string: "postgresql://localhost:5432/jobseeker_dev"
+    backend:
+      url: "http://localhost:3000"
+      version: "dev"
+    frontend:
+      url: "http://localhost:5173"
+      version: "dev"
+    external_services:
+      - service_name: "SendGrid"
+        mock_enabled: true
+        mock_url: "http://localhost:3001/mock-sendgrid"
+    data_reset_strategy: "before_each"
+
+  - id: "env_ci"
+    name: "CI Pipeline Environment"
+    type: "ci_cd"
+    database:
+      type: "postgresql"
+      connection_string: "postgresql://ci-db:5432/jobseeker_test"
+    backend:
+      url: "http://backend:3000"
+      version: "ci-build"
+    frontend:
+      url: "http://frontend:5173"
+      version: "ci-build"
+    external_services:
+      - service_name: "SendGrid"
+        mock_enabled: true
+        mock_url: "http://mock-server:3001/sendgrid"
+    data_reset_strategy: "before_suite"
+
+  - id: "env_integration"
+    name: "Integration Test Environment"
+    type: "integration"
+    database:
+      type: "postgresql"
+      connection_string: "postgresql://localhost:5433/jobseeker_integration"
+    backend:
+      url: "http://localhost:3002"
+      version: "latest"
+    data_reset_strategy: "before_each"
+
+  - id: "env_e2e"
+    name: "End-to-End Test Environment"
+    type: "staging"
+    database:
+      type: "postgresql"
+      connection_string: "postgresql://staging-db:5432/jobseeker_staging"
+    backend:
+      url: "https://staging-api.jobseeker.com"
+      version: "staging"
+    frontend:
+      url: "https://staging.jobseeker.com"
+      version: "staging"
+    external_services:
+      - service_name: "SendGrid"
+        mock_enabled: true
+        mock_url: "https://staging-mock.jobseeker.com/sendgrid"
+    data_reset_strategy: "manual"
+
+  - id: "env_performance"
+    name: "Performance Test Environment"
+    type: "performance"
+    database:
+      type: "postgresql"
+      connection_string: "postgresql://perf-db:5432/jobseeker_perf"
+    backend:
+      url: "https://perf-api.jobseeker.com"
+      version: "perf"
+    external_services:
+      - service_name: "SendGrid"
+        mock_enabled: true
+    data_reset_strategy: "manual"
+
+# ============================================================================
+# AUTOMATION FRAMEWORKS
+# ============================================================================
+automation_frameworks:
+  - id: "af_jest"
+    name: "Jest Unit Testing Framework"
+    test_levels: ["unit", "integration"]
+    language: "TypeScript"
+    version: "29.x"
+    configuration:
+      coverage:
+        enabled: true
+        threshold:
+          global:
+            statements: 90
+            branches: 85
+            functions: 90
+            lines: 90
+      testMatch:
+        - "**/__tests__/**/*.test.ts"
+        - "**/*.spec.ts"
+    location: "domain_layer, application_layer"
+
+  - id: "af_cypress"
+    name: "Cypress Component Testing Framework"
+    test_levels: ["component"]
+    language: "TypeScript"
+    version: "13.x"
+    configuration:
+      component:
+        devServer:
+          framework: "react"
+          bundler: "vite"
+      specPattern: "**/*.cy.tsx"
+    location: "ui_layer"
+
+  - id: "af_playwright"
+    name: "Playwright E2E Framework"
+    test_levels: ["e2e"]
+    language: "TypeScript"
+    version: "1.40.x"
+    configuration:
+      browsers: ["chromium", "firefox", "webkit"]
+      baseURL: "http://localhost:5173"
+      screenshot: "only-on-failure"
+      video: "retain-on-failure"
+      trace: "on-first-retry"
+    location: "e2e_tests"
+
+  - id: "af_k6"
+    name: "k6 Performance Testing Framework"
+    test_levels: ["performance"]
+    language: "JavaScript"
+    version: "0.47.x"
+    configuration:
+      scenarios:
+        load_test:
+          executor: "ramping-vus"
+          stages:
+            - duration: "2m"
+              target: 50
+            - duration: "5m"
+              target: 50
+            - duration: "2m"
+              target: 0
+      thresholds:
+        http_req_duration: ["p(95)<3000"]
+        http_req_failed: ["rate<0.05"]
+    location: "performance_tests"
+
+# ============================================================================
+# AUTOMATION PIPELINES
+# ============================================================================
+automation_pipelines:
+  - id: "ap_pr_check"
+    name: "Pull Request Validation Pipeline"
+    trigger: "pull_request"
+    stages:
+      - stage: "lint"
+        jobs: ["eslint", "prettier"]
+      - stage: "unit_tests"
+        jobs: ["jest_unit"]
+        test_suites: ["tsuite_profile_value_objects", "tsuite_matching_unit"]
+      - stage: "integration_tests"
+        jobs: ["jest_integration"]
+        test_suites: ["tsuite_profile_repository", "tsuite_matching_service"]
+      - stage: "component_tests"
+        jobs: ["cypress_component"]
+        test_suites: ["tsuite_job_card_component", "tsuite_profile_form_component"]
+    parallel: true
+    fail_fast: true
+
+  - id: "ap_main_merge"
+    name: "Main Branch Post-Merge Pipeline"
+    trigger: "push_to_main"
+    stages:
+      - stage: "full_test_suite"
+        jobs: ["jest_all", "cypress_all"]
+        test_suites: ["all"]
+      - stage: "e2e_tests"
+        jobs: ["playwright_e2e"]
+        test_suites: ["tsuite_profile_creation_e2e", "tsuite_job_search_e2e", "tsuite_application_submission_e2e"]
+        environment_ref: "env_e2e"
+      - stage: "deploy_staging"
+        jobs: ["deploy"]
+    parallel: false
+
+  - id: "ap_nightly"
+    name: "Nightly Full Test Suite"
+    trigger: "schedule"
+    schedule_cron: "0 2 * * *"
+    stages:
+      - stage: "all_tests"
+        jobs: ["jest_all", "cypress_all", "playwright_all"]
+        test_suites: ["all"]
+      - stage: "performance_tests"
+        jobs: ["k6_performance"]
+        test_suites: ["tsuite_matching_performance"]
+        environment_ref: "env_performance"
+      - stage: "security_tests"
+        jobs: ["jest_security"]
+        test_suites: ["tsuite_authentication_security"]
+    notifications:
+      on_failure: ["qa-team@jobseeker.com", "#qa-alerts"]
+
+# ============================================================================
+# TEST DOUBLES
+# ============================================================================
+test_doubles:
+  - id: "stub_sendgrid_api"
+    name: "SendGrid Email API Stub"
+    type: "stub"
+    target_service: "SendGrid Email API"
+    bounded_context_ref: "bc_notifications"
+    behavior:
+      - endpoint: "POST /v3/mail/send"
+        response:
+          status: 202
+          body:
+            message: "Email queued"
+    usage: "Used in E2E and integration tests to avoid sending real emails"
+    tags: ["stub", "email", "external"]
+
+  - id: "mock_event_bus"
+    name: "Domain Event Bus Mock"
+    type: "mock"
+    target_service: "Event Bus"
+    behavior:
+      - method: "publish"
+        verify: "Event published with correct data"
+        returns: "void"
+    usage: "Verify domain events published correctly in integration tests"
+    tags: ["mock", "event_bus", "domain_events"]
+
+  - id: "stub_linkedin_api"
+    name: "LinkedIn Job Scraper API Stub"
+    type: "stub"
+    target_service: "LinkedIn Job API"
+    bounded_context_ref: "bc_scrapers"
+    behavior:
+      - endpoint: "GET /jobs/search"
+        response:
+          status: 200
+          body:
+            jobs:
+              - id: "linkedin_123"
+                title: "Data Scientist"
+                company: "LinkedIn"
+                location: "Toronto, ON"
+    usage: "Stub LinkedIn API responses for scraping tests"
+    tags: ["stub", "linkedin", "external"]
+
+  - id: "fake_repository"
+    name: "In-Memory Fake Repository"
+    type: "fake"
+    target_service: "Repository Layer"
+    behavior:
+      - description: "Fully functional in-memory repository for testing without database"
+    usage: "Fast unit tests without database overhead"
+    tags: ["fake", "repository", "in_memory"]
+
+# ============================================================================
+# METRICS & REPORTING
+# ============================================================================
+test_metrics:
+  coverage:
+    requirements_coverage:
+      total_requirements: 150
+      covered_requirements: 145
+      coverage_percentage: 96.7
+
+    code_coverage:
+      domain_layer: 92.5
+      application_layer: 88.3
+      ui_layer: 82.1
+      overall: 87.6
+      by_type:
+        statement_coverage: 89.2
+        branch_coverage: 85.7
+        path_coverage: 78.4
+
+    test_coverage:
+      total_test_cases: 62
+      automated_test_cases: 56
+      automation_rate: 90.3
+
+  quality:
+    defect_density: 0.3
+    defect_detection_rate: 94.0
+    defect_escape_rate: 6.0
+    test_effectiveness:
+      pass_rate: 96.8
+      average_execution_time_minutes: 18
+      flaky_test_count: 1
+
+  usability:
+    system_usability_scale_score: 82
+    task_completion_rate: 93.5
+    average_time_on_task_minutes: 3.2
+
+  accessibility:
+    wcag_level: "AA"
+    wcag_compliance_percentage: 98.5
+    axe_violations_count: 0
+
+  performance:
+    page_load_time_ms: 1850
+    form_submission_time_ms: 780
+    api_response_time_ms: 320
+
+# ============================================================================
+# METADATA
+# ============================================================================
+metadata:
+  created_by: "QE Research Phase"
+  created_date: "2025-10-05"
+  schema_version: "1.0"
+  ddd_integration: true
+  ux_integration: true
+  total_strategies: 1
+  total_plans: 4
+  total_suites: 14
+  total_cases: 47
+  total_data: 10
+  total_environments: 5
+  total_frameworks: 4
+  total_pipelines: 3
+  total_doubles: 4
+  bounded_contexts_covered: 7
+
+---
+# End of Job Seeker Application QE Schema Example

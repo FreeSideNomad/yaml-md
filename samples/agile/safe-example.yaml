@@ -1,0 +1,152 @@
+# SAFe-specific Example: Mobile Platform ART
+# Demonstrates Agile Release Train and SAFe cadences
+
+agile_release_trains:
+  - id: "art_mobile_platform"
+    name: "Mobile Platform ART"
+    description: "Agile Release Train for mobile app development"
+    program_ref: "prg_mobile_platform"
+    portfolio_ref: "pf_ecommerce"
+    team_refs:
+      - "tm_ios"
+      - "tm_android"
+      - "tm_mobile_backend"
+      - "tm_mobile_qa"
+    releaseTrainEngineer:
+      name: "Sarah Martinez"
+      email: "sarah.martinez@ecommerce.com"
+    productManagement:
+      name: "David Lee"
+      email: "david.lee@ecommerce.com"
+    systemArchitect:
+      name: "Kumar Patel"
+      email: "kumar.patel@ecommerce.com"
+    cadence_refs:
+      - "cad_pi_planning"
+      - "cad_scrum_of_scrums"
+      - "cad_system_demo"
+    status: "active"
+
+  - id: "art_web_platform"
+    name: "Web Platform ART"
+    description: "Agile Release Train for web platform development"
+    program_ref: "prg_web_platform"
+    portfolio_ref: "pf_ecommerce"
+    releaseTrainEngineer:
+      name: "Mike Johnson"
+      email: "mike.johnson@ecommerce.com"
+    status: "active"
+
+cadences:
+  - id: "cad_pi_planning"
+    name: "PI Planning Cadence"
+    type: "pi_planning"
+    program_ref: "prg_mobile_platform"
+    art_ref: "art_mobile_platform"
+    frequency: "every_10_weeks"
+    durationDays: 2
+    description: "Face-to-face planning event where all ART teams plan the next Program Increment"
+    participants:
+      - "All team members from tm_ios, tm_android, tm_mobile_backend, tm_mobile_qa"
+      - "Product Management (David Lee)"
+      - "System Architect (Kumar Patel)"
+      - "RTE (Sarah Martinez)"
+      - "Business Owners"
+    artifacts:
+      - "PI Objectives"
+      - "Program Board"
+      - "Confidence Vote"
+      - "ROAM Board (Risks)"
+    nextOccurrence: "2025-03-19"
+
+  - id: "cad_scrum_of_scrums"
+    name: "Scrum of Scrums"
+    type: "scrum_of_scrums"
+    program_ref: "prg_mobile_platform"
+    art_ref: "art_mobile_platform"
+    frequency: "twice_weekly"
+    durationMinutes: 30
+    description: "Coordination meeting for team representatives to sync on dependencies"
+    participants:
+      - "Tech leads from all teams"
+      - "RTE (Sarah Martinez)"
+    schedule:
+      - day: "Tuesday"
+        time: "10:00 AM"
+      - day: "Thursday"
+        time: "10:00 AM"
+
+  - id: "cad_system_demo"
+    name: "System Demo"
+    type: "system_demo"
+    program_ref: "prg_mobile_platform"
+    art_ref: "art_mobile_platform"
+    frequency: "end_of_iteration"
+    durationMinutes: 60
+    description: "Demo of integrated system features to stakeholders"
+    participants:
+      - "All teams"
+      - "Product Management"
+      - "Stakeholders"
+      - "Customers (optional)"
+    artifacts:
+      - "Integrated working system"
+      - "Demo script"
+      - "Feedback log"
+    nextOccurrence: "2025-01-19"
+
+  - id: "cad_po_sync"
+    name: "Product Owner Sync"
+    type: "po_sync"
+    program_ref: "prg_mobile_platform"
+    art_ref: "art_mobile_platform"
+    frequency: "weekly"
+    durationMinutes: 60
+    description: "Weekly sync for Product Owners to align on backlog priorities"
+    participants:
+      - "Product Owners from all teams"
+      - "Product Management (David Lee)"
+    schedule:
+      - day: "Wednesday"
+        time: "2:00 PM"
+
+  - id: "cad_art_sync"
+    name: "ART Sync"
+    type: "art_sync"
+    program_ref: "prg_mobile_platform"
+    art_ref: "art_mobile_platform"
+    frequency: "weekly"
+    durationMinutes: 60
+    description: "Weekly coordination for RTE, Product Management, and System Architect"
+    participants:
+      - "RTE (Sarah Martinez)"
+      - "Product Management (David Lee)"
+      - "System Architect (Kumar Patel)"
+    schedule:
+      - day: "Monday"
+        time: "9:00 AM"
+
+  - id: "cad_inspect_adapt"
+    name: "Inspect and Adapt Workshop"
+    type: "inspect_adapt"
+    program_ref: "prg_mobile_platform"
+    art_ref: "art_mobile_platform"
+    frequency: "end_of_pi"
+    durationHours: 4
+    description: "Structured problem-solving workshop at end of each PI"
+    participants:
+      - "All ART members"
+      - "Stakeholders"
+    agenda:
+      - phase: "PI System Demo"
+        durationMinutes: 60
+      - phase: "Quantitative Measurement"
+        durationMinutes: 30
+      - phase: "Retrospective and Problem Solving"
+        durationMinutes: 90
+      - phase: "Planning Improvements"
+        durationMinutes: 60
+    artifacts:
+      - "Problem statements"
+      - "Improvement backlog"
+    nextOccurrence: "2025-03-27"

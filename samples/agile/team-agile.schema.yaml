@@ -1,0 +1,621 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/agile/team/v1
+title: Agile Team Patterns Schema
+description: Team-level patterns for agile execution - teams, sprints, ceremonies, impediments
+
+metadata:
+  author: "Igor Music"
+  created: "2025-10-17"
+  updated: "2025-10-17"
+  license: "MIT"
+  version: "1.0.0"
+  partition: "team"
+  references:
+    - "Scrum Guide"
+    - "SAFe 6.0 - Team Level"
+
+naming_conventions:
+  team_id: "tm_<name>"
+  team_member_id: "mbr_<name>"
+  team_topology_id: "tt_<name>"
+  role_id: "role_<name>"
+  sprint_id: "sp_<number>"
+  iteration_id: "it_<number>"
+  ceremony_id: "cer_<type>"
+  working_agreement_id: "wa_<name>"
+  impediment_id: "imp_<number>"
+  feedback_loop_id: "fb_<name>"
+
+$defs:
+  team:
+    type: object
+    description: Agile team (5-11 people) organized for delivery
+    required:
+      - id
+      - name
+      - members
+    properties:
+      id:
+        type: string
+        pattern: "^tm_[a-z0-9_]+$"
+        description: Unique team identifier
+      name:
+        type: string
+        description: Team name
+      type:
+        type: string
+        enum:
+          - scrum
+          - kanban
+          - scrumban
+        description: Team methodology
+      program_ref:
+        type: string
+        pattern: "^prg_[a-z0-9_]+$"
+        description: "Program this team belongs to (ID reference)"
+      members:
+        type: array
+        description: Team members
+        items:
+          type: string
+          pattern: "^mbr_[a-z0-9_]+$"
+          description: "Team member ID reference"
+        minItems: 3
+        maxItems: 11
+      roles:
+        type: object
+        description: Key team roles
+        properties:
+          product_owner_ref:
+            type: string
+            pattern: "^mbr_[a-z0-9_]+$"
+            description: "Product Owner ID reference"
+          scrum_master_ref:
+            type: string
+            pattern: "^mbr_[a-z0-9_]+$"
+            description: "Scrum Master ID reference"
+          tech_lead_ref:
+            type: string
+            pattern: "^mbr_[a-z0-9_]+$"
+            description: "Technical Lead ID reference"
+      capacity:
+        type: object
+        description: Team capacity
+        properties:
+          velocityAverage:
+            type: integer
+            description: Average velocity (story points per sprint)
+          hoursPerSprint:
+            type: integer
+            description: Total available hours per sprint
+      backlog:
+        type: array
+        description: "Team backlog (user story ID references)"
+        items:
+          type: string
+          pattern: "^us_[a-z0-9_]+$"
+      current_sprint_ref:
+        type: string
+        pattern: "^sp_[a-z0-9_]+$"
+        description: "Current sprint ID reference"
+      current_iteration_ref:
+        type: string
+        pattern: "^it_[a-z0-9_]+$"
+        description: "Current iteration ID reference (SAFe)"
+      practices:
+        type: array
+        description: Agile practices this team uses
+        items:
+          type: string
+      working_agreement_ref:
+        type: string
+        pattern: "^wa_[a-z0-9_]+$"
+        description: "Working agreement for this team (ID reference)"
+      team_topology_ref:
+        type: string
+        pattern: "^tt_[a-z0-9_]+$"
+        description: "Team topology classification (ID reference)"
+      definition_of_ready_ref:
+        type: string
+        pattern: "^dor_[a-z0-9_]+$"
+        description: "Definition of Ready for this team (ID reference)"
+      estimation_technique_ref:
+        type: string
+        pattern: "^est_[a-z0-9_]+$"
+        description: "Estimation technique used by this team (ID reference)"
+      feedback_loop_refs:
+        type: array
+        description: "Feedback loops this team participates in (ID references)"
+        items:
+          type: string
+          pattern: "^fb_[a-z0-9_]+$"
+
+  team_member:
+    type: object
+    description: Individual team member with skills and capacity
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        pattern: "^mbr_[a-z0-9_]+$"
+        description: Unique team member identifier
+      name:
+        type: string
+        description: Member name
+      email:
+        type: string
+        format: email
+        description: Email address
+      role:
+        type: string
+        description: Primary role
+      skills:
+        type: array
+        description: Skills this person has
+        items:
+          type: string
+      capacity:
+        type: number
+        description: '% available for sprint work (0-100)'
+        minimum: 0
+        maximum: 100
+
+  team_topology:
+    type: object
+    description: Team type and interaction patterns (Team Topologies model)
+    required:
+      - id
+      - type
+      - responsibilities
+    properties:
+      id:
+        type: string
+        pattern: "^tt_[a-z0-9_]+$"
+        description: Unique team topology identifier
+      type:
+        type: string
+        enum:
+          - stream_aligned
+          - platform
+          - enabling
+          - complicated_subsystem
+        description: Team topology type
+      responsibilities:
+        type: array
+        description: Key responsibilities of this team type
+        items:
+          type: string
+        minItems: 1
+      interactionModes:
+        type: array
+        description: How this team interacts with others (collaboration, X-as-a-Service, facilitating)
+        items:
+          type: string
+
+  role:
+    type: object
+    description: Agile role with defined responsibilities
+    required:
+      - id
+      - type
+      - responsibilities
+    properties:
+      id:
+        type: string
+        pattern: "^role_[a-z0-9_]+$"
+        description: Unique role identifier
+      type:
+        type: string
+        enum:
+          - product_owner
+          - scrum_master
+          - developer
+          - rte
+          - product_manager
+          - architect
+          - business_owner
+        description: Role type
+      responsibilities:
+        type: array
+        description: Key responsibilities of this role
+        items:
+          type: string
+        minItems: 1
+      authorityLevel:
+        type: string
+        enum:
+          - team
+          - program
+          - portfolio
+          - enterprise
+        description: Level at which this role operates
+
+  sprint:
+    type: object
+    description: Time-boxed iteration in Scrum (1-4 weeks)
+    required:
+      - id
+      - name
+      - startDate
+      - endDate
+      - goal
+    properties:
+      id:
+        type: string
+        pattern: "^sp_[a-z0-9_]+$"
+        description: Unique sprint identifier
+      name:
+        type: string
+        description: Sprint name
+      startDate:
+        type: string
+        format: date
+        description: Sprint start date
+      endDate:
+        type: string
+        format: date
+        description: Sprint end date
+      goal:
+        type: string
+        description: Sprint Goal - objective for this sprint
+        minLength: 10
+      team_ref:
+        type: string
+        pattern: "^tm_[a-z0-9_]+$"
+        description: "Team running this sprint (ID reference)"
+      committed_story_refs:
+        type: array
+        description: "Stories committed to this sprint (ID references)"
+        items:
+          type: string
+          pattern: "^us_[a-z0-9_]+$"
+      committedPoints:
+        type: integer
+        description: Total story points committed
+      completedPoints:
+        type: integer
+        description: Story points completed
+      velocity:
+        type: integer
+        description: Actual velocity for this sprint
+      definitionOfDone:
+        type: object
+        description: Checklist that must be met before story is considered done (explicit grounding to QE)
+        x-grounding:
+          target_canon: qe
+          grounding_type: epistemic
+          strength: strong
+          rationale: DoD criteria must be validated through QE test strategies
+        properties:
+          test_criteria_refs:
+            type: array
+            description: "QE test criteria IDs that validate DoD (cross-domain references)"
+            items:
+              type: string
+              pattern: "^qe:TestCriteria:[a-z0-9_-]+$"
+          checklist:
+            type: array
+            description: DoD checklist items
+            items:
+              type: object
+              properties:
+                item:
+                  type: string
+                  description: DoD requirement
+                qe_validation_ref:
+                  type: string
+                  pattern: "^qe:(TestCase|TestSuite|TestStrategy):[a-z0-9_-]+$"
+                  description: "QE artifact that validates this DoD item (cross-domain reference)"
+                verified:
+                  type: boolean
+                  description: Whether this DoD item has been verified
+      ceremony_refs:
+        type: array
+        description: "References to ceremony definitions for this sprint (ID references)"
+        items:
+          type: string
+          pattern: "^cer_[a-z0-9_]+$"
+      ceremonies:
+        type: object
+        description: Actual ceremony instances for this sprint
+        properties:
+          planning:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date-time
+              attendees:
+                type: array
+                items:
+                  type: string
+                  pattern: "^mbr_[a-z0-9_]+$"
+          dailyStandup:
+            type: object
+            properties:
+              time:
+                type: string
+                description: Daily standup time
+              location:
+                type: string
+          review:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date-time
+              attendees:
+                type: array
+                items:
+                  type: string
+                  pattern: "^mbr_[a-z0-9_]+$"
+          retrospective:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date-time
+              improvements:
+                type: array
+                description: Improvement actions from retro
+                items:
+                  type: string
+      definition_of_ready_ref:
+        type: string
+        pattern: "^dor_[a-z0-9_]+$"
+        description: "Definition of Ready for this sprint (ID reference)"
+      increment_ref:
+        type: string
+        pattern: "^inc_[a-z0-9_]+$"
+        description: "Product increment delivered by this sprint (ID reference)"
+      impediment_refs:
+        type: array
+        description: "Impediments identified during this sprint (ID references)"
+        items:
+          type: string
+          pattern: "^imp_[a-z0-9_]+$"
+      status:
+        type: string
+        enum:
+          - planned
+          - active
+          - completed
+        description: Sprint status
+
+  iteration:
+    type: object
+    description: Time-boxed iteration in SAFe (typically 2 weeks)
+    required:
+      - id
+      - name
+      - startDate
+      - endDate
+      - pi_ref
+    properties:
+      id:
+        type: string
+        pattern: "^it_[a-z0-9_]+$"
+        description: Unique iteration identifier
+      name:
+        type: string
+        description: Iteration name
+      number:
+        type: integer
+        minimum: 1
+        description: Iteration number within PI
+      startDate:
+        type: string
+        format: date
+        description: Iteration start date
+      endDate:
+        type: string
+        format: date
+        description: Iteration end date
+      pi_ref:
+        type: string
+        pattern: "^pi_[a-z0-9_]+$"
+        description: "Parent Program Increment (ID reference)"
+      goals:
+        type: array
+        description: Iteration goals
+        items:
+          type: string
+      committed_story_refs:
+        type: array
+        description: "Stories committed to this iteration (ID references)"
+        items:
+          type: string
+          pattern: "^us_[a-z0-9_]+$"
+      team_ref:
+        type: string
+        pattern: "^tm_[a-z0-9_]+$"
+        description: "Team running this iteration (ID reference)"
+      status:
+        type: string
+        enum:
+          - planned
+          - active
+          - completed
+        description: Iteration status
+
+  ceremony:
+    type: object
+    description: Agile ceremony or event
+    required:
+      - id
+      - type
+      - cadence
+    properties:
+      id:
+        type: string
+        pattern: "^cer_[a-z0-9_]+$"
+        description: Unique ceremony identifier
+      type:
+        type: string
+        enum:
+          - sprint_planning
+          - daily_standup
+          - sprint_review
+          - retrospective
+          - pi_planning
+          - system_demo
+          - backlog_refinement
+        description: Type of ceremony
+      cadence:
+        type: string
+        description: How often ceremony occurs (e.g., 'daily', 'per sprint', 'per PI')
+      durationMinutes:
+        type: integer
+        description: Typical duration in minutes
+        minimum: 15
+      participants:
+        type: array
+        description: "Participants in this ceremony (team member ID references)"
+        items:
+          type: string
+          pattern: "^mbr_[a-z0-9_]+$"
+
+  working_agreement:
+    type: object
+    description: Team norms and practices
+    required:
+      - id
+      - team_ref
+      - norms
+    properties:
+      id:
+        type: string
+        pattern: "^wa_[a-z0-9_]+$"
+        description: Unique working agreement identifier
+      team_ref:
+        type: string
+        pattern: "^tm_[a-z0-9_]+$"
+        description: "Team that owns this agreement (ID reference)"
+      norms:
+        type: array
+        description: Team norms and behavioral agreements
+        items:
+          type: string
+        minItems: 1
+      practices:
+        type: array
+        description: Engineering and collaboration practices
+        items:
+          type: string
+      createdDate:
+        type: string
+        format: date
+        description: When agreement was created
+      reviewedDate:
+        type: string
+        format: date
+        description: When agreement was last reviewed
+
+  impediment:
+    type: object
+    description: Blocker or obstacle preventing progress
+    required:
+      - id
+      - description
+      - severity
+      - status
+    properties:
+      id:
+        type: string
+        pattern: "^imp_[a-z0-9_]+$"
+        description: Unique impediment identifier
+      description:
+        type: string
+        description: Description of the impediment
+        minLength: 10
+      severity:
+        type: string
+        enum:
+          - blocking
+          - high
+          - medium
+          - low
+        description: Impact severity
+      team_ref:
+        type: string
+        pattern: "^tm_[a-z0-9_]+$"
+        description: "Team affected by this impediment (ID reference)"
+      resolutionPlan:
+        type: string
+        description: Plan for resolving the impediment
+      status:
+        type: string
+        enum:
+          - open
+          - in_progress
+          - resolved
+        description: Current status
+      createdDate:
+        type: string
+        format: date
+        description: When impediment was identified
+
+  feedback_loop:
+    type: object
+    description: Mechanism for gathering and acting on feedback
+    required:
+      - id
+      - type
+      - cadence
+    properties:
+      id:
+        type: string
+        pattern: "^fb_[a-z0-9_]+$"
+        description: Unique feedback loop identifier
+      type:
+        type: string
+        enum:
+          - sprint
+          - pi
+          - portfolio
+          - customer
+        description: Scope of feedback loop
+      cadence:
+        type: string
+        description: How often feedback is collected (e.g., 'per sprint', 'quarterly')
+      participants:
+        type: array
+        description: "Who participates in this feedback loop (team member ID references)"
+        items:
+          type: string
+          pattern: "^mbr_[a-z0-9_]+$"
+      metricsReviewed:
+        type: array
+        description: "Metrics reviewed in this feedback loop (metric ID references)"
+        items:
+          type: string
+          pattern: "^met_[a-z0-9_]+$"
+
+validation_rules:
+  - rule: "team_has_members"
+    description: "Every team must have 3-11 members"
+  - rule: "sprint_has_goal"
+    description: "Every sprint must have a goal"
+  - rule: "iteration_has_pi"
+    description: "Every iteration must belong to a PI"
+  - rule: "impediment_has_severity"
+    description: "Every impediment must have a severity rating"
+
+best_practices:
+  team:
+    - "Keep teams stable (5-11 people)"
+    - "Co-locate when possible"
+    - "Maintain team working agreements"
+    - "Track team velocity over time"
+  sprint:
+    - "Set clear sprint goals"
+    - "Conduct all ceremonies"
+    - "Maintain definition of done"
+    - "Review and adapt in retrospectives"
+  impediment:
+    - "Surface impediments in daily standups"
+    - "Scrum Master removes impediments"
+    - "Track resolution time"
+    - "Prevent recurring impediments"

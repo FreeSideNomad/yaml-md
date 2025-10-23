@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>YAML Document • /Users/igor/code/yaml-md/samples/ux/navigation-example.yaml</title>
+    <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css">
+    <script src="https://unpkg.com/@primer/layout@1.0.4/dist/index.umd.js" defer></script>
+    <style>
+      body { background: var(--bgColor-default, #fff); color: var(--fgColor-default, #24292f); font-size: 17px; line-height: 1.6; }
+      .hidden { display: none !important; }
+      .Layout { min-height: 100vh; }
+      #app > aside { display: none; }
+      #app > main { width: 100%; }
+      a, a:visited { color: #0969da !important; }
+      .tabbed-tables { margin-top: 1rem; }
+      .TabNav { border-bottom: 1px solid var(--borderColor-default, #d0d7de); }
+      .TabNav button { background: none; border: none; padding: 0.5rem 1rem; cursor: pointer; }
+      .TabNav button[aria-selected="true"] { border-bottom: 2px solid var(--borderColor-accent-emphasis, #0969da); font-weight: 600; }
+      .TabPanel.hidden { display: none !important; }
+      .type-attributes { display: grid; grid-template-columns: minmax(0, 200px) 1fr; gap: 0.5rem 1rem; margin: 1rem 0; }
+      .type-attributes dt { font-weight: 600; }
+      .type-attributes dd { margin: 0; }
+      .home-index { display: grid; gap: 0.75rem; margin-top: 1rem; }
+      .home-index a { text-decoration: none; font-weight: 600; color: var(--fgColor-accent, #0969da); }
+      .ActionList-content.ActionList-item--active { background-color: var(--bgColor-muted, #eaeef2); border-radius: 6px; }
+      .Table th, .Table td { white-space: normal; word-break: break-word; padding: 0.5rem; }
+      .table-wrapper { overflow-x: auto; margin-top: 0.5rem; }
+      .table-wrapper .Table { min-width: 640px; }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="Layout Layout--flowRow-until-lg">
+      <aside class="Layout-sidebar p-3 border-right">
+        <h1 class="h3 mb-3">Schema Types</h1>
+        <ul class="ActionList" id="nav-list">
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="" href="#">Home</a>
+          </li>
+        </ul>
+      </aside>
+      <main class="Layout-main p-4" id="content">
+        <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
+          <h2>Top Level Types</h2>
+          <p>No top-level types discovered.</p>
+        </section>
+        <section id="navigation" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Navigation", "href": "#navigation"}]'>
+          <header><h2>Navigation</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>localnav_product_detail</dd>
+            <dt>Scope</dt>
+            <dd>page</dd>
+            <dt>Scope Id</dt>
+            <dd>page_product_detail</dd>
+            <dt>Pattern</dt>
+            <dd>tabs</dd>
+            <dt>From Context</dt>
+            <dd></dd>
+            <dt>To Context</dt>
+            <dd></dd>
+            <dt>Relationship</dt>
+            <dd></dd>
+            <dt>Trigger</dt>
+            <dd></dd>
+            <dt>Visual Indicator</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="navigation-local-navigation-tab" data-tab-target="navigation-local-navigation-tab">Local Navigation</button>
+            <button role="tab" aria-selected="false" aria-controls="navigation-items-tab" data-tab-target="navigation-items-tab">Items</button>
+            </nav>
+          <div role="tabpanel" id="navigation-local-navigation-tab" class="TabPanel" data-tab-label="Local Navigation">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Local Navigation</th>
+                    <th>Scope</th>
+                    <th>Scope Id</th>
+                    <th>Pattern</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#localnav_product_detail">Localnav Product Detail</a></td>
+                    <td>page</td>
+                    <td>Product Detail</td>
+                    <td>tabs</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="navigation-items-tab" class="TabPanel hidden" data-tab-label="Items">
+            <ul class="ActionList">
+              <li class="ActionList-item">Id: nav_overview Label: Overview Target: #overview</li>
+              <li class="ActionList-item">Id: nav_specs Label: Specifications Target: #specifications</li>
+              <li class="ActionList-item">Id: nav_reviews Label: Reviews Target: #reviews</li>
+            </ul>
+          </div>
+          </div>
+          <div class="inline-objects">
+            <details class="my-3">
+              <summary>Global Navigation: top_horizontal top true</summary>
+              <dl class="type-attributes">
+                <dt>Pattern</dt>
+                <dd>top_horizontal</dd>
+                <dt>Position</dt>
+                <dd>top</dd>
+                <dt>Sticky</dt>
+                <dd>true</dd>
+                <dt>Id</dt>
+                <dd>nav_home</dd>
+                <dt>Label</dt>
+                <dd>Home</dd>
+                <dt>Target</dt>
+                <dd>page_home</dd>
+                <dt>Bounded Context</dt>
+                <dd></dd>
+                <dt>Icon</dt>
+                <dd>home</dd>
+                <dt>Badge</dt>
+                <dd></dd>
+                <dt>Type</dt>
+                <dd></dd>
+                <dt>Source</dt>
+                <dd></dd>
+                <dt>Id</dt>
+                <dd>nav_products</dd>
+                <dt>Label</dt>
+                <dd>Products</dd>
+                <dt>Target</dt>
+                <dd>page_category_list</dd>
+                <dt>Bounded Context</dt>
+                <dd>bc_product_catalog</dd>
+                <dt>Icon</dt>
+                <dd></dd>
+                <dt>Badge</dt>
+                <dd></dd>
+                <dt>Type</dt>
+                <dd></dd>
+                <dt>Source</dt>
+                <dd></dd>
+                <dt>Id</dt>
+                <dd>nav_deals</dd>
+                <dt>Label</dt>
+                <dd>Deals</dd>
+                <dt>Target</dt>
+                <dd>page_deals</dd>
+                <dt>Bounded Context</dt>
+                <dd>bc_promotions</dd>
+                <dt>Icon</dt>
+                <dd></dd>
+                <dt>Id</dt>
+                <dd>nav_cart</dd>
+                <dt>Label</dt>
+                <dd>Cart</dd>
+                <dt>Target</dt>
+                <dd>page_cart</dd>
+                <dt>Bounded Context</dt>
+                <dd>bc_shopping_cart</dd>
+                <dt>Icon</dt>
+                <dd>shopping-cart</dd>
+                <dt>Id</dt>
+                <dd>nav_account</dd>
+                <dt>Label</dt>
+                <dd>Account</dd>
+                <dt>Target</dt>
+                <dd>page_account</dd>
+                <dt>Bounded Context</dt>
+                <dd>bc_customer_account</dd>
+                <dt>Icon</dt>
+                <dd>user</dd>
+                <dt>Badge</dt>
+                <dd></dd>
+                <dt>Type</dt>
+                <dd></dd>
+                <dt>Source</dt>
+                <dd></dd>
+              </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="navigation-global-navigation-items-tab" data-tab-target="navigation-global-navigation-items-tab">Items</button>
+            <button role="tab" aria-selected="false" aria-controls="navigation-global-navigation-children-tab" data-tab-target="navigation-global-navigation-children-tab">Children</button>
+            </nav>
+          <div role="tabpanel" id="navigation-global-navigation-items-tab" class="TabPanel" data-tab-label="Items">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Label</th>
+                    <th>Target</th>
+                    <th>Icon</th>
+                    <th>Bounded Context</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#nav_home">Home</a></td>
+                    <td>Home</td>
+                    <td>Home</td>
+                    <td>home</td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td><a href="#nav_products">Products</a></td>
+                    <td>Products</td>
+                    <td>Category List</td>
+                    <td></td>
+                    <td>Bc Product Catalog</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#nav_deals">Deals</a></td>
+                    <td>Deals</td>
+                    <td>Deals</td>
+                    <td></td>
+                    <td>Bc Promotions</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#nav_cart">Cart</a></td>
+                    <td>Cart</td>
+                    <td>Cart</td>
+                    <td>Shopping Cart</td>
+                    <td>Bc Shopping Cart</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#nav_account">Account</a></td>
+                    <td>Account</td>
+                    <td>Account</td>
+                    <td>user</td>
+                    <td>Bc Customer Account</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="navigation-global-navigation-children-tab" class="TabPanel hidden" data-tab-label="Children">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Children</th>
+                    <th>Label</th>
+                    <th>Target</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a href="#nav_electronics">Electronics</a></td>
+                    <td>Electronics</td>
+                    <td>Category List</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#nav_clothing">Clothing</a></td>
+                    <td>Clothing</td>
+                    <td>Category List</td>
+                  </tr>
+                  <tr>
+                    <td><a href="#nav_home_garden">Home Garden</a></td>
+                    <td>Home &amp; Garden</td>
+                    <td>Category List</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+            <details class="my-3">
+              <summary>Badge: count active_deals_count</summary>
+              <dl class="type-attributes">
+                <dt>Type</dt>
+                <dd>count</dd>
+                <dt>Source</dt>
+                <dd>active_deals_count</dd>
+              </dl>
+            </details>
+            <details class="my-3">
+              <summary>Badge: count cart_items_count</summary>
+              <dl class="type-attributes">
+                <dt>Type</dt>
+                <dd>count</dd>
+                <dt>Source</dt>
+                <dd>cart_items_count</dd>
+              </dl>
+            </details>
+            </details>
+            <details class="my-3">
+              <summary>Utility Navigation</summary>
+            <details class="my-3">
+              <summary>User Menu: avatar</summary>
+              <dl class="type-attributes">
+                <dt>Trigger</dt>
+                <dd>avatar</dd>
+              </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="navigation-utility-navigation-user-menu-items-tab" data-tab-target="navigation-utility-navigation-user-menu-items-tab">Items</button>
+            </nav>
+          <div role="tabpanel" id="navigation-utility-navigation-user-menu-items-tab" class="TabPanel" data-tab-label="Items">
+            <ul class="ActionList">
+              <li class="ActionList-item">Label: My Orders Target: page_orders</li>
+              <li class="ActionList-item">Label: Wishlist Target: page_wishlist</li>
+              <li class="ActionList-item">Label: Settings Target: page_settings</li>
+              <li class="ActionList-item">Label: Sign Out Target: /auth/signout</li>
+            </ul>
+          </div>
+          </div>
+            </details>
+            <details class="my-3">
+              <summary>Search: header Cmd+K</summary>
+              <dl class="type-attributes">
+                <dt>Position</dt>
+                <dd>header</dd>
+                <dt>Shortcut</dt>
+                <dd>Cmd+K</dd>
+              </dl>
+            </details>
+            <details class="my-3">
+              <summary>Notifications: header unread_notifications_count</summary>
+              <dl class="type-attributes">
+                <dt>Position</dt>
+                <dd>header</dd>
+                <dt>Badge Source</dt>
+                <dd>unread_notifications_count</dd>
+              </dl>
+            </details>
+            </details>
+            <details class="my-3">
+              <summary>Mobile Navigation: bottom_tabs 768</summary>
+              <dl class="type-attributes">
+                <dt>Pattern</dt>
+                <dd>bottom_tabs</dd>
+                <dt>Breakpoint</dt>
+                <dd>768</dd>
+              </dl>
+            </details>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script>
+
+        (function() {
+          const sections = Array.from(document.querySelectorAll('.type-view'));
+          const navLinks = Array.from(document.querySelectorAll('#nav-list a'));
+          const breadcrumb = document.querySelector('#breadcrumb .Breadcrumbs-list');
+
+          const sectionMap = new Map();
+          sections.forEach(section => {
+            sectionMap.set(section.id, section);
+          });
+
+          function setActiveNav(targetId) {
+            navLinks.forEach(link => {
+              const isActive = link.dataset.target === targetId || (targetId === '' && !link.dataset.target);
+              link.classList.toggle('ActionList-item--active', isActive);
+            });
+          }
+
+          function showSection(targetId, tabId) {
+            if (!targetId || !sectionMap.has(targetId)) {
+              targetId = 'home';
+            }
+
+            sections.forEach(section => {
+              if (!section.id) return;
+              if (section.id === targetId) {
+                section.classList.remove('hidden');
+              } else {
+                section.classList.add('hidden');
+              }
+            });
+
+            const activeSection = sectionMap.get(targetId);
+            if (activeSection) {
+              if (breadcrumb) {
+                const breadcrumbData = activeSection.dataset.breadcrumb ? JSON.parse(activeSection.dataset.breadcrumb) : [];
+                breadcrumb.innerHTML = '';
+                breadcrumbData.forEach(item => {
+                  const li = document.createElement('li');
+                  li.className = 'Breadcrumbs-item';
+                  const a = document.createElement('a');
+                  a.className = 'Breadcrumbs-link';
+                  a.href = item.href || '#';
+                  a.textContent = item.label;
+                  li.appendChild(a);
+                  breadcrumb.appendChild(li);
+                });
+              }
+
+              if (tabId) {
+                activateTab(tabId);
+              } else {
+                const defaultTab = activeSection.querySelector('[role="tab"][aria-selected="true"]');
+                if (defaultTab) {
+                  activateTab(defaultTab.dataset.tabTarget);
+                }
+              }
+            }
+
+            setActiveNav(targetId === 'home' ? '' : targetId);
+          }
+
+          function activateTab(tabId) {
+            if (!tabId) return;
+            const panel = document.getElementById(tabId);
+            if (!panel) return;
+            const root = panel.closest('[data-tab-root]');
+            if (!root) return;
+            const tabs = Array.from(root.querySelectorAll('[role="tab"]'));
+            const panels = Array.from(root.querySelectorAll('[role="tabpanel"]'));
+            tabs.forEach(tab => {
+              const isActive = tab.dataset.tabTarget === tabId;
+              tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            panels.forEach(p => {
+              if (p.id === tabId) {
+                p.classList.remove('hidden');
+              } else {
+                p.classList.add('hidden');
+              }
+            });
+          }
+
+          navLinks.forEach(link => {
+            link.addEventListener('click', event => {
+              const target = link.dataset.target || '';
+              event.preventDefault();
+              if (target) {
+                window.location.hash = target;
+              } else {
+                window.location.hash = '';
+                showSection('home');
+              }
+            });
+          });
+
+          sections.forEach(section => {
+            section.addEventListener('click', event => {
+              const tabButton = event.target.closest('[role="tab"]');
+              if (tabButton) {
+                const tabId = tabButton.dataset.tabTarget;
+                activateTab(tabId);
+              }
+            });
+          });
+
+          function handleHashChange() {
+            let hash = window.location.hash.slice(1);
+            let tabId = null;
+            if (hash.includes('|')) {
+              const parts = hash.split('|');
+              hash = parts[0];
+              tabId = parts[1];
+            }
+            if (!hash) {
+              showSection('home');
+            } else {
+              showSection(hash, tabId);
+            }
+          }
+
+          window.addEventListener('hashchange', handleHashChange);
+
+          if (window.location.hash) {
+            handleHashChange();
+          } else {
+            showSection("home");
+          }
+        })();
+        
+    </script>
+  </body>
+</html>

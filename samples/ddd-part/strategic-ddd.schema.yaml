@@ -1,0 +1,734 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/ddd/strategic/v1
+title: DDD Strategic Patterns Schema
+description: Strategic patterns for Domain-Driven Design - domains, bounded contexts, context mappings
+
+metadata:
+  author: "Marina Music"
+  created: "2025-10-04"
+  updated: "2025-10-18"
+  license: "MIT"
+  version: "1.1.0"
+  partition: "strategic"
+  references:
+    - "Eric Evans - Domain-Driven Design (2003)"
+    - "Vaughn Vernon - Implementing Domain-Driven Design (2013)"
+    - "Martin Fowler - Patterns of Enterprise Application Architecture (2002)"
+
+naming_conventions:
+  domain_id: "dom_<name>"
+  bounded_context_id: "bc_<name>"
+  context_mapping_id: "cm_<source>_to_<target>"
+  bff_scope_id: "bff_<client_type>"
+  bff_interface_id: "bff_if_<context>_<client_type>"
+
+$defs:
+  system:
+    type: object
+    description: The entire software system being modeled
+    required: [id, name, domains]
+    properties:
+      id:
+        type: string
+        description: Unique system identifier
+      name:
+        type: string
+        description: System name
+      description:
+        type: string
+        description: What this system does
+      version:
+        type: string
+        description: System version
+      domains:
+        type: array
+        description: All domains in the system
+        items:
+          type: string
+          pattern: "^dom_[a-z0-9_]+$"
+      bounded_contexts:
+        type: array
+        description: All bounded contexts in system
+        items:
+          type: string
+          pattern: "^bc_[a-z0-9_]+$"
+      context_mappings:
+        type: array
+        description: Relationships between bounded contexts
+        items:
+          type: string
+          pattern: "^cm_[a-z0-9_]+_to_[a-z0-9_]+$"
+
+  domain:
+    type: object
+    description: A sphere of knowledge and activity around which the system is organized
+    required: [id, name, type]
+    properties:
+      id:
+        type: string
+        pattern: "^dom_[a-z0-9_]+$"
+        description: Unique domain identifier
+      name:
+        type: string
+        description: Domain name from ubiquitous language
+      type:
+        type: string
+        enum: [core, supporting, generic]
+        description: Domain classification
+      description:
+        type: string
+        description: What this domain encompasses
+      strategic_importance:
+        type: string
+        enum: [critical, important, standard, low]
+        description: Business importance level
+      bounded_contexts:
+        type: array
+        description: Bounded contexts within this domain (IDs)
+        items:
+          type: string
+          pattern: "^bc_[a-z0-9_]+$"
+      investment_strategy:
+        type: string
+        description: How much to invest (best team, adequate, minimal, outsource)
+      notes:
+        type: string
+        description: Additional context about this domain
+
+  bounded_context:
+    type: object
+    description: Explicit boundary within which a domain model is defined and applicable
+    required: [id, name, domain_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Unique bounded context identifier
+      name:
+        type: string
+        description: Context name from ubiquitous language
+      domain_ref:
+        type: string
+        pattern: "^dom_[a-z0-9_]+$"
+        description: Parent domain (ID reference)
+      description:
+        type: string
+        description: Purpose and scope of this context
+      ubiquitous_language:
+        type: object
+        description: Key terms and definitions specific to this context
+        properties:
+          glossary:
+            type: array
+            items:
+              type: object
+              required: [term, definition]
+              properties:
+                term:
+                  type: string
+                definition:
+                  type: string
+                examples:
+                  type: array
+                  items:
+                    type: string
+      team_ownership:
+        type: string
+        description: Team responsible for this context
+      aggregates:
+        type: array
+        description: Aggregates in this context (IDs from tactical schema)
+        items:
+          type: string
+          pattern: "^agg_[a-z0-9_]+$"
+      repositories:
+        type: array
+        description: Repositories in this context (IDs from tactical schema)
+        items:
+          type: string
+          pattern: "^repo_[a-z0-9_]+$"
+      domain_services:
+        type: array
+        description: Domain services in this context (IDs from tactical schema)
+        items:
+          type: string
+          pattern: "^svc_dom_[a-z0-9_]+$"
+      application_services:
+        type: array
+        description: Application services in this context (IDs from tactical schema)
+        items:
+          type: string
+          pattern: "^svc_app_[a-z0-9_]+$"
+      domain_events:
+        type: array
+        description: Domain events published by this context (IDs from tactical schema)
+        items:
+          type: string
+          pattern: "^evt_[a-z0-9_]+$"
+
+  context_mapping:
+    type: object
+    description: Relationship between two bounded contexts
+    required: [id, upstream_context, downstream_context, relationship_type]
+    properties:
+      id:
+        type: string
+        pattern: "^cm_[a-z0-9_]+_to_[a-z0-9_]+$"
+        description: Unique mapping identifier
+      upstream_context:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Context that influences (ID reference)
+      downstream_context:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Context that is influenced (ID reference)
+      relationship_type:
+        type: string
+        enum:
+          - partnership
+          - shared_kernel
+          - customer_supplier
+          - conformist
+          - anti_corruption_layer
+          - open_host_service
+          - published_language
+          - separate_ways
+          - big_ball_of_mud
+        description: Type of relationship between contexts
+      integration_pattern:
+        type: string
+        description: How integration is implemented (REST API, messaging, shared DB, etc.)
+      translation_map:
+        type: object
+        description: How concepts translate between contexts
+      shared_elements:
+        type: array
+        description: For shared kernel - what is shared
+        items:
+          type: string
+      acl_details:
+        type: object
+        description: For anti-corruption layer - implementation details
+        properties:
+          facades:
+            type: array
+            items:
+              type: string
+          adapters:
+            type: array
+            items:
+              type: string
+          translators:
+            type: array
+            items:
+              type: string
+      notes:
+        type: string
+        description: Additional context about this mapping
+
+  bff_scope:
+    type: object
+    description: |
+      Backend-for-Frontend (BFF) scope definition. A BFF serves exactly ONE client type
+      (web, mobile, etc.) and aggregates data from MULTIPLE bounded contexts. The BFF is
+      owned by the frontend team and provides client-specific API aggregation and orchestration.
+      Key principle: "One experience, one BFF" - scope is defined by CLIENT TYPE, not by
+      bounded contexts.
+    required:
+      - id
+      - name
+      - client_type
+      - serves_interface
+      - aggregates_from_contexts
+      - owned_by_team
+    properties:
+      id:
+        type: string
+        pattern: "^bff_[a-z0-9_]+$"
+        description: Unique BFF scope identifier (e.g., bff_web, bff_ios, bff_android)
+        examples:
+          - "bff_web"
+          - "bff_ios"
+          - "bff_android"
+          - "bff_partner_api"
+          - "bff_desktop"
+
+      name:
+        type: string
+        pattern: "^[A-Z][a-zA-Z]+BFF$"
+        description: BFF name (e.g., WebBFF, iOSBFF, AndroidBFF)
+        examples:
+          - "WebBFF"
+          - "iOSBFF"
+          - "AndroidBFF"
+          - "PartnerAPIBFF"
+          - "DesktopBFF"
+
+      client_type:
+        type: string
+        enum:
+          - web
+          - mobile_ios
+          - mobile_android
+          - desktop
+          - partner_api
+          - iot
+          - tablet
+        description: The single client type this BFF serves (exactly one)
+
+      serves_interface:
+        type: string
+        description: Description of the specific user interface this BFF is coupled to
+
+      aggregates_from_contexts:
+        type: array
+        description: Multiple bounded contexts this BFF aggregates data from (ID references)
+        items:
+          type: string
+          pattern: "^bc_[a-z0-9_]+$"
+        minItems: 1
+
+      owned_by_team:
+        type: string
+        description: Frontend team that owns and maintains this BFF (Conway's Law)
+
+      team_type:
+        type: string
+        enum:
+          - frontend
+          - mobile
+          - partner_integration
+        description: Type of team owning this BFF (must be frontend-oriented)
+
+      provides:
+        type: object
+        description: What the BFF provides to its client
+        properties:
+          endpoints:
+            type: array
+            description: API endpoints provided by this BFF
+            items:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: Endpoint path
+
+                method:
+                  type: string
+                  enum:
+                    - GET
+                    - POST
+                    - PUT
+                    - PATCH
+                    - DELETE
+
+                aggregates_from:
+                  type: array
+                  description: Bounded contexts called to assemble response
+                  items:
+                    type: string
+                    pattern: "^bc_[a-z0-9_]+$"
+
+                description:
+                  type: string
+
+          data_aggregation:
+            type: object
+            description: How the BFF aggregates data from multiple contexts
+            properties:
+              strategy:
+                type: string
+                enum:
+                  - parallel
+                  - sequential
+                  - conditional
+                description: How downstream calls are orchestrated
+
+              example:
+                type: string
+                description: Example aggregation scenario
+
+          transformations:
+            type: array
+            description: Data transformations applied for client
+            items:
+              type: object
+              properties:
+                from_context:
+                  type: string
+                  pattern: "^bc_[a-z0-9_]+$"
+
+                transformation_type:
+                  type: string
+                  enum:
+                    - format_conversion
+                    - data_enrichment
+                    - field_mapping
+                    - filtering
+                    - denormalization
+
+                description:
+                  type: string
+
+          client_optimizations:
+            type: array
+            description: Client-specific optimizations
+            items:
+              type: string
+            examples:
+              - "Bandwidth optimization for mobile"
+              - "Image size reduction for mobile networks"
+              - "Pagination for large datasets"
+              - "Field selection for minimal payloads"
+
+      responsibilities:
+        type: object
+        description: What the BFF is responsible for
+        properties:
+          data_aggregation:
+            type: boolean
+            description: Aggregates data from multiple downstream services
+            const: true
+
+          client_specific_orchestration:
+            type: boolean
+            description: Implements client-specific orchestration logic
+            const: true
+
+          presentation_logic:
+            type: boolean
+            description: Contains presentation logic (not business logic)
+            const: true
+
+          format_translation:
+            type: boolean
+            description: Translates domain models to client-friendly formats
+            const: true
+
+          business_logic:
+            type: boolean
+            description: BFF must NOT contain shared business logic
+            const: false
+
+          transaction_management:
+            type: boolean
+            description: BFF does NOT manage transactions (delegates to services)
+            const: false
+
+          direct_persistence:
+            type: boolean
+            description: BFF does NOT access databases directly
+            const: false
+
+      architecture_layer:
+        type: string
+        description: Architectural layer
+        const: "integration"
+
+      upstream_dependencies:
+        type: array
+        description: What sits upstream of the BFF (optional API Gateway)
+        items:
+          type: string
+          enum:
+            - api_gateway
+            - load_balancer
+            - cdn
+            - none
+
+      calls:
+        type: array
+        description: What the BFF calls downstream
+        items:
+          type: string
+          enum:
+            - application_service
+            - microservice
+            - bounded_context_api
+            - external_service
+
+      pattern_type:
+        type: string
+        description: Pattern classification
+        const: "bff"
+
+      anti_patterns:
+        type: object
+        description: What to avoid in BFF implementation
+        properties:
+          shared_business_logic:
+            type: boolean
+            description: Do NOT duplicate business logic across BFFs
+            const: false
+
+          generic_cross_cutting_concerns:
+            type: boolean
+            description: Do NOT implement auth/logging here (use API Gateway upstream)
+            const: false
+
+          direct_database_access:
+            type: boolean
+            description: Do NOT access databases directly
+            const: false
+
+          serving_multiple_client_types:
+            type: boolean
+            description: Do NOT serve multiple client types from one BFF
+            const: false
+
+  bff_interface:
+    type: object
+    description: |
+      Concrete BFF interface implementation for a specific bounded context accessed by a BFF.
+      This represents the actual REST API or integration interface that a BFF exposes to its
+      client, combining data from the referenced bounded context with potential data from other
+      contexts. This is the implementation artifact of a bff_scope.
+    required:
+      - id
+      - name
+      - bff_scope_ref
+      - primary_bounded_context_ref
+      - base_path
+    properties:
+      id:
+        type: string
+        pattern: "^bff_if_[a-z0-9_]+$"
+        description: Unique BFF interface identifier
+        examples:
+          - "bff_if_user_web"
+          - "bff_if_order_ios"
+          - "bff_if_profile_android"
+
+      name:
+        type: string
+        description: Descriptive name for this BFF interface
+        examples:
+          - "User Management Web BFF Interface"
+          - "Order Processing iOS BFF Interface"
+
+      bff_scope_ref:
+        type: string
+        pattern: "^bff_[a-z0-9_]+$"
+        description: Reference to the BFF scope this interface belongs to
+
+      primary_bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Primary bounded context this interface aggregates from
+
+      additional_context_refs:
+        type: array
+        description: Additional bounded contexts called for data aggregation
+        items:
+          type: string
+          pattern: "^bc_[a-z0-9_]+$"
+
+      base_path:
+        type: string
+        pattern: "^/[a-z0-9-/]+$"
+        description: Base URL path for this BFF interface
+        examples:
+          - "/api/web/users"
+          - "/api/mobile/orders"
+          - "/api/partner/profiles"
+
+      endpoints:
+        type: array
+        description: Endpoints provided by this BFF interface
+        items:
+          type: object
+          required:
+            - path
+            - method
+            - operation_type
+          properties:
+            path:
+              type: string
+              description: Endpoint path relative to base_path
+
+            method:
+              type: string
+              enum:
+                - GET
+                - POST
+                - PUT
+                - PATCH
+                - DELETE
+
+            operation_type:
+              type: string
+              enum:
+                - command
+                - query
+                - action
+              description: Type of operation (aligns with CQRS)
+
+            description:
+              type: string
+
+            delegates_to_commands:
+              type: array
+              description: Commands this endpoint delegates to (ID references)
+              items:
+                type: string
+                pattern: "^cmd_[a-z0-9_]+$"
+
+            delegates_to_queries:
+              type: array
+              description: Queries this endpoint delegates to (ID references)
+              items:
+                type: string
+                pattern: "^qry_[a-z0-9_]+$"
+
+            request_dto:
+              type: object
+              description: Request DTO structure (separate from API command records)
+              properties:
+                name:
+                  type: string
+                fields:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      type:
+                        type: string
+                      required:
+                        type: boolean
+
+            response_dto:
+              type: object
+              description: Response DTO structure
+              properties:
+                name:
+                  type: string
+                fields:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      type:
+                        type: string
+
+            aggregates_data_from:
+              type: array
+              description: Bounded contexts called to assemble this response
+              items:
+                type: string
+                pattern: "^bc_[a-z0-9_]+$"
+
+      value_object_conversion:
+        type: object
+        description: How the BFF interface converts between strings and value objects
+        properties:
+          from_string:
+            type: array
+            description: Value objects constructed from string URNs
+            items:
+              type: object
+              properties:
+                value_object_ref:
+                  type: string
+                  pattern: "^vo_[a-z0-9_]+$"
+                from_field:
+                  type: string
+                method:
+                  type: string
+                  examples:
+                    - "UserId.of(string)"
+                    - "ClientId.of(urn)"
+                    - "ServicingProfileId.fromUrn(urn)"
+
+          to_string:
+            type: array
+            description: Value objects serialized to strings
+            items:
+              type: object
+              properties:
+                value_object_ref:
+                  type: string
+                  pattern: "^vo_[a-z0-9_]+$"
+                to_field:
+                  type: string
+                method:
+                  type: string
+                  examples:
+                    - "userId.id()"
+                    - "clientId.urn()"
+                    - "profileId.urn()"
+
+      execution_model:
+        type: string
+        enum:
+          - blocking
+          - async
+          - reactive
+        description: How requests are processed
+        default: "blocking"
+
+      error_handling:
+        type: object
+        description: Error handling strategy
+        properties:
+          strategy:
+            type: string
+            enum:
+              - fail_fast
+              - graceful_degradation
+              - partial_response
+          description:
+            type: string
+
+      technology_stack:
+        type: object
+        description: Implementation technologies
+        properties:
+          framework:
+            type: string
+            examples:
+              - "Micronaut"
+              - "Spring Boot"
+              - "Express.js"
+          controller_annotation:
+            type: string
+            examples:
+              - "@Controller"
+              - "@RestController"
+
+      layer:
+        type: string
+        description: Architectural layer
+        const: "infrastructure"
+
+validation_rules:
+  - rule: "bounded_context_has_domain"
+    description: "Every bounded context must belong to exactly one domain"
+    validation: "bounded_context.domain_ref must be set and valid"
+
+  - rule: "context_mapping_different_contexts"
+    description: "Context mapping must connect two different bounded contexts"
+    validation: "context_mapping.upstream_context != context_mapping.downstream_context"
+
+best_practices:
+  strategic:
+    - "Start by identifying domains and subdomains"
+    - "Define bounded contexts based on linguistic boundaries"
+    - "Use context mapping to make integration explicit"
+    - "Invest most in core domain"
+    - "Buy or outsource generic subdomains"
+    - "One BFF per client type (web, iOS, Android, partner API)"
+    - "BFF aggregates data from MULTIPLE bounded contexts"
+    - "Owned by frontend team (Conway's Law)"
+    - "BFF contains presentation logic, NOT business logic"
+    - "Use hybrid approach: API Gateway upstream for cross-cutting concerns, BFFs downstream for client-specific orchestration"
+    - "BFF delegates to application services, does not access databases directly"
+    - "Separate request/response DTOs in BFF from API command/query records"
+    - "Use API Gateway for: cross-cutting concerns (auth, SSL, rate limiting, logging)"
+    - "Use BFF for: client-specific orchestration, data aggregation, format transformation"
+    - "Use BOTH: API Gateway upstream + multiple BFFs downstream (common pattern)"

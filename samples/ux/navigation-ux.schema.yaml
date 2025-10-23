@@ -1,0 +1,367 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/ux/navigation/v1
+title: UX Navigation Schema
+description: Navigation patterns, page structures, and wayfinding systems
+
+metadata:
+  author: "Igor Music"
+  created: "2025-10-17"
+  updated: "2025-10-18"
+  license: "MIT"
+  version: "2.1.0"
+  partition: "navigation"
+  references:
+    - "Steve Krug - Don't Make Me Think (3rd ed, 2014)"
+    - "Jakob Nielsen - Navigation Design Patterns"
+
+naming_conventions:
+  navigation_id: "nav_<name>"
+  page_id: "page_<name>"
+  page_section_id: "sect_<name>"
+  breadcrumb_id: "breadcrumb_<name>"
+
+$defs:
+  navigation:
+    type: object
+    description: "Navigation structures and patterns"
+    required: [global_navigation]
+    properties:
+      global_navigation:
+        type: object
+        description: "Primary navigation across entire system"
+        required: [pattern, items]
+        properties:
+          pattern:
+            type: string
+            enum: [top_horizontal, side_vertical, tabs, hybrid]
+          position:
+            type: string
+            enum: [top, left, right, bottom]
+          sticky:
+            type: boolean
+            description: "Remains visible on scroll"
+          items:
+            type: array
+            items:
+              type: object
+              required: [id, label, target]
+              properties:
+                id:
+                  type: string
+                  pattern: "^nav_[a-z0-9_]+$"
+                label:
+                  type: string
+                  description: "Display text (ubiquitous language)"
+                target:
+                  type: string
+                  description: "URL or page ID"
+                bounded_context:
+                  type: string
+                  description: "Associated bounded context"
+                  pattern: "^bc_[a-z0-9_]+$"
+                icon:
+                  type: string
+                  description: "Icon identifier"
+                badge:
+                  type: object
+                  description: "Notification badge"
+                  properties:
+                    type:
+                      type: string
+                      enum: [count, dot, status]
+                    source:
+                      type: string
+                      description: "Data source for badge value"
+                children:
+                  type: array
+                  items:
+                    type: object
+                  description: "Sub-navigation items (recursive, same structure as parent)"
+
+      local_navigation:
+        type: array
+        description: "Context-specific navigation sections"
+        items:
+          type: object
+          required: [id, scope, pattern]
+          properties:
+            id:
+              type: string
+              pattern: "^localnav_[a-z0-9_]+$"
+            scope:
+              type: string
+              description: "Where this navigation appears"
+              enum: [bounded_context, page, section]
+            scope_id:
+              type: string
+              description: "ID of scope (bc_id, page_id, or section_id)"
+            pattern:
+              type: string
+              enum: [tabs, sidebar, sub_nav, breadcrumbs]
+            items:
+              type: array
+              description: "Navigation items (same structure as global)"
+
+      utility_navigation:
+        type: object
+        description: "Utility functions (user menu, settings, help)"
+        properties:
+          user_menu:
+            type: object
+            properties:
+              trigger:
+                type: string
+                enum: [avatar, icon, text]
+              items:
+                type: array
+                description: "Menu items"
+          search:
+            type: object
+            properties:
+              position:
+                type: string
+                enum: [header, overlay, dedicated_page]
+              shortcut:
+                type: string
+                description: "Keyboard shortcut"
+                example: "Cmd+K"
+          notifications:
+            type: object
+            properties:
+              position:
+                type: string
+              badge_source:
+                type: string
+                description: "Domain event source for count"
+
+      mobile_navigation:
+        type: object
+        description: "Mobile-specific navigation patterns"
+        properties:
+          pattern:
+            type: string
+            enum: [bottom_tabs, hamburger, drawer, hybrid]
+          breakpoint:
+            type: integer
+            description: "Viewport width to switch to mobile nav"
+            example: 768
+
+      cross_context_navigation:
+        type: array
+        description: "Navigation between bounded contexts"
+        items:
+          type: object
+          properties:
+            from_context:
+              type: string
+              pattern: "^bc_[a-z0-9_]+$"
+            to_context:
+              type: string
+              pattern: "^bc_[a-z0-9_]+$"
+            relationship:
+              type: string
+              enum: [customer_supplier, partnership, shared_kernel, conformist]
+              description: "DDD context mapping relationship"
+            trigger:
+              type: string
+              description: "What triggers navigation"
+              enum: [link, action, workflow, event]
+            visual_indicator:
+              type: boolean
+              description: "Show visual indication of context change"
+
+  page:
+    type: object
+    description: "Individual page definition"
+    required: [page_id, name, type, url]
+    properties:
+      page_id:
+        type: string
+        pattern: "^page_[a-z0-9_]+$"
+        example: "page_job_listings"
+
+      name:
+        type: string
+        description: "Page name/title"
+
+      type:
+        type: string
+        enum: [list, detail, form, dashboard, search, empty_state, error]
+        description: "Page type classification"
+
+      url:
+        type: string
+        description: "URL path"
+        example: "/jobs"
+
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: "Primary bounded context (cross-partition reference to DDD domain)"
+
+      bff_interface_ref:
+        type: string
+        pattern: "^bff_if_[a-z0-9_]+$"
+        description: "Optional BFF interface for this page's data"
+
+      information_architecture_ref:
+        type: string
+        pattern: "^ia_[a-z0-9_]+$"
+        description: "Reference to information architecture (cross-partition reference to structure partition)"
+
+      displays:
+        type: object
+        description: "What data this page displays"
+        properties:
+          aggregate_type:
+            type: string
+            description: "DDD aggregate type"
+            pattern: "^agg_[a-z0-9_]+$"
+          cardinality:
+            type: string
+            enum: [single, collection]
+          data_source:
+            type: string
+            description: "Repository or query"
+            pattern: "^(repo_|query_)[a-z0-9_]+$"
+          query_params:
+            type: object
+            description: "Query parameters (filters, sort, pagination)"
+
+      sections:
+        type: array
+        items:
+          $ref: "#/$defs/page_section"
+        description: "Page sections"
+
+      layout:
+        type: object
+        description: "Page layout configuration"
+        properties:
+          pattern:
+            type: string
+            enum: [single_column, two_column, three_column, sidebar_left, sidebar_right, grid, custom]
+          responsive:
+            $ref: "#/$defs/responsive_config"
+
+      behaviors:
+        type: array
+        items:
+          type: string
+          pattern: "^bhv_[a-z0-9_]+$"
+        description: "Page-level behaviors (cross-partition reference to interaction partition)"
+
+      accessibility:
+        type: string
+        pattern: "^acc_[a-z0-9_]+$"
+        description: "Accessibility specification (cross-partition reference to interaction partition)"
+
+      scalability:
+        type: object
+        description: "Scalability patterns for this page"
+        properties:
+          pagination:
+            type: string
+            pattern: "^pag_[a-z0-9_]+$"
+            description: "Pagination config reference (cross-partition reference to interaction partition)"
+          lazy_loading:
+            type: boolean
+          virtual_scrolling:
+            type: boolean
+          caching:
+            type: string
+            pattern: "^cache_[a-z0-9_]+$"
+            description: "Caching config reference (cross-partition reference to interaction partition)"
+
+  page_section:
+    type: object
+    description: "Section within a page"
+    required: [section_id, type]
+    properties:
+      section_id:
+        type: string
+        pattern: "^section_[a-z0-9_]+$"
+
+      type:
+        type: string
+        enum: [header, content, sidebar, footer, filters, list, detail, form, actions, related, empty_state]
+
+      title:
+        type: string
+        description: "Section heading"
+
+      components:
+        type: array
+        items:
+          type: string
+          pattern: "^comp_[a-z0-9_]+$"
+        description: "Component IDs used in section (cross-partition reference to interaction partition)"
+        example: ["comp_job_card", "comp_pagination"]
+
+      collapsible:
+        type: boolean
+        description: "Can section be collapsed"
+
+      sticky:
+        type: boolean
+        description: "Remains visible on scroll"
+
+      responsive:
+        $ref: "#/$defs/responsive_config"
+
+  responsive_config:
+    type: object
+    description: "Responsive behavior configuration across device breakpoints"
+    properties:
+      mobile:
+        type: string
+        enum: [show, hide, collapse, reorder, single_column, stack]
+        description: "Mobile layout pattern"
+      tablet:
+        type: string
+        enum: [show, hide, collapse, reorder, single_column, two_column, stack]
+        description: "Tablet layout pattern"
+      desktop:
+        type: string
+        enum: [show, hide, collapse, reorder, single_column, two_column, three_column, grid]
+        description: "Desktop layout pattern"
+
+  breadcrumb:
+    type: object
+    description: "Breadcrumb navigation trail showing hierarchical location"
+    required: [breadcrumb_id, items]
+    properties:
+      breadcrumb_id:
+        type: string
+        pattern: "^breadcrumb_[a-z0-9_]+$"
+        description: "Unique identifier for breadcrumb"
+      items:
+        type: array
+        description: "Ordered list of breadcrumb items from root to current location"
+        items:
+          type: object
+          required: [label, target]
+          properties:
+            label:
+              type: string
+              description: "Display text for breadcrumb item"
+            target:
+              type: string
+              description: "URL or page reference"
+            page_ref:
+              type: string
+              pattern: "^page_[a-z0-9_]+$"
+              description: "Reference to page (if applicable)"
+            hierarchy_node_ref:
+              type: string
+              pattern: "^hn_[a-z0-9_]+$"
+              description: "Reference to information architecture node (cross-partition to structure)"
+      separator:
+        type: string
+        description: "Visual separator between breadcrumb items"
+        enum: [chevron, slash, arrow, dot, custom]
+        default: "chevron"
+      show_home:
+        type: boolean
+        description: "Whether to show home/root item"
+        default: true

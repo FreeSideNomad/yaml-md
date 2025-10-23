@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>YAML Document • /Users/igor/code/yaml-md/samples/agile/portfolio-example.yaml</title>
+    <link rel="stylesheet" href="https://unpkg.com/@primer/css/dist/primer.css">
+    <script src="https://unpkg.com/@primer/layout@1.0.4/dist/index.umd.js" defer></script>
+    <style>
+      body { background: var(--bgColor-default, #fff); color: var(--fgColor-default, #24292f); font-size: 17px; line-height: 1.6; }
+      .hidden { display: none !important; }
+      .Layout { min-height: 100vh; }
+      #app > aside { display: none; }
+      #app > main { width: 100%; }
+      a, a:visited { color: #0969da !important; }
+      .tabbed-tables { margin-top: 1rem; }
+      .TabNav { border-bottom: 1px solid var(--borderColor-default, #d0d7de); }
+      .TabNav button { background: none; border: none; padding: 0.5rem 1rem; cursor: pointer; }
+      .TabNav button[aria-selected="true"] { border-bottom: 2px solid var(--borderColor-accent-emphasis, #0969da); font-weight: 600; }
+      .TabPanel.hidden { display: none !important; }
+      .type-attributes { display: grid; grid-template-columns: minmax(0, 200px) 1fr; gap: 0.5rem 1rem; margin: 1rem 0; }
+      .type-attributes dt { font-weight: 600; }
+      .type-attributes dd { margin: 0; }
+      .home-index { display: grid; gap: 0.75rem; margin-top: 1rem; }
+      .home-index a { text-decoration: none; font-weight: 600; color: var(--fgColor-accent, #0969da); }
+      .ActionList-content.ActionList-item--active { background-color: var(--bgColor-muted, #eaeef2); border-radius: 6px; }
+      .Table th, .Table td { white-space: normal; word-break: break-word; padding: 0.5rem; }
+      .table-wrapper { overflow-x: auto; margin-top: 0.5rem; }
+      .table-wrapper .Table { min-width: 640px; }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="Layout Layout--flowRow-until-lg">
+      <aside class="Layout-sidebar p-3 border-right">
+        <h1 class="h3 mb-3">Schema Types</h1>
+        <ul class="ActionList" id="nav-list">
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="" href="#">Home</a>
+          </li>
+          <li class="ActionList-item">
+            <a class="ActionList-content" data-target="rm_ecommerce_2025" href="#rm_ecommerce_2025">Roadmap: E-Commerce Platform 2025 Roadmap</a>
+          </li>
+        </ul>
+      </aside>
+      <main class="Layout-main p-4" id="content">
+        <section id="home" class="type-view" data-breadcrumb='[{"label":"Home","href":"#"}]'>
+          <h2>Top Level Types</h2>
+          <div class="home-index">
+            <a href="#rm_ecommerce_2025">Roadmap: E-Commerce Platform 2025 Roadmap</a>
+          </div>
+        </section>
+        <section id="rm_ecommerce_2025" class="type-view hidden" data-breadcrumb='[{"label": "Home", "href": "#"}, {"label": "Roadmap: E-Commerce Platform 2025 Roadmap", "href": "#rm_ecommerce_2025"}]'>
+          <header><h2>Roadmap: E-Commerce Platform 2025 Roadmap</h2></header>
+          <dl class="type-attributes">
+            <dt>Id</dt>
+            <dd>rm_ecommerce_2025</dd>
+            <dt>Level</dt>
+            <dd></dd>
+            <dt>Timehorizon</dt>
+            <dd></dd>
+            <dt>Portfolio Ref</dt>
+            <dd>pf_ecommerce</dd>
+            <dt>Timeframe</dt>
+            <dd>2025</dd>
+            <dt>Theme</dt>
+            <dd></dd>
+            <dt>Name</dt>
+            <dd>Q1: Mobile App MVP Launch</dd>
+            <dt>Date</dt>
+            <dd>2025-03-31</dd>
+            <dt>Type</dt>
+            <dd></dd>
+            <dt>Name</dt>
+            <dd>Q2: AI Recommendations Beta</dd>
+            <dt>Date</dt>
+            <dd>2025-06-30</dd>
+            <dt>Type</dt>
+            <dd></dd>
+            <dt>Name</dt>
+            <dd>Q3: Mobile App Full Release</dd>
+            <dt>Date</dt>
+            <dd>2025-09-30</dd>
+            <dt>Type</dt>
+            <dd></dd>
+            <dt>Name</dt>
+            <dd>Q4: Multi-Region Deployment</dd>
+            <dt>Date</dt>
+            <dd>2025-12-31</dd>
+            <dt>Type</dt>
+            <dd></dd>
+            <dt>Confidence</dt>
+            <dd></dd>
+            <dt>Lastreviewed</dt>
+            <dd></dd>
+            <dt>Reviewcadence</dt>
+            <dd></dd>
+            <dt>Notes</dt>
+            <dd></dd>
+          </dl>
+          <div class="tabbed-tables" data-tab-root>
+            <nav class="TabNav" role="tablist">
+            <button role="tab" aria-selected="true" aria-controls="rm-ecommerce-2025-objectives-tab" data-tab-target="rm-ecommerce-2025-objectives-tab">Objectives</button>
+            <button role="tab" aria-selected="false" aria-controls="rm-ecommerce-2025-epic-refs-tab" data-tab-target="rm-ecommerce-2025-epic-refs-tab">Epic Refs</button>
+            <button role="tab" aria-selected="false" aria-controls="rm-ecommerce-2025-feature-refs-tab" data-tab-target="rm-ecommerce-2025-feature-refs-tab">Feature Refs</button>
+            <button role="tab" aria-selected="false" aria-controls="rm-ecommerce-2025-milestones-tab" data-tab-target="rm-ecommerce-2025-milestones-tab">Milestones</button>
+            <button role="tab" aria-selected="false" aria-controls="rm-ecommerce-2025-dependencies-tab" data-tab-target="rm-ecommerce-2025-dependencies-tab">Dependencies</button>
+            </nav>
+          <div role="tabpanel" id="rm-ecommerce-2025-objectives-tab" class="TabPanel" data-tab-label="Objectives">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Objectives</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="rm-ecommerce-2025-epic-refs-tab" class="TabPanel hidden" data-tab-label="Epic Refs">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Epic Refs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>epic_mobile_app</td>
+                  </tr>
+                  <tr>
+                    <td>epic_ai_recommendations</td>
+                  </tr>
+                  <tr>
+                    <td>epic_multi_region</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="rm-ecommerce-2025-feature-refs-tab" class="TabPanel hidden" data-tab-label="Feature Refs">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Feature Refs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="rm-ecommerce-2025-milestones-tab" class="TabPanel hidden" data-tab-label="Milestones">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Milestone</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Q1: Mobile App MVP Launch</td>
+                    <td>2025 03 31</td>
+                  </tr>
+                  <tr>
+                    <td>Q2: AI Recommendations Beta</td>
+                    <td>2025 06 30</td>
+                  </tr>
+                  <tr>
+                    <td>Q3: Mobile App Full Release</td>
+                    <td>2025 09 30</td>
+                  </tr>
+                  <tr>
+                    <td>Q4: Multi-Region Deployment</td>
+                    <td>2025 12 31</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div role="tabpanel" id="rm-ecommerce-2025-dependencies-tab" class="TabPanel hidden" data-tab-label="Dependencies">
+            <div class="table-wrapper">
+              <table class="Table">
+                <thead>
+                  <tr>
+                    <th>Dependencies</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><em>None</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script>
+
+        (function() {
+          const sections = Array.from(document.querySelectorAll('.type-view'));
+          const navLinks = Array.from(document.querySelectorAll('#nav-list a'));
+          const breadcrumb = document.querySelector('#breadcrumb .Breadcrumbs-list');
+
+          const sectionMap = new Map();
+          sections.forEach(section => {
+            sectionMap.set(section.id, section);
+          });
+
+          function setActiveNav(targetId) {
+            navLinks.forEach(link => {
+              const isActive = link.dataset.target === targetId || (targetId === '' && !link.dataset.target);
+              link.classList.toggle('ActionList-item--active', isActive);
+            });
+          }
+
+          function showSection(targetId, tabId) {
+            if (!targetId || !sectionMap.has(targetId)) {
+              targetId = 'home';
+            }
+
+            sections.forEach(section => {
+              if (!section.id) return;
+              if (section.id === targetId) {
+                section.classList.remove('hidden');
+              } else {
+                section.classList.add('hidden');
+              }
+            });
+
+            const activeSection = sectionMap.get(targetId);
+            if (activeSection) {
+              if (breadcrumb) {
+                const breadcrumbData = activeSection.dataset.breadcrumb ? JSON.parse(activeSection.dataset.breadcrumb) : [];
+                breadcrumb.innerHTML = '';
+                breadcrumbData.forEach(item => {
+                  const li = document.createElement('li');
+                  li.className = 'Breadcrumbs-item';
+                  const a = document.createElement('a');
+                  a.className = 'Breadcrumbs-link';
+                  a.href = item.href || '#';
+                  a.textContent = item.label;
+                  li.appendChild(a);
+                  breadcrumb.appendChild(li);
+                });
+              }
+
+              if (tabId) {
+                activateTab(tabId);
+              } else {
+                const defaultTab = activeSection.querySelector('[role="tab"][aria-selected="true"]');
+                if (defaultTab) {
+                  activateTab(defaultTab.dataset.tabTarget);
+                }
+              }
+            }
+
+            setActiveNav(targetId === 'home' ? '' : targetId);
+          }
+
+          function activateTab(tabId) {
+            if (!tabId) return;
+            const panel = document.getElementById(tabId);
+            if (!panel) return;
+            const root = panel.closest('[data-tab-root]');
+            if (!root) return;
+            const tabs = Array.from(root.querySelectorAll('[role="tab"]'));
+            const panels = Array.from(root.querySelectorAll('[role="tabpanel"]'));
+            tabs.forEach(tab => {
+              const isActive = tab.dataset.tabTarget === tabId;
+              tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            panels.forEach(p => {
+              if (p.id === tabId) {
+                p.classList.remove('hidden');
+              } else {
+                p.classList.add('hidden');
+              }
+            });
+          }
+
+          navLinks.forEach(link => {
+            link.addEventListener('click', event => {
+              const target = link.dataset.target || '';
+              event.preventDefault();
+              if (target) {
+                window.location.hash = target;
+              } else {
+                window.location.hash = '';
+                showSection('home');
+              }
+            });
+          });
+
+          sections.forEach(section => {
+            section.addEventListener('click', event => {
+              const tabButton = event.target.closest('[role="tab"]');
+              if (tabButton) {
+                const tabId = tabButton.dataset.tabTarget;
+                activateTab(tabId);
+              }
+            });
+          });
+
+          function handleHashChange() {
+            let hash = window.location.hash.slice(1);
+            let tabId = null;
+            if (hash.includes('|')) {
+              const parts = hash.split('|');
+              hash = parts[0];
+              tabId = parts[1];
+            }
+            if (!hash) {
+              showSection('home');
+            } else {
+              showSection(hash, tabId);
+            }
+          }
+
+          window.addEventListener('hashchange', handleHashChange);
+
+          if (window.location.hash) {
+            handleHashChange();
+          } else {
+            window.location.hash = "#rm_ecommerce_2025";
+          }
+        })();
+        
+    </script>
+  </body>
+</html>

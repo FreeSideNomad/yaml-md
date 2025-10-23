@@ -1,0 +1,974 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://canonical-grounding.org/schemas/ddd/tactical/v1
+title: DDD Tactical Patterns Schema
+description: Tactical patterns for Domain-Driven Design - aggregates, entities, value objects, services
+
+metadata:
+  author: "Marina Music"
+  created: "2025-10-04"
+  updated: "2025-10-18"
+  license: "MIT"
+  version: "1.1.0"
+  partition: "tactical"
+  references:
+    - "Eric Evans - Domain-Driven Design (2003)"
+    - "Vaughn Vernon - Implementing Domain-Driven Design (2013)"
+
+naming_conventions:
+  aggregate_id: "agg_<name>"
+  entity_id: "ent_<name>"
+  value_object_id: "vo_<name>"
+  repository_id: "repo_<name>"
+  domain_service_id: "svc_dom_<name>"
+  application_service_id: "svc_app_<name>"
+  command_id: "cmd_<name>"
+  query_id: "qry_<name>"
+  domain_event_id: "evt_<name>"
+
+$defs:
+  aggregate:
+    type: object
+    description: Cluster of entities and value objects with defined consistency boundary
+    required: [id, name, bounded_context_ref, root_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^agg_[a-z0-9_]+$"
+        description: Unique aggregate identifier
+      name:
+        type: string
+        description: Aggregate name from ubiquitous language
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Reference to BoundedContext from strategic schema (ID reference)
+      root_ref:
+        type: string
+        pattern: "^ent_[a-z0-9_]+$"
+        description: The aggregate root entity (ID reference)
+      entities:
+        type: array
+        description: Entities within this aggregate (including root)
+        items:
+          type: string
+          pattern: "^ent_[a-z0-9_]+$"
+      value_objects:
+        type: array
+        description: Value objects within this aggregate
+        items:
+          type: string
+          pattern: "^vo_[a-z0-9_]+$"
+      consistency_rules:
+        type: array
+        description: Business rules that must be consistent
+        items:
+          type: string
+      invariants:
+        type: array
+        description: Conditions that must always be true
+        items:
+          type: string
+      size_estimate:
+        type: string
+        enum: [small, medium, large]
+        description: Aggregate size (prefer small)
+
+  entity:
+    type: object
+    description: Object with unique identity and lifecycle
+    required: [id, name, bounded_context_ref, identity_field]
+    properties:
+      id:
+        type: string
+        pattern: "^ent_[a-z0-9_]+$"
+        description: Unique entity definition identifier
+      name:
+        type: string
+        description: Entity name from ubiquitous language
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Context this entity belongs to (ID reference to strategic schema)
+      aggregate_ref:
+        type: string
+        pattern: "^agg_[a-z0-9_]+$"
+        description: Aggregate this entity belongs to (ID reference)
+      is_aggregate_root:
+        type: boolean
+        description: True if this entity is an aggregate root
+      identity_field:
+        type: string
+        description: Field name that serves as identity
+      identity_generation:
+        type: string
+        enum: [user_provided, auto_generated, derived, external]
+        description: How identity is generated
+      attributes:
+        type: array
+        description: Entity attributes
+        items:
+          type: object
+          required: [name, type]
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+            value_object_ref:
+              type: string
+              pattern: "^vo_[a-z0-9_]+$"
+            required:
+              type: boolean
+            description:
+              type: string
+      business_methods:
+        type: array
+        description: Key business operations
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            parameters:
+              type: array
+            returns:
+              type: string
+      invariants:
+        type: array
+        description: Rules that must always hold
+        items:
+          type: string
+
+  value_object:
+    type: object
+    description: Immutable object defined by its attributes
+    required: [id, name, bounded_context_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^vo_[a-z0-9_]+$"
+        description: Unique value object definition identifier
+      name:
+        type: string
+        description: Value object name from ubiquitous language
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Context this value object belongs to (ID reference)
+      description:
+        type: string
+        description: What this value object represents
+      attributes:
+        type: array
+        description: Value object attributes
+        items:
+          type: object
+          required: [name, type]
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+            required:
+              type: boolean
+            validation:
+              type: string
+      validation_rules:
+        type: array
+        description: Rules enforced in constructor
+        items:
+          type: string
+      equality_criteria:
+        type: array
+        description: Which attributes determine equality
+        items:
+          type: string
+      immutability:
+        type: boolean
+        default: true
+        description: Value objects must be immutable
+
+  repository:
+    type: object
+    description: Persistence abstraction for aggregates
+    required: [id, name, aggregate_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^repo_[a-z0-9_]+$"
+        description: Unique repository identifier
+      name:
+        type: string
+        description: Repository name (e.g., CustomerRepository)
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Context this repository belongs to (ID reference)
+      aggregate_ref:
+        type: string
+        pattern: "^agg_[a-z0-9_]+$"
+        description: Aggregate this repository manages (ID reference)
+      interface_methods:
+        type: array
+        description: Repository interface methods
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            parameters:
+              type: array
+            returns:
+              type: string
+            query_type:
+              type: string
+              enum: [by_id, by_criteria, all, custom]
+      persistence_strategy:
+        type: string
+        description: How persistence is implemented (JPA, MongoDB, etc.)
+
+  domain_service:
+    type: object
+    description: Stateless operation that doesn't belong to an entity
+    required: [id, name, bounded_context_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^svc_dom_[a-z0-9_]+$"
+        description: Unique domain service identifier
+      name:
+        type: string
+        description: Service name from ubiquitous language
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Context this service belongs to (ID reference)
+      description:
+        type: string
+        description: What this service does and why it exists
+      operations:
+        type: array
+        description: Service operations
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            parameters:
+              type: array
+            returns:
+              type: string
+      stateless:
+        type: boolean
+        default: true
+        description: Domain services must be stateless
+
+  domain_event:
+    type: object
+    description: Something that happened in the domain
+    required: [id, name, aggregate_ref]
+    properties:
+      id:
+        type: string
+        pattern: "^evt_[a-z0-9_]+$"
+        description: Unique event identifier
+      name:
+        type: string
+        description: Event name in past tense (e.g., OrderPlaced)
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Context this event belongs to (ID reference)
+      aggregate_ref:
+        type: string
+        pattern: "^agg_[a-z0-9_]+$"
+        description: Aggregate that publishes this event (ID reference)
+      description:
+        type: string
+        description: What happened and why it matters
+      data_carried:
+        type: array
+        description: Data included in the event
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            type:
+              type: string
+            description:
+              type: string
+      immutable:
+        type: boolean
+        default: true
+        description: Events are immutable facts
+
+  application_service:
+    type: object
+    description: |
+      A stateless service that orchestrates use case execution by coordinating domain objects,
+      managing transactions, and controlling application workflow. Application Services sit in
+      the Application Layer, above the Domain Layer, and implement both command and query
+      operations. They contain NO business logic - only coordination logic.
+    required:
+      - id
+      - name
+      - bounded_context_ref
+      - implements_commands
+      - implements_queries
+    properties:
+      id:
+        type: string
+        pattern: "^svc_app_[a-z0-9_]+$"
+        description: Unique application service identifier (e.g., svc_app_user_management)
+        examples:
+          - "svc_app_user_management"
+          - "svc_app_order_processing"
+          - "svc_app_servicing_profile"
+
+      name:
+        type: string
+        pattern: "^[A-Z][a-zA-Z]+ApplicationService$"
+        description: Application service name following naming convention (e.g., UserApplicationService)
+        examples:
+          - "UserApplicationService"
+          - "OrderApplicationService"
+          - "ServicingProfileApplicationService"
+
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Reference to BoundedContext this service belongs to (ID reference to strategic schema)
+
+      description:
+        type: string
+        description: What use cases this application service orchestrates
+
+      implements_commands:
+        type: array
+        description: Command interface(s) this service implements (ID references)
+        items:
+          type: string
+          pattern: "^cmd_[a-z0-9_]+$"
+        minItems: 0
+
+      implements_queries:
+        type: array
+        description: Query interface(s) this service implements (ID references)
+        items:
+          type: string
+          pattern: "^qry_[a-z0-9_]+$"
+        minItems: 0
+
+      operations:
+        type: array
+        description: Use case operations provided by this service
+        items:
+          type: object
+          required:
+            - name
+            - type
+          properties:
+            name:
+              type: string
+              pattern: "^[a-z][a-zA-Z]+$"
+              description: Operation method name (e.g., createUser, placeOrder)
+
+            type:
+              type: string
+              enum:
+                - command
+                - query
+              description: Whether this operation modifies state (command) or retrieves data (query)
+
+            description:
+              type: string
+              description: What this operation does
+
+            parameters:
+              type: array
+              description: Command or query parameters
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  required:
+                    type: boolean
+
+            returns:
+              type: string
+              description: Return type (domain ID for creates, void for state changes, DTO for queries)
+
+            transaction_boundary:
+              type: object
+              description: Transaction scope for this operation
+              properties:
+                is_transactional:
+                  type: boolean
+                  description: True for commands, false for queries
+                  default: true
+
+                modifies_aggregates:
+                  type: array
+                  description: Aggregates modified by this operation (should be 0-1 for commands)
+                  items:
+                    type: string
+                    pattern: "^agg_[a-z0-9_]+$"
+                  maxItems: 1
+
+                consistency_type:
+                  type: string
+                  enum:
+                    - transactional
+                    - eventual
+                  description: Immediate (transactional) or deferred (eventual) consistency
+
+            workflow:
+              type: object
+              description: Orchestration workflow steps
+              properties:
+                validates_input:
+                  type: boolean
+                  description: Performs input/format validation
+                  default: true
+
+                loads_aggregates:
+                  type: array
+                  description: Aggregates loaded from repositories
+                  items:
+                    type: string
+                    pattern: "^agg_[a-z0-9_]+$"
+
+                invokes_domain_operations:
+                  type: array
+                  description: Domain operations invoked on aggregates
+                  items:
+                    type: string
+
+                invokes_domain_services:
+                  type: array
+                  description: Domain services invoked
+                  items:
+                    type: string
+                    pattern: "^svc_dom_[a-z0-9_]+$"
+
+                persists_aggregates:
+                  type: boolean
+                  description: Saves aggregates back to repository
+                  default: true
+
+                publishes_events:
+                  type: array
+                  description: Domain events published after successful execution
+                  items:
+                    type: string
+                    pattern: "^evt_[a-z0-9_]+$"
+
+                returns_dto:
+                  type: string
+                  description: DTO returned for queries
+
+      dependencies:
+        type: object
+        description: Infrastructure and domain dependencies
+        properties:
+          repositories:
+            type: array
+            description: Repositories used by this service (ID references)
+            items:
+              type: string
+              pattern: "^repo_[a-z0-9_]+$"
+
+          domain_services:
+            type: array
+            description: Domain services used (ID references)
+            items:
+              type: string
+              pattern: "^svc_dom_[a-z0-9_]+$"
+
+          event_publishers:
+            type: array
+            description: Event publishing mechanisms
+            items:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - in_memory_bus
+                    - outbox_pattern
+                    - message_queue
+                description:
+                  type: string
+
+      characteristics:
+        type: object
+        description: Defining characteristics of application services
+        properties:
+          stateless:
+            type: boolean
+            description: Application services must be stateless
+            const: true
+
+          contains_business_logic:
+            type: boolean
+            description: Application services must NOT contain business logic
+            const: false
+
+          manages_transactions:
+            type: boolean
+            description: Application services manage transaction boundaries
+            const: true
+
+          coordinates_aggregates:
+            type: boolean
+            description: Application services coordinate aggregate interactions
+            const: true
+
+          publishes_events:
+            type: boolean
+            description: Application services publish domain events
+            default: true
+
+          performs_authorization:
+            type: boolean
+            description: Application services may perform authorization checks
+            default: true
+
+      layer:
+        type: string
+        description: Architectural layer
+        const: "application"
+
+      implementation_notes:
+        type: string
+        description: Implementation details specific to this service
+
+  command_interface:
+    type: object
+    description: |
+      Command interface containing command definitions as nested records. Commands represent
+      user intent to perform state-changing operations. Following the Knight pattern, commands
+      are defined as record types nested inside an interface contract in the API layer.
+    required:
+      - id
+      - name
+      - bounded_context_ref
+      - command_records
+    properties:
+      id:
+        type: string
+        pattern: "^cmd_[a-z0-9_]+$"
+        description: Unique command interface identifier (e.g., cmd_user_commands)
+        examples:
+          - "cmd_user_commands"
+          - "cmd_order_commands"
+          - "cmd_servicing_profile_commands"
+
+      name:
+        type: string
+        pattern: "^[A-Z][a-zA-Z]+Commands$"
+        description: Command interface name (e.g., UserCommands, OrderCommands)
+        examples:
+          - "UserCommands"
+          - "OrderCommands"
+          - "ServicingProfileCommands"
+
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Reference to BoundedContext (ID reference)
+
+      aggregate_ref:
+        type: string
+        pattern: "^agg_[a-z0-9_]+$"
+        description: Primary aggregate this command interface operates on
+
+      description:
+        type: string
+        description: What operations this command interface provides
+
+      command_records:
+        type: array
+        description: Nested command record definitions
+        items:
+          type: object
+          required:
+            - record_name
+            - intent
+            - parameters
+          properties:
+            record_name:
+              type: string
+              pattern: "^[A-Z][a-zA-Z]+Cmd$"
+              description: Command record name (e.g., CreateUserCmd, PlaceOrderCmd)
+              examples:
+                - "CreateUserCmd"
+                - "ActivateUserCmd"
+                - "PlaceOrderCmd"
+                - "EnrollServiceCmd"
+
+            intent:
+              type: string
+              pattern: "^[a-z][a-zA-Z]+$"
+              description: Imperative verb describing intent (create, activate, place, enroll)
+              examples:
+                - "createUser"
+                - "activateUser"
+                - "placeOrder"
+                - "enrollService"
+
+            description:
+              type: string
+              description: What this command does and why
+
+            parameters:
+              type: array
+              description: Command parameters (all required for command execution)
+              items:
+                type: object
+                required:
+                  - name
+                  - type
+                properties:
+                  name:
+                    type: string
+                    description: Parameter name
+
+                  type:
+                    type: string
+                    description: Parameter type (String, primitive, or value object)
+
+                  value_object_ref:
+                    type: string
+                    pattern: "^vo_[a-z0-9_]+$"
+                    description: Reference to SharedKernel value object if applicable
+
+                  required:
+                    type: boolean
+                    description: Whether parameter is required
+                    default: true
+
+                  description:
+                    type: string
+
+            returns:
+              type: string
+              enum:
+                - void
+                - domain_id
+                - acknowledgment
+                - result_status
+              description: |
+                What the command returns:
+                - void: State transitions (activate, deactivate)
+                - domain_id: Creation commands (return UserId, OrderId, etc.)
+                - acknowledgment: Async command accepted
+                - result_status: Success/failure indicator
+
+            return_type_ref:
+              type: string
+              pattern: "^vo_[a-z0-9_]+$"
+              description: Reference to value object for domain_id returns
+
+            modifies_aggregate:
+              type: string
+              pattern: "^agg_[a-z0-9_]+$"
+              description: Aggregate modified by this command (should be exactly one)
+
+            publishes_events:
+              type: array
+              description: Domain events published after successful execution
+              items:
+                type: string
+                pattern: "^evt_[a-z0-9_]+$"
+
+            audit_fields:
+              type: array
+              description: Fields for audit trail (e.g., reason, initiatedBy, approvedBy)
+              items:
+                type: string
+
+      immutability:
+        type: boolean
+        description: Command records must be immutable
+        const: true
+
+      layer:
+        type: string
+        description: Architectural layer where commands are defined
+        const: "api"
+
+  query_interface:
+    type: object
+    description: |
+      Query interface containing query definitions and result DTOs as nested records. Queries
+      represent requests to retrieve information without side effects. Following the Knight
+      pattern, queries are defined as interface methods with nested result record types.
+    required:
+      - id
+      - name
+      - bounded_context_ref
+      - query_methods
+    properties:
+      id:
+        type: string
+        pattern: "^qry_[a-z0-9_]+$"
+        description: Unique query interface identifier (e.g., qry_user_queries)
+        examples:
+          - "qry_user_queries"
+          - "qry_order_queries"
+          - "qry_servicing_profile_queries"
+
+      name:
+        type: string
+        pattern: "^[A-Z][a-zA-Z]+Queries$"
+        description: Query interface name (e.g., UserQueries, OrderQueries)
+        examples:
+          - "UserQueries"
+          - "OrderQueries"
+          - "ServicingProfileQueries"
+
+      bounded_context_ref:
+        type: string
+        pattern: "^bc_[a-z0-9_]+$"
+        description: Reference to BoundedContext (ID reference)
+
+      aggregate_ref:
+        type: string
+        pattern: "^agg_[a-z0-9_]+$"
+        description: Primary aggregate this query interface reads from
+
+      description:
+        type: string
+        description: What data this query interface provides access to
+
+      query_methods:
+        type: array
+        description: Query method definitions
+        items:
+          type: object
+          required:
+            - method_name
+            - result_record_name
+          properties:
+            method_name:
+              type: string
+              pattern: "^(get|list|find|search)[A-Z][a-zA-Z]+$"
+              description: Query method name (e.g., getUserSummary, listOrders, findByStatus)
+              examples:
+                - "getUserSummary"
+                - "getOrderDetails"
+                - "listOrders"
+                - "findProductsByCategory"
+
+            description:
+              type: string
+              description: What data this query retrieves
+
+            parameters:
+              type: array
+              description: Query parameters (typically domain identifiers or filter criteria)
+              items:
+                type: object
+                required:
+                  - name
+                  - type
+                properties:
+                  name:
+                    type: string
+
+                  type:
+                    type: string
+
+                  value_object_ref:
+                    type: string
+                    pattern: "^vo_[a-z0-9_]+$"
+
+                  required:
+                    type: boolean
+                    default: true
+
+                  description:
+                    type: string
+
+            result_record_name:
+              type: string
+              pattern: "^[A-Z][a-zA-Z]+Summary$"
+              description: Name of result DTO record (e.g., UserSummary, OrderSummary)
+              examples:
+                - "UserSummary"
+                - "OrderDetailDTO"
+                - "ServicingProfileSummary"
+
+            result_structure:
+              type: object
+              description: Structure of the result DTO
+              properties:
+                fields:
+                  type: array
+                  description: Fields in the result DTO
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - type
+                    properties:
+                      name:
+                        type: string
+
+                      type:
+                        type: string
+                        description: Field type (String for IDs/enums, primitives for counts)
+
+                      serialization:
+                        type: string
+                        description: How complex types are serialized
+                        examples:
+                          - "UserId serialized to String"
+                          - "Status enum serialized to String"
+                          - "URN format for compound IDs"
+
+                      description:
+                        type: string
+
+                aggregate_counts:
+                  type: array
+                  description: Count fields for related entities (not full collections)
+                  items:
+                    type: object
+                    properties:
+                      field_name:
+                        type: string
+                      counted_entity:
+                        type: string
+
+            bypasses_domain_model:
+              type: boolean
+              description: Whether query reads directly from read model (CQRS pattern)
+              default: false
+
+            optimizations:
+              type: object
+              description: Query optimization strategies
+              properties:
+                denormalized:
+                  type: boolean
+                  description: Uses denormalized read model
+                  default: false
+
+                cached:
+                  type: boolean
+                  description: Results are cached
+                  default: false
+
+                indexed:
+                  type: boolean
+                  description: Database uses indexes for this query
+                  default: true
+
+      result_characteristics:
+        type: object
+        description: Characteristics of query results
+        properties:
+          immutable:
+            type: boolean
+            description: Result DTOs are immutable records
+            const: true
+
+          flat_structure:
+            type: boolean
+            description: DTOs use flat structure (no nested objects per Knight pattern)
+            default: true
+
+          string_serialization:
+            type: boolean
+            description: Complex types serialized to strings
+            default: true
+
+      layer:
+        type: string
+        description: Architectural layer where queries are defined
+        const: "api"
+
+      no_side_effects:
+        type: boolean
+        description: Queries must have no side effects
+        const: true
+
+validation_rules:
+  - rule: "aggregate_root_is_entity"
+    description: "Every aggregate must have exactly one root, which must be an entity"
+    validation: "aggregate.root_ref must reference an entity with is_aggregate_root=true"
+
+  - rule: "repository_per_aggregate_root"
+    description: "Repository must reference an aggregate, not individual entities"
+    validation: "repository.aggregate_ref must be set"
+
+  - rule: "value_objects_immutable"
+    description: "Value objects must be immutable"
+    validation: "value_object.immutability must be true"
+
+  - rule: "domain_service_stateless"
+    description: "Domain services must be stateless"
+    validation: "domain_service.stateless must be true"
+
+  - rule: "events_immutable"
+    description: "Domain events must be immutable"
+    validation: "domain_event.immutable must be true"
+
+  - rule: "application_service_stateless"
+    description: "Application services must be stateless"
+    validation: "application_service.characteristics.stateless must be true"
+
+  - rule: "one_aggregate_per_transaction"
+    description: "Command must modify at most one aggregate per transaction (Vaughn Vernon rule)"
+    validation: "For each operation where type='command', transaction_boundary.modifies_aggregates must have maxItems: 1"
+
+  - rule: "queries_no_side_effects"
+    description: "Queries must have no side effects"
+    validation: "query_interface.no_side_effects must be true"
+
+best_practices:
+  tactical:
+    - "Design small aggregates (Vaughn Vernon's rule)"
+    - "Protect true invariants in consistency boundaries"
+    - "Reference other aggregates by identity only"
+    - "Use eventual consistency outside aggregate boundaries"
+    - "Make value objects for domain concepts, not primitives"
+    - "Publish domain events for cross-aggregate communication"
+    - "Keep application services thin - no business logic, only coordination"
+    - "One aggregate per transaction - use eventual consistency for cross-aggregate operations"
+    - "Application service method = one use case"
+    - "Validate input format at application layer, business rules at domain layer"
+    - "Publish domain events AFTER successful transaction commit"
+    - "Application service should implement both Commands and Queries interfaces (Knight pattern)"
+    - "Generate domain IDs in application service, not database"
+    - "Repository interfaces defined in application layer, implemented in infrastructure"
+    - "Model commands as nested records inside command interfaces (Knight pattern)"
+    - "Command records must be immutable"
+    - "Use imperative verbs for command names (Create, Activate, Place, Enroll)"
+    - "Creation commands return domain IDs, state transition commands return void"
+    - "Include audit fields where appropriate (reason, initiatedBy, approvedBy)"
+    - "Defer validation to application/domain layer - commands are just data"
+    - "Model queries as interface methods with nested result records (Knight pattern)"
+    - "Result DTOs must be immutable records"
+    - "Use query verbs for method names (get, list, find, search)"
+    - "Serialize all complex types to strings in DTOs (IDs, enums, URNs)"
+    - "Return aggregate counts, not full collections"
+    - "Queries should be read-only with no side effects"
+    - "Use flat DTO structure (no nested objects per Knight pattern)"
+    - "Separate command handlers from query handlers for independent optimization"
+    - "Commands modify state and return void/id/acknowledgment"
+    - "Queries return data and have no side effects"
+    - "Use CQRS selectively where read/write models differ significantly"
+    - "Not every system needs CQRS - avoid premature complexity"

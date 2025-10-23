@@ -1,0 +1,1038 @@
+---
+version: 0.2.0
+status: draft
+last_updated: 2025-10-09
+---
+
+# IoT Sensor Data Processing System
+# Demonstrates: Streaming at scale, watermarking, windowed aggregations, late arrival handling, anomaly detection
+
+system:
+  id: sys-iot-sensor-platform
+  name: IoT Sensor Data Platform
+  description: Scalable IoT data ingestion and processing for millions of connected devices
+  owners:
+    - team: iot-platform
+      contact: iot-platform@smartcity.com
+  domains:
+    - dom-sensor-ingestion
+    - dom-time-series-analytics
+    - dom-anomaly-detection
+  tags: [iot, streaming, time-series, high-throughput]
+
+domains:
+  - id: dom-sensor-ingestion
+    name: Sensor Ingestion Domain
+    description: High-throughput ingestion of sensor telemetry from millions of devices
+    owners:
+      - team: iot-engineering
+        contact: iot-eng@smartcity.com
+    pipelines:
+      - pip-ingest-sensors
+      - pip-process-telemetry
+
+  - id: dom-time-series-analytics
+    name: Time Series Analytics Domain
+    description: Windowed aggregations and time-series analysis
+    owners:
+      - team: analytics-engineering
+        contact: analytics-eng@smartcity.com
+    pipelines:
+      - pip-aggregate-metrics
+
+  - id: dom-anomaly-detection
+    name: Anomaly Detection Domain
+    description: Real-time anomaly detection for sensor data
+    owners:
+      - team: ml-engineering
+        contact: ml-eng@smartcity.com
+    pipelines:
+      - pip-detect-anomalies
+
+pipelines:
+  - id: pip-ingest-sensors
+    name: Ingest Sensor Data Pipeline
+    description: High-throughput ingestion with deduplication and watermarking
+    mode: streaming
+    schedule:
+      id: sch-sensor-continuous
+      type: continuous
+      triggers:
+        - type: message
+          source: iot-hub
+    traits: [high-throughput, at-least-once, watermarked]
+    tags: [ingestion, raw-data]
+    stages:
+      - id: stg-mqtt-ingest
+        name: MQTT Ingestion
+        description: Ingest sensor readings from IoT Hub via MQTT
+        uses_patterns:
+          - pat-event-streaming
+          - pat-schema-registry
+        inputs: []
+        outputs:
+          - ds-sensor-readings-raw
+        transforms:
+          - id: trf-mqtt-consume
+            type: custom
+            description: Consume messages from MQTT broker
+            config:
+              protocol: mqtt
+              broker: iot-hub.smartcity.com
+              topics: [sensors/+/telemetry]
+              qos: 1
+              schema_registry: confluent-schema-registry
+
+      - id: stg-deduplication
+        name: Deduplication
+        description: Deduplicate sensor readings based on device_id and event_time
+        uses_patterns:
+          - pat-deduplication
+          - pat-watermarking
+        inputs:
+          - ds-sensor-readings-raw
+        outputs:
+          - ds-sensor-readings-deduped
+        transforms:
+          - id: trf-dedupe-readings
+            type: deduplication
+            description: Remove duplicate readings within watermark window
+            config:
+              dedup_key: [device_id, event_time]
+              watermark_column: event_time
+              watermark_delay: 1h
+              keep: first
+
+      - id: stg-enrich-metadata
+        name: Enrich Device Metadata
+        description: Join sensor readings with device metadata
+        uses_patterns:
+          - pat-stream-enrichment
+        inputs:
+          - ds-sensor-readings-deduped
+          - ds-device-metadata
+        outputs:
+          - ds-sensor-readings-enriched
+        depends_on:
+          - stg-deduplication
+        transforms:
+          - id: trf-join-device-meta
+            type: join
+            description: Enrich with device location, type, and configuration
+            config:
+              join_type: inner
+              left_key: device_id
+              right_key: device_id
+              right_table: ds-device-metadata
+
+  - id: pip-process-telemetry
+    name: Process Telemetry Pipeline
+    description: Process and validate sensor telemetry
+    mode: streaming
+    schedule:
+      id: sch-telemetry-continuous
+      type: continuous
+    stages:
+      - id: stg-validate-readings
+        name: Validate Readings
+        description: Validate sensor readings against expected ranges
+        uses_patterns:
+          - pat-validation
+        inputs:
+          - ds-sensor-readings-enriched
+        outputs:
+          - ds-sensor-readings-validated
+        transforms:
+          - id: trf-range-validation
+            type: filter
+            description: Filter readings outside valid ranges
+            config:
+              temperature_range: [-40, 85]
+              humidity_range: [0, 100]
+              pressure_range: [300, 1100]
+              battery_range: [0, 100]
+
+          - id: trf-quality-score
+            type: custom
+            description: Calculate data quality score
+            config:
+              factors: [signal_strength, battery_level, sensor_health]
+
+      - id: stg-partition-by-type
+        name: Partition by Sensor Type
+        description: Partition readings by sensor type for optimized processing
+        uses_patterns:
+          - pat-partitioning
+        inputs:
+          - ds-sensor-readings-validated
+        outputs:
+          - ds-temperature-readings
+          - ds-humidity-readings
+          - ds-pressure-readings
+        depends_on:
+          - stg-validate-readings
+        transforms:
+          - id: trf-partition-readings
+            type: custom
+            description: Route readings to type-specific tables
+            config:
+              partition_key: sensor_type
+              partition_values:
+                temperature: ds-temperature-readings
+                humidity: ds-humidity-readings
+                pressure: ds-pressure-readings
+
+  - id: pip-aggregate-metrics
+    name: Aggregate Metrics Pipeline
+    description: Windowed aggregations for time-series analytics
+    mode: streaming
+    schedule:
+      id: sch-aggregate-continuous
+      type: continuous
+    traits: [windowed, watermarked, late-arrival-handling]
+    stages:
+      - id: stg-tumbling-1min
+        name: 1-Minute Tumbling Window
+        description: Aggregate sensor readings in 1-minute tumbling windows
+        uses_patterns:
+          - pat-tumbling-window
+          - pat-watermarking
+        inputs:
+          - ds-sensor-readings-validated
+        outputs:
+          - ds-metrics-1min
+        transforms:
+          - id: trf-window-1min
+            type: window
+            description: 1-minute tumbling window with late arrival handling
+            config:
+              window_type: tumbling
+              window_size: 1m
+              watermark_delay: 1m
+              allowed_lateness: 5m
+
+          - id: trf-agg-1min
+            type: aggregate
+            description: Calculate min, max, avg per window
+            config:
+              group_by: [device_id, sensor_type, window_start]
+              aggregations:
+                reading_count: count
+                avg_value: avg
+                min_value: min
+                max_value: max
+                stddev_value: stddev
+
+      - id: stg-sliding-5min
+        name: 5-Minute Sliding Window
+        description: Aggregate sensor readings in 5-minute sliding windows
+        uses_patterns:
+          - pat-sliding-window
+          - pat-watermarking
+        inputs:
+          - ds-sensor-readings-validated
+        outputs:
+          - ds-metrics-5min
+        transforms:
+          - id: trf-window-5min
+            type: window
+            description: 5-minute sliding window with 1-minute slide
+            config:
+              window_type: sliding
+              window_size: 5m
+              slide_interval: 1m
+              watermark_delay: 2m
+              allowed_lateness: 10m
+
+          - id: trf-agg-5min
+            type: aggregate
+            description: Calculate rolling statistics
+            config:
+              group_by: [device_id, sensor_type, window_start]
+              aggregations:
+                reading_count: count
+                avg_value: avg
+                min_value: min
+                max_value: max
+                percentile_95: percentile(0.95)
+                percentile_99: percentile(0.99)
+
+      - id: stg-session-window
+        name: Session Window Aggregation
+        description: Session-based aggregation for device activity
+        uses_patterns:
+          - pat-session-window
+        inputs:
+          - ds-sensor-readings-validated
+        outputs:
+          - ds-device-sessions
+        transforms:
+          - id: trf-session-window
+            type: window
+            description: Session window with 30-minute gap
+            config:
+              window_type: session
+              session_gap: 30m
+              watermark_delay: 30m
+
+          - id: trf-session-stats
+            type: aggregate
+            description: Calculate per-session statistics
+            config:
+              group_by: [device_id, session_start]
+              aggregations:
+                session_duration: max(event_time) - min(event_time)
+                event_count: count
+                avg_battery_drain: avg(battery_level)
+
+  - id: pip-detect-anomalies
+    name: Detect Anomalies Pipeline
+    description: Real-time anomaly detection for sensor data
+    mode: streaming
+    schedule:
+      id: sch-anomaly-continuous
+      type: continuous
+    traits: [ml-inference, stateful]
+    stages:
+      - id: stg-statistical-anomaly
+        name: Statistical Anomaly Detection
+        description: Detect anomalies using statistical methods
+        uses_patterns:
+          - pat-anomaly-detection
+        inputs:
+          - ds-metrics-5min
+        outputs:
+          - ds-statistical-anomalies
+        transforms:
+          - id: trf-zscore-anomaly
+            type: custom
+            description: Z-score based anomaly detection
+            config:
+              method: zscore
+              threshold: 3.0
+              window_size: 1h
+              metrics: [avg_value, stddev_value]
+
+          - id: trf-iqr-anomaly
+            type: custom
+            description: IQR-based outlier detection
+            config:
+              method: iqr
+              multiplier: 1.5
+              window_size: 24h
+
+      - id: stg-ml-anomaly
+        name: ML-Based Anomaly Detection
+        description: Detect complex anomalies using ML models
+        uses_patterns:
+          - pat-ml-inference
+          - pat-feature-engineering
+        inputs:
+          - ds-sensor-readings-validated
+          - ds-metrics-5min
+        outputs:
+          - ds-ml-anomalies
+        depends_on:
+          - stg-statistical-anomaly
+        transforms:
+          - id: trf-feature-extraction
+            type: custom
+            description: Extract features for anomaly detection
+            config:
+              features:
+                - current_value
+                - rolling_mean_1h
+                - rolling_stddev_1h
+                - rate_of_change
+                - time_since_last_reading
+
+          - id: trf-ml-inference
+            type: custom
+            description: Run isolation forest model
+            config:
+              model_name: isolation-forest-v2
+              model_version: 2.1.0
+              contamination: 0.01
+              threshold: 0.7
+
+      - id: stg-consolidate-anomalies
+        name: Consolidate Anomalies
+        description: Combine and prioritize anomalies from different sources
+        uses_patterns:
+          - pat-merge-upsert
+        inputs:
+          - ds-statistical-anomalies
+          - ds-ml-anomalies
+        outputs:
+          - ds-anomalies-consolidated
+        depends_on:
+          - stg-statistical-anomaly
+          - stg-ml-anomaly
+        transforms:
+          - id: trf-merge-anomalies
+            type: custom
+            description: Merge anomalies and assign severity
+            config:
+              merge_key: [device_id, event_time]
+              severity_rules:
+                - if: statistical AND ml
+                  severity: critical
+                - if: statistical OR ml
+                  severity: high
+
+datasets:
+  - id: ds-sensor-readings-raw
+    name: Sensor Readings Raw Stream
+    description: Raw sensor telemetry from IoT devices
+    type: stream
+    format: avro
+    location: kafka://sensor-readings-raw
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: event_time
+          type: timestamp
+          nullable: false
+          description: Event time from device
+        - name: ingestion_time
+          type: timestamp
+          nullable: false
+          description: Ingestion time at platform
+        - name: sensor_type
+          type: string
+          nullable: false
+        - name: value
+          type: double
+          nullable: false
+        - name: unit
+          type: string
+          nullable: false
+        - name: battery_level
+          type: integer
+          nullable: true
+        - name: signal_strength
+          type: integer
+          nullable: true
+    classification: internal
+    contains_pii: false
+    tags: [raw, high-volume, real-time]
+
+  - id: ds-device-metadata
+    name: Device Metadata
+    description: Device registration and configuration metadata
+    type: table
+    format: delta
+    location: s3://iot-lake/metadata/devices/
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: device_type
+          type: string
+          nullable: false
+        - name: manufacturer
+          type: string
+          nullable: false
+        - name: firmware_version
+          type: string
+          nullable: false
+        - name: location_lat
+          type: double
+          nullable: true
+        - name: location_lon
+          type: double
+          nullable: true
+        - name: location_name
+          type: string
+          nullable: true
+        - name: installation_date
+          type: date
+          nullable: false
+        - name: last_maintenance_date
+          type: date
+          nullable: true
+    classification: internal
+    contains_pii: false
+    tags: [reference-data, metadata]
+
+  - id: ds-sensor-readings-deduped
+    name: Sensor Readings Deduplicated
+    description: Deduplicated sensor readings with watermarking
+    type: stream
+    format: avro
+    location: kafka://sensor-readings-deduped
+    classification: internal
+    contains_pii: false
+    tags: [deduped, watermarked]
+
+  - id: ds-sensor-readings-enriched
+    name: Sensor Readings Enriched
+    description: Sensor readings enriched with device metadata
+    type: stream
+    format: avro
+    location: kafka://sensor-readings-enriched
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: event_time
+          type: timestamp
+          nullable: false
+        - name: sensor_type
+          type: string
+          nullable: false
+        - name: value
+          type: double
+          nullable: false
+        - name: unit
+          type: string
+          nullable: false
+        - name: device_type
+          type: string
+          nullable: false
+        - name: location_name
+          type: string
+          nullable: true
+        - name: location_lat
+          type: double
+          nullable: true
+        - name: location_lon
+          type: double
+          nullable: true
+    classification: internal
+    contains_pii: false
+    tags: [enriched, streaming]
+
+  - id: ds-sensor-readings-validated
+    name: Sensor Readings Validated
+    description: Validated and quality-scored sensor readings
+    type: table
+    format: iceberg
+    location: s3://iot-lake/validated/sensor-readings/
+    partitioning:
+      columns: [event_date, sensor_type]
+      strategy: daily
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: event_time
+          type: timestamp
+          nullable: false
+        - name: sensor_type
+          type: string
+          nullable: false
+        - name: value
+          type: double
+          nullable: false
+        - name: unit
+          type: string
+          nullable: false
+        - name: quality_score
+          type: double
+          nullable: false
+        - name: location_name
+          type: string
+          nullable: true
+    classification: internal
+    contains_pii: false
+    tags: [validated, quality-scored]
+
+  - id: ds-temperature-readings
+    name: Temperature Readings
+    description: Temperature sensor readings
+    type: table
+    format: iceberg
+    location: s3://iot-lake/partitioned/temperature/
+    partitioning:
+      columns: [event_date, location_name]
+      strategy: daily
+    classification: internal
+    contains_pii: false
+    tags: [temperature, time-series]
+
+  - id: ds-humidity-readings
+    name: Humidity Readings
+    description: Humidity sensor readings
+    type: table
+    format: iceberg
+    location: s3://iot-lake/partitioned/humidity/
+    partitioning:
+      columns: [event_date, location_name]
+      strategy: daily
+    classification: internal
+    contains_pii: false
+    tags: [humidity, time-series]
+
+  - id: ds-pressure-readings
+    name: Pressure Readings
+    description: Atmospheric pressure sensor readings
+    type: table
+    format: iceberg
+    location: s3://iot-lake/partitioned/pressure/
+    partitioning:
+      columns: [event_date, location_name]
+      strategy: daily
+    classification: internal
+    contains_pii: false
+    tags: [pressure, time-series]
+
+  - id: ds-metrics-1min
+    name: 1-Minute Aggregated Metrics
+    description: Sensor metrics aggregated in 1-minute tumbling windows
+    type: table
+    format: iceberg
+    location: s3://iot-lake/metrics/1min/
+    partitioning:
+      columns: [window_date]
+      strategy: daily
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: sensor_type
+          type: string
+          nullable: false
+        - name: window_start
+          type: timestamp
+          nullable: false
+        - name: window_end
+          type: timestamp
+          nullable: false
+        - name: reading_count
+          type: bigint
+          nullable: false
+        - name: avg_value
+          type: double
+          nullable: false
+        - name: min_value
+          type: double
+          nullable: false
+        - name: max_value
+          type: double
+          nullable: false
+        - name: stddev_value
+          type: double
+          nullable: true
+    classification: internal
+    contains_pii: false
+    tags: [aggregated, time-series, 1min]
+
+  - id: ds-metrics-5min
+    name: 5-Minute Aggregated Metrics
+    description: Sensor metrics aggregated in 5-minute sliding windows
+    type: table
+    format: iceberg
+    location: s3://iot-lake/metrics/5min/
+    partitioning:
+      columns: [window_date]
+      strategy: daily
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: sensor_type
+          type: string
+          nullable: false
+        - name: window_start
+          type: timestamp
+          nullable: false
+        - name: window_end
+          type: timestamp
+          nullable: false
+        - name: reading_count
+          type: bigint
+          nullable: false
+        - name: avg_value
+          type: double
+          nullable: false
+        - name: min_value
+          type: double
+          nullable: false
+        - name: max_value
+          type: double
+          nullable: false
+        - name: percentile_95
+          type: double
+          nullable: false
+        - name: percentile_99
+          type: double
+          nullable: false
+    classification: internal
+    contains_pii: false
+    tags: [aggregated, time-series, 5min]
+
+  - id: ds-device-sessions
+    name: Device Sessions
+    description: Device activity sessions based on session windows
+    type: table
+    format: iceberg
+    location: s3://iot-lake/sessions/
+    partitioning:
+      columns: [session_date]
+      strategy: daily
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: session_start
+          type: timestamp
+          nullable: false
+        - name: session_end
+          type: timestamp
+          nullable: false
+        - name: session_duration
+          type: bigint
+          nullable: false
+          description: Duration in seconds
+        - name: event_count
+          type: bigint
+          nullable: false
+        - name: avg_battery_drain
+          type: double
+          nullable: true
+    classification: internal
+    contains_pii: false
+    tags: [sessions, analytics]
+
+  - id: ds-statistical-anomalies
+    name: Statistical Anomalies
+    description: Anomalies detected using statistical methods
+    type: stream
+    format: avro
+    location: kafka://statistical-anomalies
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: event_time
+          type: timestamp
+          nullable: false
+        - name: sensor_type
+          type: string
+          nullable: false
+        - name: value
+          type: double
+          nullable: false
+        - name: anomaly_score
+          type: double
+          nullable: false
+        - name: detection_method
+          type: string
+          nullable: false
+    classification: internal
+    contains_pii: false
+    tags: [anomalies, statistical]
+
+  - id: ds-ml-anomalies
+    name: ML Anomalies
+    description: Anomalies detected using machine learning models
+    type: stream
+    format: avro
+    location: kafka://ml-anomalies
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: event_time
+          type: timestamp
+          nullable: false
+        - name: sensor_type
+          type: string
+          nullable: false
+        - name: value
+          type: double
+          nullable: false
+        - name: anomaly_score
+          type: double
+          nullable: false
+        - name: model_version
+          type: string
+          nullable: false
+    classification: internal
+    contains_pii: false
+    tags: [anomalies, ml]
+
+  - id: ds-anomalies-consolidated
+    name: Consolidated Anomalies
+    description: All anomalies consolidated and prioritized
+    type: table
+    format: iceberg
+    location: s3://iot-lake/anomalies/consolidated/
+    partitioning:
+      columns: [detection_date]
+      strategy: daily
+    schema:
+      fields:
+        - name: device_id
+          type: string
+          nullable: false
+        - name: event_time
+          type: timestamp
+          nullable: false
+        - name: sensor_type
+          type: string
+          nullable: false
+        - name: value
+          type: double
+          nullable: false
+        - name: severity
+          type: string
+          nullable: false
+        - name: detection_methods
+          type: array<string>
+          nullable: false
+        - name: max_anomaly_score
+          type: double
+          nullable: false
+    classification: internal
+    contains_pii: false
+    tags: [anomalies, consolidated]
+
+contracts:
+  - id: ctr-sensor-readings-v1
+    name: Sensor Readings Contract
+    dataset: ds-sensor-readings-validated
+    version: 1.0.0
+    schema:
+      $ref: schemas/sensor-readings-v1.avsc
+    sla:
+      freshness_minutes: 5
+      completeness_percent: 99.0
+      availability_percent: 99.9
+    evolution_policy: backward-compatible
+    owners:
+      - team: iot-engineering
+        contact: iot-eng@smartcity.com
+    consumers:
+      - team: analytics-engineering
+        use_case: Time-series analytics and reporting
+      - team: ml-engineering
+        use_case: Anomaly detection and predictive maintenance
+
+  - id: ctr-metrics-5min-v1
+    name: 5-Minute Metrics Contract
+    dataset: ds-metrics-5min
+    version: 1.0.0
+    schema:
+      $ref: schemas/metrics-5min-v1.avsc
+    sla:
+      freshness_minutes: 10
+      completeness_percent: 98.0
+      availability_percent: 99.5
+    evolution_policy: forward-compatible
+    owners:
+      - team: analytics-engineering
+        contact: analytics-eng@smartcity.com
+    consumers:
+      - team: operations
+        use_case: Real-time monitoring dashboards
+      - team: ml-engineering
+        use_case: Anomaly detection models
+
+checks:
+  - id: chk-freshness-sensor-readings
+    name: Freshness Check - Sensor Readings
+    type: freshness
+    dataset: ds-sensor-readings-validated
+    threshold:
+      max_age_minutes: 5
+    severity: high
+    alert:
+      channel: slack
+      escalation: iot-engineering
+
+  - id: chk-completeness-metrics
+    name: Completeness Check - Metrics
+    type: completeness
+    dataset: ds-metrics-1min
+    assertions:
+      - field: device_id
+        not_null: true
+      - field: reading_count
+        min_value: 1
+    severity: medium
+    alert:
+      channel: slack
+      escalation: analytics-engineering
+
+  - id: chk-watermark-lag
+    name: Watermark Lag Check
+    type: custom
+    dataset: ds-sensor-readings-validated
+    threshold:
+      max_watermark_lag_minutes: 60
+    severity: high
+    alert:
+      channel: slack
+      escalation: iot-engineering
+
+  - id: chk-anomaly-rate
+    name: Anomaly Rate Check
+    type: anomaly
+    dataset: ds-anomalies-consolidated
+    threshold:
+      max_anomaly_rate_percent: 5.0
+    severity: medium
+    alert:
+      channel: slack
+      escalation: ml-engineering
+
+lineage:
+  - id: lin-raw-to-deduped
+    upstream: ds-sensor-readings-raw
+    downstream: ds-sensor-readings-deduped
+    transform: trf-dedupe-readings
+    relationship: many-to-one
+
+  - id: lin-deduped-to-enriched
+    upstream: ds-sensor-readings-deduped
+    downstream: ds-sensor-readings-enriched
+    transform: trf-join-device-meta
+    relationship: one-to-one
+
+  - id: lin-enriched-to-validated
+    upstream: ds-sensor-readings-enriched
+    downstream: ds-sensor-readings-validated
+    transform: trf-range-validation
+    relationship: one-to-one
+
+  - id: lin-validated-to-metrics-1min
+    upstream: ds-sensor-readings-validated
+    downstream: ds-metrics-1min
+    transform: trf-agg-1min
+    relationship: many-to-one
+
+  - id: lin-validated-to-metrics-5min
+    upstream: ds-sensor-readings-validated
+    downstream: ds-metrics-5min
+    transform: trf-agg-5min
+    relationship: many-to-one
+
+  - id: lin-metrics-to-statistical-anomalies
+    upstream: ds-metrics-5min
+    downstream: ds-statistical-anomalies
+    transform: trf-zscore-anomaly
+    relationship: one-to-many
+
+  - id: lin-validated-to-ml-anomalies
+    upstream: ds-sensor-readings-validated
+    downstream: ds-ml-anomalies
+    transform: trf-ml-inference
+    relationship: one-to-many
+
+  - id: lin-anomalies-to-consolidated
+    upstream: ds-statistical-anomalies
+    downstream: ds-anomalies-consolidated
+    transform: trf-merge-anomalies
+    relationship: many-to-one
+
+governance:
+  retention:
+    - dataset: ds-sensor-readings-raw
+      policy: delete-after-days
+      days: 7
+
+    - dataset: ds-sensor-readings-validated
+      policy: archive-after-years
+      years: 2
+
+    - dataset: ds-metrics-1min
+      policy: archive-after-years
+      years: 1
+
+    - dataset: ds-metrics-5min
+      policy: archive-after-years
+      years: 3
+
+    - dataset: ds-anomalies-consolidated
+      policy: archive-after-years
+      years: 5
+
+  access:
+    - dataset: ds-sensor-readings-validated
+      tier: general
+      roles: [iot-engineer, data-analyst, ml-engineer]
+
+    - dataset: ds-metrics-5min
+      tier: general
+      roles: [data-analyst, business-user, operations]
+
+    - dataset: ds-anomalies-consolidated
+      tier: restricted
+      roles: [operations-lead, ml-engineer, iot-engineer]
+
+observability:
+  metrics:
+    - name: sensor_readings_ingested_rate
+      dataset: ds-sensor-readings-raw
+      type: gauge
+      description: Rate of sensor readings ingested per second
+
+    - name: deduplication_rate
+      dataset: ds-sensor-readings-deduped
+      type: gauge
+      description: Percentage of duplicate readings removed
+
+    - name: watermark_lag_seconds
+      dataset: ds-sensor-readings-validated
+      type: gauge
+      description: Current watermark lag in seconds
+
+    - name: window_processing_latency
+      dataset: ds-metrics-1min
+      type: histogram
+      description: Latency from event time to window completion
+
+    - name: anomaly_detection_rate
+      dataset: ds-anomalies-consolidated
+      type: gauge
+      description: Rate of anomalies detected per hour
+
+  slos:
+    - name: sensor-ingestion-latency-slo
+      target: 99.0
+      unit: percent
+      window: 7d
+
+    - name: metric-freshness-slo
+      target: 95.0
+      unit: percent
+      window: 30d
+      linked_check: chk-freshness-sensor-readings
+
+    - name: anomaly-detection-latency-slo
+      target: 90.0
+      unit: percent
+      window: 7d
+
+  alerts:
+    - name: high-watermark-lag
+      condition: "watermark_lag > 60 minutes"
+      severity: high
+      channel: slack
+
+    - name: low-ingestion-rate
+      condition: "ingestion_rate < 1000/sec"
+      severity: medium
+      channel: slack
+
+    - name: high-anomaly-rate
+      condition: "anomaly_rate > 5%"
+      severity: medium
+      channel: slack
+
+    - name: window-processing-delay
+      condition: "processing_latency > 5 minutes"
+      severity: high
+      channel: pagerduty
